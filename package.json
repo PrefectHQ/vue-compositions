@@ -5,7 +5,7 @@
   "description": "A collection of reusable vue compositions",
   "main": "index.ts",
   "scripts": {
-    "test": "test"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,10 @@
   },
   "homepage": "https://github.com/PrefectHQ/vue-compositions#readme",
   "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.3",
+    "ts-jest": "^27.1.0",
+    "ts-node": "^10.4.0",
     "typescript": "^4.5.2",
     "vue": "^3.2.24"
   }
