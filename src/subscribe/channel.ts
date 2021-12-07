@@ -46,7 +46,7 @@ export default class Channel<T extends Action = Action> {
   private lastExecution: number = 0
   private subscriptions: Map<number, Subscription<T>> = new Map()
 
-  private get interval(): number {
+  public get interval(): number {
     const intervals = Array.from(this.subscriptions.values()).map(
       (subscription) => subscription.options.interval ?? Infinity
     )

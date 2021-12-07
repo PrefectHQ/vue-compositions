@@ -14,7 +14,7 @@ export default class Subscription<T extends Action> {
   public readonly id: number
   public readonly options: SubscriptionOptions
 
-  private readonly channel: Channel<T>
+  public readonly channel: Channel<T>
 
   public get error(): Ref<unknown> {
     return this.channel.error
