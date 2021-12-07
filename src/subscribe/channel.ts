@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Ref, ref, unref } from 'vue'
-import { Manager } from './manager'
+import Manager from './manager'
 import Subscription from './subscription'
 import {
   Action,
@@ -86,7 +86,6 @@ export default class Channel<T extends Action = Action> {
   }
 
   public async execute() {
-    console.log(JSON.stringify(this.args))
     const args = (unref(this.args) as Parameters<T>).map(unref)
 
     this.loading.value = true
@@ -96,7 +95,6 @@ export default class Channel<T extends Action = Action> {
     this.setInterval()
 
     try {
-      console.log('execute')
       this.result.value = await this.action(...args)
       this.errored.value = false
       this.error.value = null

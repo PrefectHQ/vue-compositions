@@ -2,7 +2,7 @@
 import { onUnmounted, shallowReactive, ToRefs, toRefs, watch } from 'vue'
 import { Action, ActionArguments, SubscriptionOptions } from './types'
 import Subscription from './subscription'
-import { Manager } from './manager'
+import Manager from './manager'
 
 const defaultManager = new Manager()
 

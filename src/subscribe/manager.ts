@@ -8,7 +8,7 @@ import {
 import Channel from './channel'
 import Subscription from './subscription'
 
-export class Manager {
+export default class Manager {
   private channels: Map<ChannelSignature, Channel> = new Map()
 
   public subscribe<T extends Action>(
