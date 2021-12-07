@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "removeComments": false,
+      "sourceMap": true,
+      "target": "esnext",
+      "module": "esnext",
+      "moduleResolution": "node",
+    },
+    "include": [
+      "src/**/*"
+    ]
+  }

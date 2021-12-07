@@ -1,0 +1,27 @@
+{
+  "name": "@prefecthq/vue-compositions",
+  "private": false,
+  "version": "0.1.0",
+  "description": "A collection of reusable vue compositions",
+  "main": "index.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PrefectHQ/vue-compositions.git"
+  },
+  "keywords": [
+    "vue3",
+    "composition-api"
+  ],
+  "author": "Craig Harshbarger",
+  "bugs": {
+    "url": "https://github.com/PrefectHQ/vue-compositions/issues"
+  },
+  "homepage": "https://github.com/PrefectHQ/vue-compositions#readme",
+  "devDependencies": {
+    "typescript": "^4.5.2",
+    "vue": "^3.2.24"
+  }
+}
