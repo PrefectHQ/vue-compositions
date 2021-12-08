@@ -177,7 +177,8 @@ describe('subscribe', () => {
     it('calls action again when args change', async () => {
         const action = jest.fn()
         const number = ref(0)
-        const subscription = uniqueSubscribe(action, [number])
+        
+        uniqueSubscribe(action, [number])
 
         number.value = 1
 
