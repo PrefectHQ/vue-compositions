@@ -1,7 +1,8 @@
 import { subscribe } from '@/subscribe'
 import Manager from '@/subscribe/manager'
-import { ref } from 'vue'
+import { h, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
+import { render } from '@testing-library/vue'
 
 function hello(number: number): boolean {
     return number === 1
@@ -201,6 +202,25 @@ describe('subscribe', () => {
         await timeout()
 
         expect(subscription.result.value).toBe(1)
+    })
+
+    it('calls unsubscribe when component is unmounted', () => {
+        const action = jest.fn()
+        let subscription
+
+        const { unmount } = render({
+            setup() {
+                subscription = uniqueSubscribe(action, [])
+
+                return h('')
+            }
+        })
+
+        const spy = jest.spyOn(subscription, 'unsubscribe')
+
+        unmount()
+
+        expect(spy).toBeCalledTimes(1)
     })
 
 })

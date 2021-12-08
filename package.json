@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/PrefectHQ/vue-compositions#readme",
   "devDependencies": {
+    "@testing-library/vue": "^6.4.2",
     "@types/jest": "^27.0.3",
     "jest": "^27.4.3",
     "ts-jest": "^27.1.0",
