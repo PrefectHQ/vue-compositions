@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { getCurrentInstance, onUnmounted, shallowReactive, ToRefs, toRefs, watch } from 'vue'
+import { getCurrentInstance, isRef, onUnmounted, shallowReactive, ToRefs, toRefs, unref, watch } from 'vue'
 import { Action, ActionArguments, SubscriptionOptions } from './types'
 import Subscription from './subscription'
 import Manager from './manager'
@@ -13,19 +13,27 @@ export function subscribe<T extends Action>(
   manager: Manager = defaultManager
 ): Subscription<T> {
   const subscription = shallowReactive(manager.subscribe(action, args, options))
+  let unwatch
 
-  // watch(
-  //   args,
-  //   (newArgs, oldArgs) => {
-  //     console.log({ newArgs, oldArgs })
-  //     subscription.unsubscribe()
-  //     Object.assign(subscription, manager.subscribe(action, newArgs, options))
-  //   },
-  //   { deep: true }
-  // )
+  if(isRef(args) || (unref(args) as Parameters<T>).some(isRef)) {
+    unwatch = watch(
+      args,
+      (newArgs) => {
+        subscription.unsubscribe()
+        Object.assign(subscription, manager.subscribe(action, newArgs, options))
+      },
+      { deep: true }
+    )
+  }
 
   if(getCurrentInstance()) {
-    onUnmounted(subscription.unsubscribe)
+    onUnmounted(() => {
+      subscription.unsubscribe()
+
+      if(unwatch) {
+        unwatch()
+      }
+    })
   }
 
   return subscription

@@ -1,5 +1,6 @@
 import { subscribe } from '@/subscribe'
 import Manager from '@/subscribe/manager'
+import { ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
 
 function hello(number: number): boolean {
@@ -14,6 +15,8 @@ function helloPromise(number: number, delay: number): Promise<boolean> {
 
 describe('subscribe', () => {
 
+    afterEach(() => jest.useRealTimers())
+
     it('returns the correct result', async () => {
         const subscription = uniqueSubscribe(hello, [1])
 
@@ -22,7 +25,7 @@ describe('subscribe', () => {
         expect(subscription.result.value).toBe(true)
     })
 
-    it('returns result undefined until action promise resolves', async () => {
+    it('returns result undefined until action promise resolves', () => {
         const subscription = uniqueSubscribe(helloPromise, [1, 10])
 
         expect(subscription.result.value).toBe(undefined)
@@ -41,7 +44,7 @@ describe('subscribe', () => {
         expect(subscription.result.value).toBe(true)
     })
 
-    it('sets loading to true', async() => {
+    it('sets loading to true', () => {
         const subscription = uniqueSubscribe(hello, [1])
 
         expect(subscription.loading.value).toBe(true)
@@ -55,7 +58,7 @@ describe('subscribe', () => {
         expect(subscription.loading.value).toBe(false)
     })
 
-    it('defaults errored to false', async () => {
+    it('defaults errored to false', () => {
         const action = jest.fn()
 
         const subscription = uniqueSubscribe(action, [])
@@ -63,7 +66,7 @@ describe('subscribe', () => {
         expect(subscription.errored.value).toBe(false)
     })
 
-    it('sets errored to true', async () => {
+    it('sets errored to true', () => {
         function errors() {
             throw 'look! an error'
         }
@@ -73,7 +76,7 @@ describe('subscribe', () => {
         expect(subscription.errored.value).toBe(true)
     })
 
-    it('sets error if an error is thrown', async () => {
+    it('sets error if an error is thrown', () => {
         const error = 'look! an error'
 
         function errors() {
@@ -143,7 +146,7 @@ describe('subscribe', () => {
         expect(interval).toBe(Infinity)
     })
 
-    it('executes the correct number of times when interval is set', async() => {
+    it('executes the correct number of times when interval is set', () => {
         jest.useFakeTimers()
 
         const action = jest.fn()
@@ -156,11 +159,9 @@ describe('subscribe', () => {
         subscription.unsubscribe()
 
         expect(action).toBeCalledTimes(2)
-
-        jest.useRealTimers()
     })
 
-    it('stops executing when unsubscribed', async() => {
+    it('stops executing when unsubscribed', () => {
         jest.useFakeTimers()
 
         const action = jest.fn()
@@ -171,6 +172,34 @@ describe('subscribe', () => {
         jest.runOnlyPendingTimers()
 
         expect(action).toBeCalledTimes(1)
+    })
+
+    it('calls action again when args change', async () => {
+        const action = jest.fn()
+        const number = ref(0)
+        const subscription = uniqueSubscribe(action, [number])
+
+        number.value = 1
+
+        await timeout()
+
+        expect(action).toBeCalledTimes(2)
+    })
+
+
+    it('updates result when args change', async () => {
+        function returnBackToMe(value: number): number {
+            return value
+        }
+
+        const number = ref(0)
+        const subscription = uniqueSubscribe(returnBackToMe, [number])
+
+        number.value = 1
+
+        await timeout()
+
+        expect(subscription.result.value).toBe(1)
     })
 
 })
