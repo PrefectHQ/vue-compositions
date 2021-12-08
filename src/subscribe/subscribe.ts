@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { getCurrentInstance, isRef, onUnmounted, shallowReactive, unref, watch } from 'vue'
 import { Action, ActionArguments, SubscriptionOptions } from './types'
 import Subscription from './subscription'

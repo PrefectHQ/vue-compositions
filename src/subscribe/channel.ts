@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Ref, ref, unref } from 'vue'
 import Manager from './manager'
 import Subscription from './subscription'
