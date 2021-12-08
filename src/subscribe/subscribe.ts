@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { onUnmounted, shallowReactive, ToRefs, toRefs, watch } from 'vue'
+import { getCurrentInstance, onUnmounted, shallowReactive, ToRefs, toRefs, watch } from 'vue'
 import { Action, ActionArguments, SubscriptionOptions } from './types'
 import Subscription from './subscription'
 import Manager from './manager'
@@ -24,7 +24,9 @@ export function subscribe<T extends Action>(
   //   { deep: true }
   // )
 
-  // onUnmounted(subscription.unsubscribe)
+  if(getCurrentInstance()) {
+    onUnmounted(subscription.unsubscribe)
+  }
 
   return subscription
 }
