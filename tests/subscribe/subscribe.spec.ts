@@ -25,15 +25,18 @@ describe('subscribe', () => {
     it('returns result undefined until action promise resolves', async () => {
         const subscription = uniqueSubscribe(helloPromise, [1, 10])
 
-        await timeout(5)
-
         expect(subscription.result.value).toBe(undefined)
     })
 
     it('returns the correct result when action promise resolves', async () => {
+        jest.useFakeTimers()
+
         const subscription = uniqueSubscribe(helloPromise, [1, 10])
 
-        await timeout(20)
+        jest.runAllTimers()
+        jest.useRealTimers()
+
+        await timeout()
 
         expect(subscription.result.value).toBe(true)
     })
@@ -53,11 +56,9 @@ describe('subscribe', () => {
     })
 
     it('defaults errored to false', async () => {
-        function doesNotError() {
-            return true
-        }
+        const action = jest.fn()
 
-        const subscription = uniqueSubscribe(doesNotError, [])
+        const subscription = uniqueSubscribe(action, [])
 
         expect(subscription.errored.value).toBe(false)
     })
@@ -86,24 +87,17 @@ describe('subscribe', () => {
 
     it('doesn\'t execute multiple times when multiple subscriptions are created', () => {
         const manager = new Manager()
-        let executions = 0
-
-        function action() {
-            return ++executions
-        }
+        const action = jest.fn()
 
         subscribe(action, [], {}, manager)
         subscribe(action, [], {}, manager)
 
-        expect(executions).toBe(1)
+        expect(action).toBeCalledTimes(1)
     })
 
     it('calculates the poll interval correctly', () => {
         const manager = new Manager()
-
-        function action() {
-            return true
-        }
+        const action = jest.fn()
 
         const subscription1 = subscribe(action, [], { interval: 10 }, manager)
         const subscription2 = subscribe(action, [], { interval: 20 }, manager)
@@ -117,10 +111,7 @@ describe('subscribe', () => {
 
     it('calculates the poll interval correctly when a subscription is unsubscribed', () => {
         const manager = new Manager()
-
-        function action() {
-            return true
-        }
+        const action = jest.fn()
 
         const subscription1 = subscribe(action, [], { interval: 10 }, manager)
         const subscription2 = subscribe(action, [], { interval: 20 }, manager)
@@ -136,10 +127,7 @@ describe('subscribe', () => {
 
     it('stops polling when all subscriptions with interval unsubscribe', () => {
         const manager = new Manager()
-
-        function action() {
-            return true
-        }
+        const action = jest.fn()
 
         const subscription1 = subscribe(action, [], { interval: 10 }, manager)
         const subscription2 = subscribe(action, [], { interval: 20 }, manager)
@@ -155,42 +143,34 @@ describe('subscribe', () => {
         expect(interval).toBe(Infinity)
     })
 
-    // this test is flakey.... can return different values sometimes because setTimeout isn't exact. 
-    // is there a better way to test polling is working?
     it('executes the correct number of times when interval is set', async() => {
-        const interval = 50
-        const expectation = 5
-        let executions = 0
+        jest.useFakeTimers()
 
-        function action() {
-            return ++executions
-        }
+        const action = jest.fn()
+        const subscription = uniqueSubscribe(action, [], { interval: 50 })
 
-        const subscription = uniqueSubscribe(action, [], { interval })
-
-        await timeout(interval * expectation)
-        await timeout(5) // buffer because setTimeout isn't precise to the ms
+        // action is executed once immediately and sets a timer for the second run
+        // runOnlyPendingTimers runs the timer and executes the action a second time
+        jest.runOnlyPendingTimers()
 
         subscription.unsubscribe()
 
-        expect(executions).toBe(expectation)
+        expect(action).toBeCalledTimes(2)
+
+        jest.useRealTimers()
     })
 
     it('stops executing when unsubscribed', async() => {
-        const interval = 10
-        let executions = 0
+        jest.useFakeTimers()
 
-        function action() {
-            return ++executions
-        }
+        const action = jest.fn()
 
-        const subscription = uniqueSubscribe(action, [], { interval })
-
+        const subscription = uniqueSubscribe(action, [], { interval: 50 })
         subscription.unsubscribe()
 
-        await timeout(interval * 3)
+        jest.runOnlyPendingTimers()
 
-        expect(executions).toBe(1)
+        expect(action).toBeCalledTimes(1)
     })
 
 })
