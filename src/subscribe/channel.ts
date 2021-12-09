@@ -36,16 +36,16 @@ export default class Channel<T extends Action = Action> {
   public result: Ref<Awaited<ReturnType<T>> | undefined> = ref(undefined)
   public errored: Ref<boolean> = ref(false)
   public error: Ref<unknown> = ref(null)
+  public executed: boolean = false
 
   private readonly manager: Manager
   private readonly action: T
   private readonly args: ActionArguments<T>
   private timer: ReturnType<typeof setInterval> | null = null
-  private executed: boolean = false
   private lastExecution: number = 0
   private subscriptions: Map<number, Subscription<T>> = new Map()
 
-  public get interval(): number {
+  private get interval(): number {
     const intervals = Array.from(this.subscriptions.values()).map(
       (subscription) => subscription.options.interval ?? Infinity
     )

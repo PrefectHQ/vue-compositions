@@ -1,4 +1,4 @@
-import { getCurrentInstance, isRef, onUnmounted, shallowReactive, unref, watch } from 'vue'
+import { getCurrentInstance, isReactive, isRef, onUnmounted, shallowReactive, unref, watch } from 'vue'
 import { Action, ActionArguments, SubscriptionOptions } from './types'
 import Subscription from './subscription'
 import Manager from './manager'
@@ -14,7 +14,12 @@ export function subscribe<T extends Action>(
   const subscription = shallowReactive(manager.subscribe(action, args, options))
   let unwatch
 
-  if(isRef(args) || (unref(args) as Parameters<T>).some(isRef)) {
+  if(
+      isRef(args) || 
+      isReactive(args) || 
+      (unref(args) as Parameters<T>).some(isRef) || 
+      (unref(args) as Parameters<T>).some(isReactive)
+    ) {
     unwatch = watch(
       args,
       (newArgs) => {

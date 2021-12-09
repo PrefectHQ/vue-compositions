@@ -1,6 +1,6 @@
 import { subscribe } from '@/subscribe'
 import Manager from '@/subscribe/manager'
-import { h, ref } from 'vue'
+import { h, reactive, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
 import { render } from '@testing-library/vue'
 
@@ -14,14 +14,24 @@ function helloPromise(number: number, delay: number): Promise<boolean> {
     })
 }
 
+afterEach(() => jest.useRealTimers())
+
 describe('subscribe', () => {
 
-    afterEach(() => jest.useRealTimers())
-
     it('returns the correct result', async () => {
-        const subscription = uniqueSubscribe(hello, [1])
+        const subscription = await uniqueSubscribe(hello, [1])
 
-        await timeout()
+        expect(subscription.result.value).toBe(true)
+    })
+
+    it('returns the correct result when awaiting the promise', async () => {
+        jest.useFakeTimers()
+
+        const promise = uniqueSubscribe(helloPromise, [1, 1000]).promise()
+
+        jest.runAllTimers()
+
+        const subscription = await promise
 
         expect(subscription.result.value).toBe(true)
     })
@@ -52,9 +62,7 @@ describe('subscribe', () => {
     })
 
     it('sets loading to false', async() => {
-        const subscription = uniqueSubscribe(hello, [1])
-        
-        await timeout()
+        const subscription = await uniqueSubscribe(hello, [1])
 
         expect(subscription.loading.value).toBe(false)
     })
@@ -89,77 +97,107 @@ describe('subscribe', () => {
         expect(subscription.error.value).toBe(error)
     })
 
-    it('doesn\'t execute multiple times when multiple subscriptions are created', () => {
+    it('rejects promise', async () => {
+        const error = 'error'
+        
+        function action() {
+            throw error
+        }
+
+        let caught
+
+        try {
+            await uniqueSubscribe(action, []).promise()
+        } catch(err) {
+            caught = err
+        }
+
+        expect(caught).toBe(error)
+    })
+
+    it('executes the action once when two subscriptions are created', () => {
         const manager = new Manager()
         const action = jest.fn()
-
+        
         subscribe(action, [], {}, manager)
         subscribe(action, [], {}, manager)
 
         expect(action).toBeCalledTimes(1)
     })
 
-    it('calculates the poll interval correctly', () => {
+    it('calculates the poll interval correctly', async () => {
+        jest.useFakeTimers()
+ 
         const manager = new Manager()
         const action = jest.fn()
+        const initialExecutions = 1
+        const additionalExecutions = 3
+        const minInterval = 10
+        const maxInterval = 20
 
-        const subscription1 = subscribe(action, [], { interval: 10 }, manager)
-        const subscription2 = subscribe(action, [], { interval: 20 }, manager)
-        const interval = subscription1.channel.interval
+        subscribe(action, [], { interval: minInterval }, manager)
+        subscribe(action, [], { interval: maxInterval }, manager)
 
-        subscription1.unsubscribe()
-        subscription2.unsubscribe()
+        jest.advanceTimersByTime(additionalExecutions * minInterval)
 
-        expect(interval).toBe(10)
+        expect(action).toBeCalledTimes(initialExecutions + additionalExecutions)
     })
 
     it('calculates the poll interval correctly when a subscription is unsubscribed', () => {
+        jest.useFakeTimers()
+        
         const manager = new Manager()
         const action = jest.fn()
+        const initialExecutions = 1
+        const additionalExecutions = 3
+        const minInterval = 10
+        const maxInterval = 20
 
-        const subscription1 = subscribe(action, [], { interval: 10 }, manager)
-        const subscription2 = subscribe(action, [], { interval: 20 }, manager)
+        const subscription1 = subscribe(action, [], { interval: minInterval }, manager)
+        const subscription2 = subscribe(action, [], { interval: maxInterval }, manager)
 
         subscription1.unsubscribe()
 
-        const interval = subscription1.channel.interval
+        jest.advanceTimersByTime(additionalExecutions * maxInterval)
 
-        subscription2.unsubscribe()
-        
-        expect(interval).toBe(20)
+        expect(action).toBeCalledTimes(initialExecutions + additionalExecutions)
     })
 
     it('stops polling when all subscriptions with interval unsubscribe', () => {
+        jest.useFakeTimers()
+        
         const manager = new Manager()
         const action = jest.fn()
+        const minInterval = 10
+        const maxInterval = 20
 
-        const subscription1 = subscribe(action, [], { interval: 10 }, manager)
-        const subscription2 = subscribe(action, [], { interval: 20 }, manager)
+        const subscription1 = subscribe(action, [], { interval: minInterval }, manager)
+        const subscription2 = subscribe(action, [], { interval: maxInterval }, manager)
         const subscription3 = subscribe(action, [], {}, manager)
 
         subscription1.unsubscribe()
         subscription2.unsubscribe()
 
-        const interval = subscription1.channel.interval
+        jest.advanceTimersByTime(maxInterval)
 
-        subscription3.unsubscribe()
-
-        expect(interval).toBe(Infinity)
+        expect(action).toBeCalledTimes(1)
     })
 
     it('executes the correct number of times when interval is set', () => {
         jest.useFakeTimers()
 
+        const initialExecutions = 1
+        const additionalExecutions = Math.floor( Math.random() * 10 ) + 1
+
         const action = jest.fn()
-        const subscription = uniqueSubscribe(action, [], { interval: 50 })
+        
+        uniqueSubscribe(action, [], { interval: 50 })
 
-        // action is executed once immediately and sets a timer for the second run
-        // runOnlyPendingTimers runs the timer and executes the action a second time
-        jest.runOnlyPendingTimers()
+        for(let i = 0; i < additionalExecutions; i++) {
+            jest.runOnlyPendingTimers()
+        }
 
-        subscription.unsubscribe()
-
-        expect(action).toBeCalledTimes(2)
+        expect(action).toBeCalledTimes(initialExecutions + additionalExecutions)
     })
 
     it('stops executing when unsubscribed', () => {
@@ -175,33 +213,73 @@ describe('subscribe', () => {
         expect(action).toBeCalledTimes(1)
     })
 
-    it('calls action again when args change', async () => {
-        const action = jest.fn()
-        const number = ref(0)
-        
-        uniqueSubscribe(action, [number])
+    describe('executes action again when args change', () => {
 
-        number.value = 1
+        it('when using reactive args', async () => {
+            const action = jest.fn()
+            const args = reactive([0])
+            
+            uniqueSubscribe(action, args)
+    
+            args[0] = 1
+    
+            await timeout()
+    
+            expect(action).toBeCalledTimes(2)
+        })
 
-        await timeout()
+        it('when using ref args', async () => {
+            const action = jest.fn()
+            const args = ref([0])
+            
+            uniqueSubscribe(action, args)
+    
+            args.value = [1]
+    
+            await timeout()
+    
+            expect(action).toBeCalledTimes(2)
+        })
 
-        expect(action).toBeCalledTimes(2)
+        it('when using args containing a ref value', async () => {
+            const action = jest.fn()
+            const number = ref(0)
+            const args = [number]
+            
+            uniqueSubscribe(action, args)
+    
+            number.value = 1
+    
+            await timeout()
+    
+            expect(action).toBeCalledTimes(2)
+        })
+
+        it('when using args containing a reactive value', async () => {
+            const action = jest.fn()
+            const argument = reactive({ number: 0 })
+            const args = [argument]
+            
+            uniqueSubscribe(action, args)
+    
+            argument.number = 1
+    
+            await timeout()
+    
+            expect(action).toBeCalledTimes(2)
+        })
+
     })
 
-
     it('updates result when args change', async () => {
-        function returnBackToMe(value: number): number {
-            return value
-        }
-
         const number = ref(0)
-        const subscription = uniqueSubscribe(returnBackToMe, [number])
+        const subscription = uniqueSubscribe(hello, [number])
 
         number.value = 1
 
         await timeout()
 
-        expect(subscription.result.value).toBe(1)
+        expect(subscription.result.value).toBe(true)
     })
 
     it('calls unsubscribe when component is unmounted', () => {
@@ -212,7 +290,7 @@ describe('subscribe', () => {
             setup() {
                 subscription = uniqueSubscribe(action, [])
 
-                return h('')
+                return () => h('p')
             }
         })
 
