@@ -16,11 +16,11 @@ If any subscriptions have `options.interval` then the shortest interval will be 
 When a subscription is removed the channel interval is recalculated. A subscription can be removed by calling `subscription.unsubscribe()` or the subscription will automatically be removed when the component that created the subscription is unmounted.
 
 ## Arguments
-| Name    | Type                      | Description |
-| --------| ------------------------- | ------------|
-| action  | `(...args: any[]) => any` | The function to be executed
-| args    | `Parameters<action>`      | Parameters of the action being executed
-| options.interval | `number`    | A max poll interval in milliseconds.
+| Name    | Type                      | Required | Default | Description |
+| --------| ------------------------- | ---------| --------| ------------|
+| action  | `(...args: any[]) => any` | True | | The function to be executed
+| args    | `Parameters<action>`      | True | | Parameters of the action being executed
+| options.interval | `number`    | False | `Infinity` | A max poll interval in milliseconds.
 
 ## Returns
 | Name        | Type                                | Default     | Description                                                     |
