@@ -11,7 +11,9 @@ When creating a subscription for the first time a `Channel` is created. A channe
 
 If another subscription is created with the same action and args, it will not execute the action again. Instead the same channel will be reused. So if multiple components subscribe using the same args the action will only be executed once. 
 
-If any subscriptions have `options.interval` then the shortest interval will be used. All subscriptions will received an updated response at the decided interval, even if a specific subscription has no interval or if it has a greater interval. Interval is basically "maximum age of execution" which be default is `Infinity`.
+If any subscriptions have `options.interval` then the shortest interval will be used. All subscriptions will received an updated response at the decided interval, even if a specific subscription has no interval or if it has a greater interval. Interval is basically "maximum age of execution" which defaults to `Infinity`.
+
+When a subscription is removed the channel interval is recalculated. A subscription can be removed by calling `subscription.unsubscribe()` or the subscription will automatically be removed when the component that created the subscription is unmounted.
 
 ## Arguments
 | Name    | Type                      | Description |
