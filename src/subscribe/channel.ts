@@ -33,7 +33,7 @@ class ChannelSignatureManager {
 export default class Channel<T extends Action = Action> {
   public readonly signature: ChannelSignature
   public loading: Ref<boolean> = ref(false)
-  public result: Ref<Awaited<ReturnType<T>> | undefined> = ref(undefined)
+  public response: Ref<Awaited<ReturnType<T>> | undefined> = ref(undefined)
   public errored: Ref<boolean> = ref(false)
   public error: Ref<unknown> = ref(null)
   public executed: boolean = false
@@ -65,7 +65,7 @@ export default class Channel<T extends Action = Action> {
 
     this.subscriptions.set(subscription.id, subscription)
 
-    if (!this.executed || options.updateResultOnSubscribe) {
+    if (!this.executed) {
       this.execute()
     }
 
@@ -94,7 +94,7 @@ export default class Channel<T extends Action = Action> {
     this.setInterval()
 
     try {
-      this.result.value = await this.action(...args)
+      this.response.value = await this.action(...args)
       this.errored.value = false
       this.error.value = null
     } catch (error) {

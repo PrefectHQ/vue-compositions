@@ -14,5 +14,4 @@ export type ChannelSignature = `${number}-${string}`
 
 export type SubscriptionOptions = {
   interval?: number
-  updateResultOnSubscribe?: boolean
 }

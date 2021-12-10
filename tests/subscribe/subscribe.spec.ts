@@ -18,13 +18,13 @@ afterEach(() => jest.useRealTimers())
 
 describe('subscribe', () => {
 
-    it('returns the correct result', async () => {
+    it('returns the correct response', async () => {
         const subscription = await uniqueSubscribe(hello, [1])
 
-        expect(subscription.result.value).toBe(true)
+        expect(subscription.response.value).toBe(true)
     })
 
-    it('returns the correct result when awaiting the promise', async () => {
+    it('returns the correct response when awaiting the promise', async () => {
         jest.useFakeTimers()
 
         const promise = uniqueSubscribe(helloPromise, [1, 1000]).promise()
@@ -33,16 +33,16 @@ describe('subscribe', () => {
 
         const subscription = await promise
 
-        expect(subscription.result.value).toBe(true)
+        expect(subscription.response.value).toBe(true)
     })
 
-    it('returns result undefined until action promise resolves', () => {
+    it('returns response undefined until action promise resolves', () => {
         const subscription = uniqueSubscribe(helloPromise, [1, 10])
 
-        expect(subscription.result.value).toBe(undefined)
+        expect(subscription.response.value).toBe(undefined)
     })
 
-    it('returns the correct result when action promise resolves', async () => {
+    it('returns the correct response when action promise resolves', async () => {
         jest.useFakeTimers()
 
         const subscription = uniqueSubscribe(helloPromise, [1, 10])
@@ -52,7 +52,7 @@ describe('subscribe', () => {
 
         await timeout()
 
-        expect(subscription.result.value).toBe(true)
+        expect(subscription.response.value).toBe(true)
     })
 
     it('sets loading to true', () => {
@@ -271,7 +271,7 @@ describe('subscribe', () => {
 
     })
 
-    it('updates result when args change', async () => {
+    it('updates response when args change', async () => {
         const number = ref(0)
         const subscription = uniqueSubscribe(hello, [number])
 
@@ -279,7 +279,7 @@ describe('subscribe', () => {
 
         await timeout()
 
-        expect(subscription.result.value).toBe(true)
+        expect(subscription.response.value).toBe(true)
     })
 
     it('calls unsubscribe when component is unmounted', () => {

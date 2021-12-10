@@ -28,8 +28,8 @@ export default class Subscription<T extends Action> {
     return this.channel.loading
   }
 
-  public get result(): Ref<Awaited<ReturnType<T>> | undefined> {
-    return this.channel.result
+  public get response(): Ref<Awaited<ReturnType<T>> | undefined> {
+    return this.channel.response
   }
 
   constructor(channel: Channel<T>, options: SubscriptionOptions) {
