@@ -3,6 +3,8 @@ The `subscribe` composition manages data sharing across components. Multiple com
 
 ## Example
 ```typescript
+import { subscribe } from '@prefecthq/vue-compositions'
+
 const subscription = subscribe(action, args, options)
 ```
 
