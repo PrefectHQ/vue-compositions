@@ -1,17 +1,17 @@
 {
-    "compilerOptions": {
-      "removeComments": false,
-      "sourceMap": true,
-      "target": "esnext",
-      "module": "esnext",
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "paths": {
-          "@/*": ["./src/*"]
-      }
-    },
-    "include": [
-      "src/**/*",
-      "tests/**/*"
-    ]
-  }
+  "compilerOptions": {
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "paths": {
+        "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
+}
