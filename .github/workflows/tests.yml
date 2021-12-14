@@ -39,4 +39,4 @@ jobs:
       - name: Install Modules
         run: npm install
       - name: Run Tests
-        run: npm run test:unit
+        run: npm run test
