@@ -55,6 +55,7 @@ jobs:
         run: |
           git config --global user.name 'Craig Harshbarger'
           git config --global user.email 'pleek91@gmail.com'
+          git add CHANGELOG.md
           git commit -am "Generate CHANGELOG.md"
           git push
 
