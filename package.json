@@ -6,7 +6,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
-    "changelog": "auto-changelog --commit-limit 0"
+    "changelog": "auto-changelog --package --commit-limit 0"
   },
   "repository": {
     "type": "git",
