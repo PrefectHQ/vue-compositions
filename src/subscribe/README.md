@@ -35,3 +35,4 @@ When a subscription is removed the channel interval is recalculated. A subscript
 | promise     | `() => Promise<ReturnType<action>>` |             | Returns a promise that resolves when the `response` is returned |
 | unsubscribe | `() => void`                        |             | Remove the subscription from the channel                        |
 | subscribe   | `() => subscription<action>`        |             | Resubscribes to the channel using the same arguments            |
+
