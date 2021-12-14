@@ -38,16 +38,17 @@ export default class Subscription<T extends Action> {
     this.options = options
   }
 
-  public refresh() {
+  public refresh(): void {
     this.channel.execute()
   }
 
-  public subscribe() {
+  public subscribe(): Subscription<T> {
     this.channel.unsubscribe(this.id)
-    this.channel.subscribe(this.options)
+
+    return this.channel.subscribe(this.options)
   }
 
-  public unsubscribe() {
+  public unsubscribe(): void {
     this.channel.unsubscribe(this.id)
   }
 
