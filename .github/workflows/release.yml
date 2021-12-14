@@ -48,9 +48,6 @@ jobs:
         uses: EndBug/version-check@v1
         id: version
 
-      - name: Create Tag
-        run: git tag ${{ steps.version.outputs.version }}
-
       - name: Generate Changelog
         run: npm run changelog
       
