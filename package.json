@@ -13,6 +13,7 @@
     "url": "https://github.com/PrefectHQ/vue-compositions.git"
   },
   "keywords": [
+    "prefect",
     "vue3",
     "composition-api"
   ],
