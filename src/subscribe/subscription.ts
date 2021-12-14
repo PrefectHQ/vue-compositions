@@ -31,12 +31,6 @@ export default class Subscription<T extends Action> {
     this.channel.execute()
   }
 
-  public subscribe(): Subscription<T> {
-    this.channel.unsubscribe(this.id)
-
-    return this.channel.subscribe(this.options)
-  }
-
   public unsubscribe(): void {
     this.channel.unsubscribe(this.id)
   }
