@@ -315,9 +315,8 @@ describe('subscribe', () => {
         await timeout()
         
         subscription1.unsubscribe()
-        subscription2.refresh()
         
-        await timeout()
+        await subscription2.refresh()
 
         expect(subscription1.response.value).toBe(1)
         expect(subscription2.response.value).toBe(2)

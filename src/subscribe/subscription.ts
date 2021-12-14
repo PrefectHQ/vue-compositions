@@ -27,8 +27,8 @@ export default class Subscription<T extends Action> {
     this.options = options
   }
 
-  public refresh(): void {
-    this.channel.execute()
+  public async refresh(): Promise<void> {
+    await this.channel.execute()
   }
 
   public unsubscribe(): void {
