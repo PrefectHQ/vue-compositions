@@ -1,7 +1,6 @@
 import { ref, Ref, watch } from 'vue'
 import { Action, SubscriptionOptions } from './types'
 import Channel from './channel'
-import { clone } from '@/clone'
 
 class SubscriptionIdManager {
   private static id: number = 0
