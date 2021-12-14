@@ -1,6 +1,7 @@
-import { Ref, watch } from 'vue'
+import { ref, Ref, watch } from 'vue'
 import { Action, SubscriptionOptions } from './types'
 import Channel from './channel'
+import { clone } from '@/clone'
 
 class SubscriptionIdManager {
   private static id: number = 0
@@ -13,24 +14,12 @@ class SubscriptionIdManager {
 export default class Subscription<T extends Action> {
   public readonly id: number
   public readonly options: SubscriptionOptions
-
+  public loading: Ref<boolean> = ref(false)
+  public response: Ref<Awaited<ReturnType<T>> | undefined> = ref(undefined)
+  public errored: Ref<boolean> = ref(false)
+  public error: Ref<unknown> = ref(null)
+  
   private readonly channel: Channel<T>
-
-  public get error(): Ref<unknown> {
-    return this.channel.error
-  }
-
-  public get errored(): Ref<boolean> {
-    return this.channel.errored
-  }
-
-  public get loading(): Ref<boolean> {
-    return this.channel.loading
-  }
-
-  public get response(): Ref<Awaited<ReturnType<T>> | undefined> {
-    return this.channel.response
-  }
 
   constructor(channel: Channel<T>, options: SubscriptionOptions) {
     this.id = SubscriptionIdManager.get()

@@ -32,10 +32,6 @@ class ChannelSignatureManager {
 
 export default class Channel<T extends Action = Action> {
   public readonly signature: ChannelSignature
-  public loading: Ref<boolean> = ref(false)
-  public response: Ref<Awaited<ReturnType<T>> | undefined> = ref(undefined)
-  public errored: Ref<boolean> = ref(false)
-  public error: Ref<unknown> = ref(null)
   public executed: boolean = false
 
   private readonly manager: Manager
@@ -51,6 +47,30 @@ export default class Channel<T extends Action = Action> {
     )
 
     return Math.min(...intervals) ?? Infinity
+  }
+
+  private set loading(loading: boolean) {
+    for(const subscription of this.subscriptions.values()) {
+      subscription.loading.value = loading
+    }
+  }
+
+  private set errored(errored: boolean) {
+    for(const subscription of this.subscriptions.values()) {
+      subscription.errored.value = errored
+    }
+  }
+
+  private set error(error: unknown) {
+    for(const subscription of this.subscriptions.values()) {
+      subscription.error.value = error
+    }
+  }
+
+  private set response(response: Awaited<ReturnType<T>>) {
+    for(const subscription of this.subscriptions.values()) {
+      subscription.response.value = response
+    }
   }
 
   constructor(manager: Manager, action: T, args: ActionArguments<T>) {
@@ -87,21 +107,21 @@ export default class Channel<T extends Action = Action> {
   public async execute() {
     const args = (unref(this.args) as Parameters<T>).map(unref)
 
-    this.loading.value = true
-    this.lastExecution = Date.now()
+    this.loading = true
     this.executed = true
+    this.lastExecution = Date.now()
 
     this.setInterval()
 
     try {
-      this.response.value = await this.action(...args)
-      this.errored.value = false
-      this.error.value = null
+      this.response = await this.action(...args)
+      this.errored = false
+      this.error = null
     } catch (error) {
-      this.errored.value = true
-      this.error.value = error
+      this.errored = true
+      this.error = error
     } finally {
-      this.loading.value = false
+      this.loading = false
     }
   }
 
