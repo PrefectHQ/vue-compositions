@@ -301,7 +301,7 @@ describe('subscribe', () => {
         expect(spy).toBeCalledTimes(1)
     })
 
-    it('stops updating subscription when unsubscribed', async () => {
+    it('does not update subscription when unsubscribed', async () => {
         const manager = new Manager()
         let int = 0
 
@@ -320,6 +320,21 @@ describe('subscribe', () => {
 
         expect(subscription1.response.value).toBe(1)
         expect(subscription2.response.value).toBe(2)
+    })
+
+    it('does not update subscription when args change if unsubscribed', async () => {
+        const number = ref(0)
+        const subscription = uniqueSubscribe(hello, [number])
+
+        await timeout()
+
+        subscription.unsubscribe()
+
+        number.value = 1
+
+        await timeout()
+
+        expect(subscription.response.value).toBe(false)
     })
 
 })

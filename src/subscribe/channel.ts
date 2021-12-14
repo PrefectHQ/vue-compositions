@@ -125,6 +125,10 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
+  public isSubscribed(id: number): boolean {
+    return this.subscriptions.has(id)
+  }
+
   private setInterval() {
     if (this.timer) {
       clearTimeout(this.timer)

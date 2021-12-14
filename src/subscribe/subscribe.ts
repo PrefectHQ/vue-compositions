@@ -23,6 +23,11 @@ export function subscribe<T extends Action>(
     unwatch = watch(
       args,
       (newArgs) => {
+        if(!subscription.isSubscribed()) {
+          unwatch()
+          return
+        }
+        
         subscription.unsubscribe()
         Object.assign(subscription, manager.subscribe(action, newArgs, options))
       },

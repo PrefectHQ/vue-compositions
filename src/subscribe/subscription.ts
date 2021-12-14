@@ -35,6 +35,10 @@ export default class Subscription<T extends Action> {
     this.channel.unsubscribe(this.id)
   }
 
+  public isSubscribed(): boolean {
+    return this.channel.isSubscribed(this.id)
+  }
+
   public promise(): Promise<Subscription<T>> {
     return new Promise((resolve, reject) => {
       if(this.channel.executed) {
