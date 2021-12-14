@@ -91,11 +91,18 @@ describe('clone', () => {
         expect(isReactive(copy)).toBe(true)
     })
 
-    it('does not retain shallowReactive proxy', () => {
+    it('does not retain shallowReactive proxy by default', () => {
         const source = shallowReactive({ hello: ref('world') })
         const copy = clone(source)
 
         expect(isRef(copy.hello)).toBe(false)
+    })
+
+    it('does not retain shallowReactive proxy when shallow options is used', () => {
+        const source = shallowReactive({ hello: ref('world') })
+        const copy = clone(source, { shallow: true })
+
+        expect(isRef(copy.hello)).toBe(true)
     })
 
     it('retains ref', () => {
