@@ -59,9 +59,6 @@ jobs:
           git commit -am "Generate CHANGELOG.md"
           git push
 
-      - name: Build package
-        run: npm run build
-
       - name: Publish Package
         id: publish
         uses: JS-DevTools/npm-publish@v1
