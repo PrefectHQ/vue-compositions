@@ -15,8 +15,6 @@ jobs:
 
     steps: 
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Check Package Version
         uses: EndBug/version-check@v2.1.0
