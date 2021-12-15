@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Check Package Version
-        uses: EndBug/version-check@v1
+        uses: EndBug/version-check@v2.1.0
         id: check
 
       - name: Cancel
@@ -49,7 +49,7 @@ jobs:
         run: npm ci install
 
       - name: Get Package Version
-        uses: EndBug/version-check@v1
+        uses: EndBug/version-check@v2.1.0
         id: version
 
       - name: Generate Changelog
