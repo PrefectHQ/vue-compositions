@@ -5,7 +5,8 @@ The `media` composition is a reactive wrapper around [window.matchMedia](https:/
 ```typescript
 import { media } from '@prefecthq/vue-compositions'
 
-const breakpoint = media('(min-width: 1440px)')
+export const small = media('(min-width: 640px)')
+export const medium = media('(min-width: 1024px)')
 ```
 
 ## Arguments
