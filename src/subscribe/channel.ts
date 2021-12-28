@@ -10,7 +10,7 @@ import {
 
 class ChannelSignatureManager {
   private static actionId: number = 0
-  private static actionIds: Map<Action, number> = new Map()
+  private static readonly actionIds: Map<Action, number> = new Map()
 
   public static get<T extends Action>(
     action: T,
@@ -39,7 +39,7 @@ export default class Channel<T extends Action = Action> {
   private readonly args: ActionArguments<T>
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
-  private subscriptions: Map<number, Subscription<T>> = new Map()
+  private readonly subscriptions: Map<number, Subscription<T>> = new Map()
 
   private get interval(): number {
     const intervals = Array.from(this.subscriptions.values()).map(
@@ -50,25 +50,25 @@ export default class Channel<T extends Action = Action> {
   }
 
   private set loading(loading: boolean) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.loading.value = loading
     }
   }
 
   private set errored(errored: boolean) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.errored.value = errored
     }
   }
 
   private set error(error: unknown) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.error.value = error
     }
   }
 
   private set response(response: Awaited<ReturnType<T>>) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.response.value = response
     }
   }

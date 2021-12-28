@@ -13,5 +13,5 @@ export type ActionResponse<T extends Action> = Awaited<ReturnType<T>>
 export type ChannelSignature = `${number}-${string}`
 
 export type SubscriptionOptions = {
-  interval?: number
+  interval?: number,
 }
