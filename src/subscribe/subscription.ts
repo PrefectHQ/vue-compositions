@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { ref, Ref, watch } from 'vue'
 import Channel from './channel'
 import { Action, SubscriptionOptions } from './types'
@@ -5,7 +6,7 @@ import { Action, SubscriptionOptions } from './types'
 class SubscriptionIdManager {
   private static id: number = 0
 
-  public static get() {
+  public static get(): number {
     return SubscriptionIdManager.id++
   }
 }
@@ -20,7 +21,7 @@ export default class Subscription<T extends Action> {
 
   private readonly channel: Channel<T>
 
-  constructor(channel: Channel<T>, options: SubscriptionOptions) {
+  public constructor(channel: Channel<T>, options: SubscriptionOptions) {
     this.id = SubscriptionIdManager.get()
     this.channel = channel
     this.options = options
@@ -50,26 +51,17 @@ export default class Subscription<T extends Action> {
         return
       }
 
-      let loadingWatcher
-      let erroredWatcher
-
-      loadingWatcher = watch(this.loading, () => {
+      const loadingWatcher = watch(this.loading, () => {
         if (!this.loading.value) {
-          if (erroredWatcher) {
-            erroredWatcher()
-          }
-
+          erroredWatcher()
           loadingWatcher()
           resolve(this)
         }
       })
 
-      erroredWatcher = watch(this.errored, () => {
+      const erroredWatcher = watch(this.errored, () => {
         if (this.errored.value) {
-          if (loadingWatcher) {
-            loadingWatcher()
-          }
-
+          loadingWatcher()
           erroredWatcher()
           reject(this.error.value)
         }

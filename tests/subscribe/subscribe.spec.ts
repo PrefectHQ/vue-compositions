@@ -3,6 +3,7 @@ import { h, reactive, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
 import { subscribe } from '@/subscribe'
 import Manager from '@/subscribe/manager'
+import Subscription from '@/subscribe/subscription'
 
 function hello(number: number): boolean {
   return number === 1
@@ -76,7 +77,7 @@ describe('subscribe', () => {
   })
 
   it('sets errored to true', () => {
-    function errors() {
+    function errors(): void {
       throw 'look! an error'
     }
 
@@ -88,7 +89,7 @@ describe('subscribe', () => {
   it('sets error if an error is thrown', () => {
     const error = 'look! an error'
 
-    function errors() {
+    function errors(): void {
       throw error
     }
 
@@ -100,7 +101,7 @@ describe('subscribe', () => {
   it('rejects promise', async () => {
     const error = 'error'
 
-    function action() {
+    function action(): void {
       throw error
     }
 
@@ -125,7 +126,7 @@ describe('subscribe', () => {
     expect(action).toBeCalledTimes(1)
   })
 
-  it('calculates the poll interval correctly', async () => {
+  it('calculates the poll interval correctly', () => {
     jest.useFakeTimers()
 
     const manager = new Manager()
@@ -154,6 +155,7 @@ describe('subscribe', () => {
     const maxInterval = 20
 
     const subscription1 = subscribe(action, [], { interval: minInterval }, manager)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const subscription2 = subscribe(action, [], { interval: maxInterval }, manager)
 
     subscription1.unsubscribe()
@@ -173,6 +175,7 @@ describe('subscribe', () => {
 
     const subscription1 = subscribe(action, [], { interval: minInterval }, manager)
     const subscription2 = subscribe(action, [], { interval: maxInterval }, manager)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const subscription3 = subscribe(action, [], {}, manager)
 
     subscription1.unsubscribe()
@@ -284,7 +287,7 @@ describe('subscribe', () => {
 
   it('calls unsubscribe when component is unmounted', () => {
     const action = jest.fn()
-    let subscription
+    let subscription: Subscription<typeof action>
 
     const { unmount } = render({
       setup() {
@@ -294,7 +297,7 @@ describe('subscribe', () => {
       },
     })
 
-    const spy = jest.spyOn(subscription, 'unsubscribe')
+    const spy = jest.spyOn(subscription!, 'unsubscribe')
 
     unmount()
 
@@ -305,7 +308,7 @@ describe('subscribe', () => {
     const manager = new Manager()
     let int = 0
 
-    function action() {
+    function action(): number {
       return ++int
     }
 

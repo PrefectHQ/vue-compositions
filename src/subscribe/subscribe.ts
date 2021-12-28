@@ -12,7 +12,7 @@ export function subscribe<T extends Action>(
   manager: Manager = defaultManager
 ): Subscription<T> {
   const subscription = shallowReactive(manager.subscribe(action, args, options))
-  let unwatch
+  let unwatch: ReturnType<typeof watch> | undefined
 
   if (
     isRef(args) ||
@@ -24,7 +24,7 @@ export function subscribe<T extends Action>(
       args,
       (newArgs) => {
         if (!subscription.isSubscribed()) {
-          unwatch()
+          unwatch!()
           return
         }
 

@@ -3,9 +3,9 @@ import { getCurrentInstance, isRef, onUnmounted, ref, Ref, unref, watch } from '
 export function media(query: Ref<string> | string): Ref<boolean> {
   let mediaQuery = window.matchMedia(unref(query))
   const matches = ref(mediaQuery.matches)
-  let unwatch
+  let unwatch: ReturnType<typeof watch> | undefined
 
-  function updateMatches(event: MediaQueryListEvent) {
+  function updateMatches(event: MediaQueryListEvent): void {
     matches.value = event.matches
   }
 

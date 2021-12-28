@@ -14,8 +14,8 @@ describe('media', () => {
         matches: false,
         media: query,
         onchange: null,
-        addListener: jest.fn(), // deprecated
-        removeListener: jest.fn(), // deprecated
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
         addEventListener,
         removeEventListener,
         dispatchEvent: jest.fn(),
@@ -25,7 +25,7 @@ describe('media', () => {
 
   afterEach(() => jest.resetAllMocks())
 
-  it('returns a ref', async () => {
+  it('returns a ref', () => {
     const match = media('(hover)')
 
     expect(isRef(match)).toBe(true)
@@ -53,7 +53,7 @@ describe('media', () => {
   })
 
 
-  it('if vue component is unmounted, event listener is removed', async () => {
+  it('if vue component is unmounted, event listener is removed', () => {
     const { unmount } = render({
       setup() {
         media('(hover)')

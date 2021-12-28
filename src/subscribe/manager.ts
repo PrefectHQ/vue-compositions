@@ -21,6 +21,10 @@ export default class Manager {
     return subscription
   }
 
+  public deleteChannel(signature: ChannelSignature): void {
+    this.channels.delete(signature)
+  }
+
   private getChannel<T extends Action>(
     action: T,
     args: ActionArguments<T>
@@ -34,9 +38,5 @@ export default class Manager {
     this.channels.set(channel.signature, channel)
 
     return channel
-  }
-
-  public deleteChannel(signature: ChannelSignature) {
-    this.channels.delete(signature)
   }
 }
