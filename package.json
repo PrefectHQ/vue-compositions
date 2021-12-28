@@ -6,6 +6,8 @@
   "main": "index.ts",
   "scripts": {
     "test": "jest",
+    "lint": "eslint ./",
+    "lint:fix": "eslint ./ --fix",
     "changelog": "auto-changelog --package --commit-limit 0"
   },
   "repository": {
@@ -23,9 +25,11 @@
   },
   "homepage": "https://github.com/PrefectHQ/vue-compositions#readme",
   "devDependencies": {
+    "@prefecthq/eslint-config": "1.0.5",
     "@testing-library/vue": "^6.4.2",
     "@types/jest": "^27.0.3",
     "auto-changelog": "^2.3.0",
+    "eslint": "^8.5.0",
     "jest": "^27.4.3",
     "ts-jest": "^27.1.0",
     "ts-node": "^10.4.0",
