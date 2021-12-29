@@ -1,4 +1,5 @@
-import { Ref, ref, unref } from 'vue'
+/* eslint-disable max-classes-per-file */
+import { unref } from 'vue'
 import Manager from './manager'
 import Subscription from './subscription'
 import {
@@ -10,11 +11,11 @@ import {
 
 class ChannelSignatureManager {
   private static actionId: number = 0
-  private static actionIds: Map<Action, number> = new Map()
+  private static readonly actionIds: Map<Action, number> = new Map()
 
   public static get<T extends Action>(
     action: T,
-    args: ActionArguments<T>
+    args: ActionArguments<T>,
   ): ChannelSignature {
     let actionId
 
@@ -37,47 +38,47 @@ export default class Channel<T extends Action = Action> {
   private readonly manager: Manager
   private readonly action: T
   private readonly args: ActionArguments<T>
+  private readonly subscriptions: Map<number, Subscription<T>> = new Map()
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
-  private subscriptions: Map<number, Subscription<T>> = new Map()
+
+  public constructor(manager: Manager, action: T, args: ActionArguments<T>) {
+    this.signature = ChannelSignatureManager.get(action, args)
+    this.manager = manager
+    this.action = action
+    this.args = args
+  }
 
   private get interval(): number {
-    const intervals = Array.from(this.subscriptions.values()).map(
-      (subscription) => subscription.options.interval ?? Infinity
-    )
+    const intervals = Array
+      .from(this.subscriptions.values())
+      .map(subscription => subscription.options.interval ?? Infinity)
 
-    return Math.min(...intervals) ?? Infinity
+    return Math.min(...intervals)
   }
 
   private set loading(loading: boolean) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.loading.value = loading
     }
   }
 
   private set errored(errored: boolean) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.errored.value = errored
     }
   }
 
   private set error(error: unknown) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.error.value = error
     }
   }
 
   private set response(response: Awaited<ReturnType<T>>) {
-    for(const subscription of this.subscriptions.values()) {
+    for (const subscription of this.subscriptions.values()) {
       subscription.response.value = response
     }
-  }
-
-  constructor(manager: Manager, action: T, args: ActionArguments<T>) {
-    this.signature = ChannelSignatureManager.get(action, args)
-    this.manager = manager
-    this.action = action
-    this.args = args
   }
 
   public subscribe(options: SubscriptionOptions): Subscription<T> {
@@ -104,7 +105,7 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  public async execute() {
+  public async execute(): Promise<void> {
     const args = (unref(this.args) as Parameters<T>).map(unref)
 
     this.loading = true
@@ -129,7 +130,7 @@ export default class Channel<T extends Action = Action> {
     return this.subscriptions.has(id)
   }
 
-  private setInterval() {
+  private setInterval(): void {
     if (this.timer) {
       clearTimeout(this.timer)
     }

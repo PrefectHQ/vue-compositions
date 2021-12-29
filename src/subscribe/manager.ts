@@ -1,19 +1,19 @@
+import Channel from './channel'
+import Subscription from './subscription'
 import {
   Action,
   ActionArguments,
   ChannelSignature,
   SubscriptionOptions
 } from './types'
-import Channel from './channel'
-import Subscription from './subscription'
 
 export default class Manager {
-  private channels: Map<ChannelSignature, Channel> = new Map()
+  private readonly channels: Map<ChannelSignature, Channel> = new Map()
 
   public subscribe<T extends Action>(
     action: T,
     args: ActionArguments<T>,
-    options: SubscriptionOptions
+    options: SubscriptionOptions,
   ): Subscription<T> {
     const channel = this.getChannel(action, args)
     const subscription = channel.subscribe(options)
@@ -21,9 +21,13 @@ export default class Manager {
     return subscription
   }
 
+  public deleteChannel(signature: ChannelSignature): void {
+    this.channels.delete(signature)
+  }
+
   private getChannel<T extends Action>(
     action: T,
-    args: ActionArguments<T>
+    args: ActionArguments<T>,
   ): Channel<T> {
     const channel = new Channel<T>(this, action, args)
 
@@ -34,9 +38,5 @@ export default class Manager {
     this.channels.set(channel.signature, channel)
 
     return channel
-  }
-
-  public deleteChannel(signature: ChannelSignature) {
-    this.channels.delete(signature)
   }
 }
