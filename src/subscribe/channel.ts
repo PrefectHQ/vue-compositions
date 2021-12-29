@@ -15,7 +15,7 @@ class ChannelSignatureManager {
 
   public static get<T extends Action>(
     action: T,
-    args: ActionArguments<T>
+    args: ActionArguments<T>,
   ): ChannelSignature {
     let actionId
 
@@ -50,9 +50,9 @@ export default class Channel<T extends Action = Action> {
   }
 
   private get interval(): number {
-    const intervals = Array.from(this.subscriptions.values()).map(
-      (subscription) => subscription.options.interval ?? Infinity
-    )
+    const intervals = Array
+      .from(this.subscriptions.values())
+      .map(subscription => subscription.options.interval ?? Infinity)
 
     return Math.min(...intervals)
   }

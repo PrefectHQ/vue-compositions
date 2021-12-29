@@ -11,7 +11,7 @@ export function subscribe<T extends Action>(
   action: T,
   args: ActionArguments<T>,
   options: SubscriptionOptions = {},
-  manager: Manager = defaultManager
+  manager: Manager = defaultManager,
 ): Subscription<T> {
   const subscription = shallowReactive(manager.subscribe(action, args, options))
   let unwatch: ReturnType<typeof watch> | undefined
@@ -33,7 +33,7 @@ export function subscribe<T extends Action>(
         subscription.unsubscribe()
         Object.assign(subscription, manager.subscribe(action, newArgs, options))
       },
-      { deep: true }
+      { deep: true },
     )
   }
 

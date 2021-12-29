@@ -10,7 +10,7 @@ export function timeout(ms = 0): Promise<void> {
 export function uniqueSubscribe<T extends Action>(
   action: T,
   args: ActionArguments<T>,
-  options: SubscriptionOptions = {}
+  options: SubscriptionOptions = {},
 ): Subscription<T> {
   return subscribe(action, args, options, new Manager())
 }
