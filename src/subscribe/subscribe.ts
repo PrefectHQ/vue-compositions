@@ -5,6 +5,8 @@ import { Action, ActionArguments, SubscriptionOptions } from './types'
 
 const defaultManager = new Manager()
 
+// I don't think this method makes sense with 3 params
+// eslint-disable-next-line max-params
 export function subscribe<T extends Action>(
   action: T,
   args: ActionArguments<T>,
