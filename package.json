@@ -8,6 +8,7 @@
     "test": "jest",
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
+    "types": "vue-tsc --noEmit",
     "changelog": "auto-changelog --package --commit-limit 0"
   },
   "repository": {
@@ -34,6 +35,7 @@
     "ts-jest": "^27.1.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2",
-    "vue": "^3.2.24"
+    "vue": "^3.2.24",
+    "vue-tsc": "^0.30.1"
   }
 }
