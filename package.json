@@ -2,7 +2,7 @@
   "name": "@prefecthq/vue-compositions",
   "private": false,
   "version": "0.1.9",
-  "description": "A collection of reusable vue compositions",
+  "description": "A collection of reusable vue compositions.",
   "main": "index.ts",
   "scripts": {
     "test": "jest",
