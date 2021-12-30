@@ -55,6 +55,7 @@ jobs:
       
       - name: Commit Changelog
         run: |
+          git pull
           git config --global user.name 'Craig Harshbarger'
           git config --global user.email 'pleek91@gmail.com'
           git add CHANGELOG.md
