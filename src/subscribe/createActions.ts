@@ -1,6 +1,7 @@
-type Callable<T> = {
-  [P in keyof T]: T[P] extends (...args: any[]) => any ? P : never
-}[keyof T]
+type AnyFunction = (...args: any[]) => any
+type Callable<T> = keyof {
+  [P in keyof T as T[P] extends AnyFunction ? P : never]: T[P]
+}
 
 export function createActions<T extends Record<string, any>>(context: T): Pick<T, Callable<T>> {
   const keys = Object.keys(context).filter(key => typeof context[key] === 'function')
