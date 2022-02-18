@@ -1,11 +1,11 @@
 # Subscribe
-The `subscribe` composition manages data sharing across components. Multiple components can subscribe to an `action` (any method or function) and and share the response value. 
+The `useSubscription` composition manages data sharing across components. Multiple components can subscribe to an `action` (any method or function) and and share the response value. 
 
 ## Example
 ```typescript
-import { subscribe } from '@prefecthq/vue-compositions'
+import { useSubscription } from '@prefecthq/vue-compositions'
 
-const subscription = subscribe(action, args, options)
+const subscription = useSubscription(action, args, options)
 ```
 
 ## How it works
