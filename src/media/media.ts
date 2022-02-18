@@ -1,5 +1,7 @@
 import { getCurrentInstance, isRef, onUnmounted, ref, Ref, unref, watch } from 'vue'
-
+/**
+ * @deprecated use useMedia instead
+ */
 export function media(query: Ref<string> | string): Ref<boolean> {
   let mediaQuery = window.matchMedia(unref(query))
   const matches = ref(mediaQuery.matches)
