@@ -49,3 +49,5 @@ export function subscribe<T extends Action>(
 
   return subscription
 }
+
+export const useSubscription = subscribe

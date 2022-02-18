@@ -31,3 +31,5 @@ export function media(query: Ref<string> | string): Ref<boolean> {
 
   return matches
 }
+
+export const useMedia = media
