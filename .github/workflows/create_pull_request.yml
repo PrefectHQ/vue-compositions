@@ -10,8 +10,8 @@ jobs:
     name: Create pull requests
     runs-on: ubuntu-latest
     defaults:
-    run:
-      working-directory: orion-ui
+      run:
+        working-directory: orion-ui
     steps:
 
       - name: Checkout orion
