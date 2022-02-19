@@ -45,6 +45,7 @@ jobs:
         run: git push
       
       - name: Create PR
+        run: |
           gh pr create \
             --title "Update vue-compositions" \
             --body '_automatically created_' \
