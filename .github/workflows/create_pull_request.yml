@@ -29,6 +29,11 @@ jobs:
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
+      - name: Configure git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+
       - name: Create branch
         run: git checkout -b "update-vue-compositions"
 
