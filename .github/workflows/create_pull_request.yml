@@ -2,7 +2,6 @@ name: Create PRs to Repositories
 
 on:
   workflow_dispatch:
-  push:
 
 jobs:
 
@@ -46,7 +45,7 @@ jobs:
           git commit -m "Update dependency"
 
       - name: Push to remote
-        run: git push
+        run: git push --set-upstream origin update-vue-compositions
       
       - name: Create PR
         run: |
