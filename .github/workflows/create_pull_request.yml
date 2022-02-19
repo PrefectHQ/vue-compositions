@@ -9,6 +9,9 @@ jobs:
   create-pull-request:
     name: Create pull requests
     runs-on: ubuntu-latest
+    defaults:
+    run:
+      working-directory: orion-ui
     steps:
 
       - name: Checkout orion
@@ -19,7 +22,6 @@ jobs:
 
       - name: Read .nvmrc
         run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
-          working-directory: ./orion-ui
         id: nvm
 
       - name: Setup node
@@ -32,7 +34,6 @@ jobs:
 
       - name: Update dependency
         run: npm install @prefecthq/vue-compositions@latest --save --save-exact
-          working-directory: ./orion-ui
 
       - name: Commit dependency update
         run: |
