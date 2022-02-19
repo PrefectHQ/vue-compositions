@@ -18,13 +18,12 @@ jobs:
           token: ${{ secrets.PAT }}
 
       - name: Read .nvmrc
-        working-directory: orion-ui
         run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+          working-directory: ./orion-ui
         id: nvm
 
       - name: Setup node
         uses: actions/setup-node@v2
-        working-directory: orion-ui
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
@@ -32,9 +31,8 @@ jobs:
         run: git checkout -b "update-vue-compositions"
 
       - name: Update dependency
-        working-directory: orion-ui
-        run: |
-          npm install @prefecthq/vue-compositions@latest --save --save-exact
+        run: npm install @prefecthq/vue-compositions@latest --save --save-exact
+          working-directory: ./orion-ui
 
       - name: Commit dependency update
         run: |
