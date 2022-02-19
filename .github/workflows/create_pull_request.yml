@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
         with: 
           repository: PrefectHQ/orion
-          token: ${{ secrets.GITHUB_PAT }}
+          token: ${{ secrets.PAT }}
 
       - name: Read .nvmrc
         working-directory: ./orion-ui
@@ -50,4 +50,4 @@ jobs:
             --body '_automatically created_' \
             --base main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
