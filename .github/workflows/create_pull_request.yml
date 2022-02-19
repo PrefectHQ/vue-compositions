@@ -1,0 +1,53 @@
+name: Create PRs to Repositories
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+
+  create-pull-request:
+    name: Create pull requests
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout orion
+        uses: actions/checkout@v2
+        with: 
+          repository: PrefectHQ/orion
+          token: ${{ secrets.GITHUB_PAT }}
+
+      - name: Read .nvmrc
+        working-directory: ./orion-ui
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+        id: nvm
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        working-directory: ./orion-ui
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+
+      - name: Create branch
+        run: git checkout -b "update-vue-compositions"
+
+      - name: Update dependency
+        working-directory: ./orion-ui
+        run: |
+          npm install @prefecthq/vue-compositions@latest --save --save-exact
+
+      - name: Commit dependency update
+        run: |
+          git add -A
+          git commit -m "Update dependency"
+
+      - name: Push to remote
+        run: git push
+      
+      - name: Create PR
+          gh pr create \
+            --title "Update vue-compositions" \
+            --body '_automatically created_' \
+            --base main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_PAT }}
