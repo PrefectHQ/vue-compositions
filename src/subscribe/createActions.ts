@@ -3,7 +3,9 @@ type Callable<T> = keyof {
   [P in keyof T as T[P] extends AnyFunction ? P : never]: T[P]
 }
 
-export function createActions<T extends Record<string, unknown>>(context: T): Pick<T, Callable<T>> {
+// we do specifically want any here. unknown breaks this for classes
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createActions<T extends Record<string, any>>(context: T): Pick<T, Callable<T>> {
   const value = {} as Pick<T, Callable<T>>
 
   return Object.keys(context).reduce<Pick<T, Callable<T>>>((output, key) => {
