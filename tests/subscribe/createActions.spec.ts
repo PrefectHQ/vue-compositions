@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/class-literal-property-style */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createActions } from '@/subscribe'
@@ -60,7 +61,7 @@ describe('createActions', () => {
     expect(actions.cappa).toBeUndefined()
   })
 
-  it('does return inherited class methods', () => {
+  it('does return inherited class members are functions', () => {
     class Beta {
       public cappa(): string {
         return 'cappa'
@@ -72,6 +73,18 @@ describe('createActions', () => {
     const actions = createActions(new Alpha)
 
     expect(actions.cappa).toBeDefined()
+  })
+
+  it('does not return class members that are not methods', () => {
+    class Alpha {
+      public get alpha(): string {
+        return 'alpha'
+      }
+    }
+
+    const actions = createActions(new Alpha)
+
+    expect(Object.keys(actions).length).toBe(0)
   })
 
   it('does not return inherited object prototype', () => {
