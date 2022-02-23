@@ -2,19 +2,34 @@ type AnyFunction = (...args: unknown[]) => unknown
 type Callable<T> = keyof {
   [P in keyof T as T[P] extends AnyFunction ? P : never]: T[P]
 }
+type OnlyCallable<T> = Pick<T, Callable<T>>
 
 // we do specifically want any here. unknown breaks this for classes
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createActions<T extends Record<string, any>>(context: T): Pick<T, Callable<T>> {
-  const value = {} as Pick<T, Callable<T>>
+export function createActions<T extends Record<string, any>>(context: T): OnlyCallable<T> {
+  const objectPrototypeKeys = Reflect.ownKeys(Object.prototype)
+  const actions: Record<string, unknown> = {}
+  let prototype = Reflect.getPrototypeOf(context)
 
-  return Object.keys(context).reduce<Pick<T, Callable<T>>>((output, key) => {
-    const possiblyMethod = context[key]
-
-    if (typeof possiblyMethod === 'function') {
-      output[key as Callable<T>] = possiblyMethod.bind(context)
+  // properties
+  Reflect.ownKeys(context).forEach(key => {
+    if (typeof key === 'string' && typeof context[key] === 'function') {
+      actions[key] = context[key].bind(context)
     }
+  })
 
-    return output
-  }, value)
+  // methods
+  while (prototype && prototype !== Object.prototype) {
+    Reflect.ownKeys(prototype).forEach(key => {
+      if (typeof key === 'string' && !objectPrototypeKeys.includes(key)) {
+        // any necessary because Reflect.getPrototypeOf returns object
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        actions[key] = (prototype as any)[key].bind(context)
+      }
+    })
+
+    prototype = Reflect.getPrototypeOf(prototype)
+  }
+
+  return actions as Required<OnlyCallable<T>>
 }
