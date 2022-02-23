@@ -1,4 +1,4 @@
-import { subscribe } from '@/subscribe'
+import { useSubscription } from '@/subscribe'
 import Manager from '@/subscribe/manager'
 import Subscription from '@/subscribe/subscription'
 import { Action, ActionArguments, SubscriptionOptions } from '@/subscribe/types'
@@ -12,5 +12,5 @@ export function uniqueSubscribe<T extends Action>(
   args: ActionArguments<T>,
   options: SubscriptionOptions = {},
 ): Subscription<T> {
-  return subscribe(action, args, options, new Manager())
+  return useSubscription(action, args, options, new Manager())
 }

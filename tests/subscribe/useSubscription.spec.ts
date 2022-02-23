@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue'
 import { h, reactive, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
-import { subscribe } from '@/subscribe'
+import { useSubscription } from '@/subscribe'
 import Manager from '@/subscribe/manager'
 import Subscription from '@/subscribe/subscription'
 
@@ -120,8 +120,8 @@ describe('subscribe', () => {
     const manager = new Manager()
     const action = jest.fn()
 
-    subscribe(action, [], {}, manager)
-    subscribe(action, [], {}, manager)
+    useSubscription(action, [], {}, manager)
+    useSubscription(action, [], {}, manager)
 
     expect(action).toBeCalledTimes(1)
   })
@@ -136,8 +136,8 @@ describe('subscribe', () => {
     const minInterval = 10
     const maxInterval = 20
 
-    subscribe(action, [], { interval: minInterval }, manager)
-    subscribe(action, [], { interval: maxInterval }, manager)
+    useSubscription(action, [], { interval: minInterval }, manager)
+    useSubscription(action, [], { interval: maxInterval }, manager)
 
     jest.advanceTimersByTime(additionalExecutions * minInterval)
 
@@ -154,9 +154,9 @@ describe('subscribe', () => {
     const minInterval = 10
     const maxInterval = 20
 
-    const subscription1 = subscribe(action, [], { interval: minInterval }, manager)
+    const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subscription2 = subscribe(action, [], { interval: maxInterval }, manager)
+    const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
 
     subscription1.unsubscribe()
 
@@ -173,10 +173,10 @@ describe('subscribe', () => {
     const minInterval = 10
     const maxInterval = 20
 
-    const subscription1 = subscribe(action, [], { interval: minInterval }, manager)
-    const subscription2 = subscribe(action, [], { interval: maxInterval }, manager)
+    const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
+    const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subscription3 = subscribe(action, [], {}, manager)
+    const subscription3 = useSubscription(action, [], {}, manager)
 
     subscription1.unsubscribe()
     subscription2.unsubscribe()
@@ -312,8 +312,8 @@ describe('subscribe', () => {
       return ++int
     }
 
-    const subscription1 = subscribe(action, [], {}, manager)
-    const subscription2 = subscribe(action, [], {}, manager)
+    const subscription1 = useSubscription(action, [], {}, manager)
+    const subscription2 = useSubscription(action, [], {}, manager)
 
     await timeout()
 
