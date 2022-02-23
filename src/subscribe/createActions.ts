@@ -1,4 +1,6 @@
-type AnyFunction = (...args: unknown[]) => unknown
+// unknown breaks this for classes
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyFunction = (...args: any[]) => any
 type Callable<T> = keyof {
   [P in keyof T as T[P] extends AnyFunction ? P : never]: T[P]
 }
