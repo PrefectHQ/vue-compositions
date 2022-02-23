@@ -87,6 +87,24 @@ describe('createActions', () => {
     expect(Object.keys(actions).length).toBe(0)
   })
 
+  it('does override instance members', () => {
+    class Beta {
+      public cappa(): string {
+        return 'beta'
+      }
+    }
+
+    class Alpha extends Beta {
+      public cappa(): string {
+        return 'alpha'
+      }
+    }
+
+    const actions = createActions(new Alpha)
+
+    expect(actions.cappa()).toEqual('alpha')
+  })
+
   it('does not return inherited object prototype', () => {
     class Alpha {}
 

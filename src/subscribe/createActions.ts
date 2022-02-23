@@ -23,7 +23,7 @@ export function createActions<T extends Record<string, any>>(context: T): OnlyCa
   // methods
   while (prototype && prototype !== Object.prototype) {
     Reflect.ownKeys(prototype).forEach(key => {
-      if (typeof key === 'string' && typeof context[key] === 'function' && !objectPrototypeKeys.includes(key)) {
+      if (typeof key === 'string' && typeof actions[key] === 'undefined' && typeof context[key] === 'function' && !objectPrototypeKeys.includes(key)) {
         // any necessary because Reflect.getPrototypeOf returns object
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         actions[key] = (prototype as any)[key].bind(context)
