@@ -1,5 +1,5 @@
 import { render } from '@testing-library/vue'
-import { h, reactive, ref } from 'vue'
+import { computed, h, reactive, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
 import { useSubscription } from '@/subscribe'
 import Manager from '@/subscribe/manager'
@@ -338,6 +338,20 @@ describe('subscribe', () => {
     await timeout()
 
     expect(subscription.response.value).toBe(false)
+  })
+
+  it('when using computed args', async () => {
+    const action = jest.fn()
+    const valueRef = ref(0)
+    const valueComputed = computed(() => valueRef.value)
+
+    uniqueSubscribe(action, [valueComputed])
+
+    valueRef.value = 1
+
+    await timeout()
+
+    expect(action).toBeCalledTimes(2)
   })
 
 })

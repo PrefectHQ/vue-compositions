@@ -27,7 +27,10 @@ class ChannelSignatureManager {
       ChannelSignatureManager.actionIds.set(action, actionId)
     }
 
-    return `${actionId}-${JSON.stringify(args)}`
+    const unwrappedArgs = unref(args)
+    const stringArgs = JSON.stringify(unwrappedArgs)
+
+    return `${actionId}-${stringArgs}`
   }
 }
 
