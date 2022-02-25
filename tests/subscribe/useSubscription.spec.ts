@@ -354,4 +354,16 @@ describe('subscribe', () => {
     expect(action).toBeCalledTimes(2)
   })
 
+  it('fails when using nested computed args', () => {
+    const action = jest.fn()
+    const valueRef = ref(0)
+    const valueComputed = computed(() => valueRef)
+    const valueComputedComputed = computed(() => valueComputed)
+
+    expect(() => {
+      uniqueSubscribe(action, [valueComputedComputed])
+    }).toThrowError()
+
+  })
+
 })
