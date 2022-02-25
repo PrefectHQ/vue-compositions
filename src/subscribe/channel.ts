@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-import { unref } from 'vue'
 import Manager from './manager'
 import Subscription from './subscription'
 import {
@@ -8,6 +7,7 @@ import {
   ChannelSignature,
   SubscriptionOptions
 } from './types'
+import { unrefArgs } from './utilities'
 
 class ChannelSignatureManager {
   private static actionId: number = 0
@@ -27,8 +27,8 @@ class ChannelSignatureManager {
       ChannelSignatureManager.actionIds.set(action, actionId)
     }
 
-    const unwrappedArgs = unref(args)
-    const stringArgs = JSON.stringify(unwrappedArgs)
+    const unreffed = unrefArgs(args)
+    const stringArgs = JSON.stringify(unreffed)
 
     return `${actionId}-${stringArgs}`
   }
@@ -109,7 +109,7 @@ export default class Channel<T extends Action = Action> {
   }
 
   public async execute(): Promise<void> {
-    const args = (unref(this.args) as Parameters<T>).map(unref)
+    const args = unrefArgs(this.args)
 
     this.loading = true
     this.executed = true
