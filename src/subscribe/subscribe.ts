@@ -2,6 +2,7 @@ import { getCurrentInstance, isReactive, isRef, onUnmounted, shallowReactive, un
 import Manager from './manager'
 import Subscription from './subscription'
 import { Action, ActionArguments, SubscribeArguments, SubscriptionOptions } from './types'
+import { watchableArgs } from './utilities'
 
 const defaultManager = new Manager()
 
@@ -25,16 +26,23 @@ export function subscribe<T extends Action>(
     (unref(args) as Parameters<T>).some(isRef) ||
     (unref(args) as Parameters<T>).some(isReactive)
   ) {
+    const argsToWatch = watchableArgs(args)
+
     unwatch = watch(
-      args,
-      (newArgs) => {
+      argsToWatch,
+      () => {
         if (!subscription.isSubscribed()) {
           unwatch!()
           return
         }
 
         subscription.unsubscribe()
-        Object.assign(subscription, manager.subscribe(action, newArgs, options))
+
+        const newSubscription = manager.subscribe(action, args, options)
+
+        newSubscription.response.value ??= subscription.response.value
+
+        Object.assign(subscription, newSubscription)
       },
       { deep: true },
     )

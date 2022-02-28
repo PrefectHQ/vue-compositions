@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { ref, Ref, watch } from 'vue'
 import Channel from './channel'
-import { Action, SubscriptionOptions } from './types'
+import { Action, ActionResponse, SubscriptionOptions } from './types'
 
 class SubscriptionIdManager {
   private static id: number = 0
@@ -15,16 +15,17 @@ export default class Subscription<T extends Action> {
   public readonly id: number
   public readonly options: SubscriptionOptions
   public loading: Ref<boolean> = ref(false)
-  public response: Ref<Awaited<ReturnType<T>> | undefined> = ref(undefined)
+  public response: Ref<ActionResponse<T>| undefined> = ref(undefined)
   public errored: Ref<boolean> = ref(false)
   public error: Ref<unknown> = ref(null)
 
   private readonly channel: Channel<T>
 
-  public constructor(channel: Channel<T>, options: SubscriptionOptions) {
+  public constructor(channel: Channel<T>, options: SubscriptionOptions, response?: ActionResponse<T>) {
     this.id = SubscriptionIdManager.get()
     this.channel = channel
     this.options = options
+    this.response.value = response
   }
 
   public async refresh(): Promise<void> {

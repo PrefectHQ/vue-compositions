@@ -155,8 +155,8 @@ describe('subscribe', () => {
     const maxInterval = 20
 
     const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
+
+    useSubscription(action, [], { interval: maxInterval }, manager)
 
     subscription1.unsubscribe()
 
@@ -175,8 +175,8 @@ describe('subscribe', () => {
 
     const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
     const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subscription3 = useSubscription(action, [], {}, manager)
+
+    useSubscription(action, [], {}, manager)
 
     subscription1.unsubscribe()
     subscription2.unsubscribe()
@@ -258,10 +258,38 @@ describe('subscribe', () => {
       expect(action).toBeCalledTimes(2)
     })
 
+    it('when using args containing a ref value and a non reactive value', async () => {
+      const action = jest.fn()
+      const number = ref(0)
+      const args = [number, 0]
+
+      uniqueSubscribe(action, args)
+
+      number.value = 1
+
+      await timeout()
+
+      expect(action).toBeCalledTimes(2)
+    })
+
     it('when using args containing a reactive value', async () => {
       const action = jest.fn()
       const argument = reactive({ number: 0 })
       const args = [argument]
+
+      uniqueSubscribe(action, args)
+
+      argument.number = 1
+
+      await timeout()
+
+      expect(action).toBeCalledTimes(2)
+    })
+
+    it('when using args containing a reactive value and a non reactive value', async () => {
+      const action = jest.fn()
+      const argument = reactive({ number: 0 })
+      const args = [argument, 0]
 
       uniqueSubscribe(action, args)
 
@@ -364,6 +392,43 @@ describe('subscribe', () => {
       uniqueSubscribe(action, [valueComputedComputed])
     }).toThrowError()
 
+  })
+
+  it('it does not return undefined when a subscription changes', async () => {
+    jest.useFakeTimers()
+
+    function action(value: number): Promise<number> {
+      return new Promise((resolve) => setTimeout(() => resolve(value), 100))
+    }
+
+    const originalValue = 0
+    const valueArg = ref(originalValue)
+    const subscription = useSubscription(action, [valueArg])
+
+    jest.runAllTimers()
+    jest.useRealTimers()
+
+    valueArg.value = 1
+
+    await timeout()
+
+    expect(subscription.response.value).toBe(originalValue)
+  })
+
+  it('correctly sets response on additional subscriptions', async () => {
+    function action(): number {
+      return 0
+    }
+
+    const manager = new Manager()
+
+    useSubscription(action, [], {}, manager)
+
+    await timeout()
+
+    const subscription = useSubscription(action, [], {}, manager)
+
+    expect(subscription.response.value).toBe(0)
   })
 
 })

@@ -4,6 +4,7 @@ import Subscription from './subscription'
 import {
   Action,
   ActionArguments,
+  ActionResponse,
   ChannelSignature,
   SubscriptionOptions
 } from './types'
@@ -42,6 +43,7 @@ export default class Channel<T extends Action = Action> {
   private readonly action: T
   private readonly args: ActionArguments<T>
   private readonly subscriptions: Map<number, Subscription<T>> = new Map()
+  private response: ActionResponse<T> | undefined = undefined
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
 
@@ -78,14 +80,8 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  private set response(response: Awaited<ReturnType<T>>) {
-    for (const subscription of this.subscriptions.values()) {
-      subscription.response.value = response
-    }
-  }
-
   public subscribe(options: SubscriptionOptions): Subscription<T> {
-    const subscription = new Subscription(this, options)
+    const subscription = new Subscription(this, options, this.response)
 
     this.subscriptions.set(subscription.id, subscription)
 
@@ -118,7 +114,7 @@ export default class Channel<T extends Action = Action> {
     this.setInterval()
 
     try {
-      this.response = await this.action(...args)
+      this.setResponse(await this.action(...args))
       this.errored = false
       this.error = null
     } catch (error) {
@@ -131,6 +127,14 @@ export default class Channel<T extends Action = Action> {
 
   public isSubscribed(id: number): boolean {
     return this.subscriptions.has(id)
+  }
+
+  private setResponse(response: Awaited<ReturnType<T>>) {
+    this.response = response
+
+    for (const subscription of this.subscriptions.values()) {
+      subscription.response.value = response
+    }
   }
 
   private setInterval(): void {
