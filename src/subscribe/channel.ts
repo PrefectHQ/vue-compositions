@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-import { ref, Ref } from 'vue'
 import Manager from './manager'
 import Subscription from './subscription'
 import {
