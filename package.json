@@ -1,7 +1,7 @@
 {
   "name": "@prefecthq/vue-compositions",
   "private": false,
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "A collection of reusable vue compositions.",
   "main": "index.ts",
   "scripts": {
