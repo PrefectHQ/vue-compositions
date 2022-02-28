@@ -408,8 +408,6 @@ describe('subscribe', () => {
     jest.runAllTimers()
     jest.useRealTimers()
 
-    await timeout()
-
     valueArg.value = 1
 
     await timeout()
