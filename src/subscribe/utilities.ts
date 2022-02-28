@@ -9,7 +9,7 @@ export function unrefArgs<T extends Action>(args: ActionArguments<T>): Parameter
 
 export function watchableArgs<T extends Action>(args: ActionArguments<T>): WatchSource | WatchSource[] {
   if (isRef(args) || isReactive(args)) {
-    // can't quite figure out the types here. But the method is accurate best I can tell
+    // can't quite figure out the types here. But the tests around reactive arguments pass so I believe this is correct
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return args as any
   }
