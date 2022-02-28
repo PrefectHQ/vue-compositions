@@ -258,10 +258,38 @@ describe('subscribe', () => {
       expect(action).toBeCalledTimes(2)
     })
 
+    it('when using args containing a ref value and a non reactive value', async () => {
+      const action = jest.fn()
+      const number = ref(0)
+      const args = [number, 0]
+
+      uniqueSubscribe(action, args)
+
+      number.value = 1
+
+      await timeout()
+
+      expect(action).toBeCalledTimes(2)
+    })
+
     it('when using args containing a reactive value', async () => {
       const action = jest.fn()
       const argument = reactive({ number: 0 })
       const args = [argument]
+
+      uniqueSubscribe(action, args)
+
+      argument.number = 1
+
+      await timeout()
+
+      expect(action).toBeCalledTimes(2)
+    })
+
+    it('when using args containing a reactive value and a non reactive value', async () => {
+      const action = jest.fn()
+      const argument = reactive({ number: 0 })
+      const args = [argument, 0]
 
       uniqueSubscribe(action, args)
 
