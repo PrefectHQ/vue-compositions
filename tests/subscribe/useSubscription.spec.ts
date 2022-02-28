@@ -155,8 +155,8 @@ describe('subscribe', () => {
     const maxInterval = 20
 
     const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
+
+    useSubscription(action, [], { interval: maxInterval }, manager)
 
     subscription1.unsubscribe()
 
@@ -175,8 +175,8 @@ describe('subscribe', () => {
 
     const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
     const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const subscription3 = useSubscription(action, [], {}, manager)
+
+    useSubscription(action, [], {}, manager)
 
     subscription1.unsubscribe()
     subscription2.unsubscribe()
@@ -415,6 +415,22 @@ describe('subscribe', () => {
     await timeout()
 
     expect(subscription.response.value).toBe(originalValue)
+  })
+
+  it('correctly sets response on additional subscriptions', async () => {
+    function action(): number {
+      return 0
+    }
+
+    const manager = new Manager()
+
+    useSubscription(action, [], {}, manager)
+
+    await timeout()
+
+    const subscription = useSubscription(action, [], {}, manager)
+
+    expect(subscription.response.value).toBe(0)
   })
 
 })
