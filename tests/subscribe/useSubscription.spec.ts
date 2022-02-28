@@ -366,4 +366,27 @@ describe('subscribe', () => {
 
   })
 
+  it('it does not return undefined when a subscription changes', async () => {
+    jest.useFakeTimers()
+
+    function action(value: number): Promise<number> {
+      return new Promise((resolve) => setTimeout(() => resolve(value), 100))
+    }
+
+    const originalValue = 0
+    const valueArg = ref(originalValue)
+    const subscription = useSubscription(action, [valueArg])
+
+    jest.runAllTimers()
+    jest.useRealTimers()
+
+    await timeout()
+
+    valueArg.value = 1
+
+    await timeout()
+
+    expect(subscription.response.value).toBe(originalValue)
+  })
+
 })

@@ -34,7 +34,12 @@ export function subscribe<T extends Action>(
         }
 
         subscription.unsubscribe()
-        Object.assign(subscription, manager.subscribe(action, newArgs, options))
+
+        const newSubscription = manager.subscribe(action, newArgs, options)
+
+        newSubscription.response.value ??= subscription.response.value
+
+        Object.assign(subscription, newSubscription)
       },
       { deep: true },
     )
