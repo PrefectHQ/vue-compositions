@@ -9,15 +9,14 @@ const defaultManager = new Manager()
 /**
  * @deprecated use useSubscription instead
  */
-// I don't think this method makes sense with 3 params
-// eslint-disable-next-line max-params
 export function subscribe<T extends Action>(
   action: T,
   args: ActionArguments<T>,
   options: SubscriptionOptions = {},
-  manager: Manager = defaultManager,
 ): Subscription<T> {
+  const manager = options.manager ?? defaultManager
   const subscription = shallowReactive(manager.subscribe(action, args, options))
+
   let unwatch: ReturnType<typeof watch> | undefined
 
   if (
@@ -61,10 +60,9 @@ export function subscribe<T extends Action>(
   return subscription
 }
 
-export function useSubscription<T extends Action>(...[action, args, options, manager]: SubscribeArguments<T>): Subscription<T> {
+export function useSubscription<T extends Action>(...[action, args, options]: SubscribeArguments<T>): Subscription<T> {
   const argsWithDefault = args ?? ([] as unknown as ActionArguments<T>)
   const optionsWithDefault = options ?? {}
-  const managerWithDefault = manager ?? defaultManager
 
-  return subscribe(action, argsWithDefault, optionsWithDefault, managerWithDefault)
+  return subscribe(action, argsWithDefault, optionsWithDefault)
 }

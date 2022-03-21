@@ -120,8 +120,8 @@ describe('subscribe', () => {
     const manager = new Manager()
     const action = jest.fn()
 
-    useSubscription(action, [], {}, manager)
-    useSubscription(action, [], {}, manager)
+    useSubscription(action, [], { manager })
+    useSubscription(action, [], { manager })
 
     expect(action).toBeCalledTimes(1)
   })
@@ -136,8 +136,8 @@ describe('subscribe', () => {
     const minInterval = 10
     const maxInterval = 20
 
-    useSubscription(action, [], { interval: minInterval }, manager)
-    useSubscription(action, [], { interval: maxInterval }, manager)
+    useSubscription(action, [], { interval: minInterval, manager })
+    useSubscription(action, [], { interval: maxInterval, manager })
 
     jest.advanceTimersByTime(additionalExecutions * minInterval)
 
@@ -154,9 +154,9 @@ describe('subscribe', () => {
     const minInterval = 10
     const maxInterval = 20
 
-    const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
+    const subscription1 = useSubscription(action, [], { interval: minInterval, manager })
 
-    useSubscription(action, [], { interval: maxInterval }, manager)
+    useSubscription(action, [], { interval: maxInterval, manager })
 
     subscription1.unsubscribe()
 
@@ -173,10 +173,10 @@ describe('subscribe', () => {
     const minInterval = 10
     const maxInterval = 20
 
-    const subscription1 = useSubscription(action, [], { interval: minInterval }, manager)
-    const subscription2 = useSubscription(action, [], { interval: maxInterval }, manager)
+    const subscription1 = useSubscription(action, [], { interval: minInterval, manager })
+    const subscription2 = useSubscription(action, [], { interval: maxInterval, manager })
 
-    useSubscription(action, [], {}, manager)
+    useSubscription(action, [], { manager })
 
     subscription1.unsubscribe()
     subscription2.unsubscribe()
@@ -340,8 +340,8 @@ describe('subscribe', () => {
       return ++int
     }
 
-    const subscription1 = useSubscription(action, [], {}, manager)
-    const subscription2 = useSubscription(action, [], {}, manager)
+    const subscription1 = useSubscription(action, [], { manager })
+    const subscription2 = useSubscription(action, [], { manager })
 
     await timeout()
 
@@ -422,11 +422,11 @@ describe('subscribe', () => {
 
     const manager = new Manager()
 
-    useSubscription(action, [], {}, manager)
+    useSubscription(action, [], { manager })
 
     await timeout()
 
-    const subscription = useSubscription(action, [], {}, manager)
+    const subscription = useSubscription(action, [], { manager })
 
     expect(subscription.response.value).toBe(0)
   })

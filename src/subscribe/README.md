@@ -23,6 +23,7 @@ When a subscription is removed the channel interval is recalculated. A subscript
 | action  | `(...args: any[]) => any` | True | | The function to be executed
 | args    | `Parameters<action>`      | True | | Parameters of the action being executed
 | options.interval | `number`    | False | `Infinity` | A max poll interval in milliseconds.
+| options.manager | `Manager`    | False | `defaultManager` | A channel manager to use for the subscription.
 
 ## Returns
 | Name        | Type                                | Default     | Description                                                     |

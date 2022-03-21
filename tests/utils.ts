@@ -12,5 +12,10 @@ export function uniqueSubscribe<T extends Action>(
   args: ActionArguments<T>,
   options: SubscriptionOptions = {},
 ): Subscription<T> {
-  return useSubscription(action, args, options, new Manager())
+  const optionsWithManager = {
+    ...options,
+    manager: new Manager(),
+  }
+
+  return useSubscription(action, args, optionsWithManager)
 }
