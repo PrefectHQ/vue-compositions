@@ -16,11 +16,12 @@ export type ChannelSignature = `${number}-${string}`
 
 export type SubscriptionOptions = {
   interval?: number,
+  manager?: Manager,
 }
 
 type OnlyRequired<T extends any[], U extends any[] = []> = Partial<T> extends T ? U : T extends [infer F, ...infer R] ? OnlyRequired<R, [...U, F]> : U
 type ActionParamsRequired<T extends Action> = OnlyRequired<Parameters<T>>
 
 export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> extends never[]
-  ? [action: T, args?: ActionArguments<T>, options?: SubscriptionOptions, manager?: Manager ]
-  : [action: T, args: ActionArguments<T>, options?: SubscriptionOptions, manager?: Manager ]
+  ? [action: T, args?: ActionArguments<T>, options?: SubscriptionOptions ]
+  : [action: T, args: ActionArguments<T>, options?: SubscriptionOptions ]
