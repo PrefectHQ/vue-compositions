@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ref, UnwrapRef } from 'vue'
 import Manager from './manager'
+import Subscription from './subscription'
 
 type ToPossibleRefs<T> = {
   [K in keyof T]: T[K] | Ref<UnwrapRef<T[K]>>
@@ -23,5 +24,28 @@ type OnlyRequired<T extends any[], U extends any[] = []> = Partial<T> extends T 
 type ActionParamsRequired<T extends Action> = OnlyRequired<Parameters<T>>
 
 export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> extends never[]
-  ? [action: T, args?: ActionArguments<T>, options?: SubscriptionOptions ]
-  : [action: T, args: ActionArguments<T>, options?: SubscriptionOptions ]
+  ? [action: T, args?: ActionArguments<T>, options?: SubscriptionOptions]
+  : [action: T, args: ActionArguments<T>, options?: SubscriptionOptions]
+
+
+export type MappedSubscription<T extends Action> = {
+  loading: Subscription<T>['loading'],
+  response: Subscription<T>['response'],
+  errored: Subscription<T>['errored'],
+  error: Subscription<T>['error'],
+  refresh: Subscription<T>['refresh'],
+  unsubscribe: Subscription<T>['unsubscribe'],
+  isSubscribed: Subscription<T>['isSubscribed'],
+  promise: () => Promise<UseSubscription<T>>,
+}
+
+export type UseSubscription<T extends Action> = {
+  loading: boolean,
+  response: ActionResponse<T> | undefined,
+  errored: boolean,
+  error: unknown,
+  refresh: Subscription<T>['refresh'],
+  unsubscribe: Subscription<T>['unsubscribe'],
+  isSubscribed: Subscription<T>['isSubscribed'],
+  promise: () => Promise<UseSubscription<T>>,
+}

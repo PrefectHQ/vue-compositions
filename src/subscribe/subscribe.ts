@@ -1,15 +1,15 @@
-import { getCurrentInstance, isReactive, isRef, onUnmounted, shallowReactive, unref, watch } from 'vue'
+import { getCurrentInstance, isReactive, isRef, onUnmounted, reactive, unref, watch } from 'vue'
 import Manager from './manager'
-import Subscription from './subscription'
-import { Action, ActionArguments, SubscribeArguments } from './types'
-import { watchableArgs } from './utilities'
+import { Action, ActionArguments, SubscribeArguments, UseSubscription } from './types'
+import { mapSubscription, watchableArgs } from './utilities'
 
 const defaultManager = new Manager()
 
-export function useSubscription<T extends Action>(...[action, args, options = {}]: SubscribeArguments<T>): Subscription<T> {
+export function useSubscription<T extends Action>(...[action, args, options = {}]: SubscribeArguments<T>): UseSubscription<T> {
   const manager = options.manager ?? defaultManager
   const argsWithDefault = args ?? ([] as unknown as ActionArguments<T>)
-  const subscription = shallowReactive(manager.subscribe(action, argsWithDefault, options))
+  const subscription = manager.subscribe(action, argsWithDefault, options)
+  const response = reactive(mapSubscription(subscription))
 
   let unwatch: ReturnType<typeof watch> | undefined
 
@@ -35,7 +35,7 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
 
         newSubscription.response.value ??= subscription.response.value
 
-        Object.assign(subscription, newSubscription)
+        Object.assign(response, mapSubscription(newSubscription))
       },
       { deep: true },
     )
@@ -43,7 +43,7 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
 
   if (getCurrentInstance()) {
     onUnmounted(() => {
-      subscription.unsubscribe()
+      response.unsubscribe()
 
       if (unwatch) {
         unwatch()
@@ -51,5 +51,5 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
     })
   }
 
-  return subscription
+  return response
 }

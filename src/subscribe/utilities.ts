@@ -1,5 +1,6 @@
-import { isReactive, isRef, unref, WatchSource } from 'vue'
-import { Action, ActionArguments } from './types'
+import { isReactive, isRef, reactive, unref, WatchSource } from 'vue'
+import Subscription from './subscription'
+import { Action, ActionArguments, MappedSubscription } from './types'
 
 export function unrefArgs<T extends Action>(args: ActionArguments<T>): Parameters<T> {
   const argsUnref = unref(args) as Parameters<T>
@@ -19,4 +20,19 @@ export function watchableArgs<T extends Action>(args: ActionArguments<T>): Watch
   }
 
   return []
+}
+
+export function mapSubscription<T extends Action>(subscription: Subscription<T>): MappedSubscription<T> {
+  const { loading, error, errored, response } = subscription
+
+  return {
+    loading,
+    error,
+    errored,
+    response,
+    refresh: () => subscription.refresh(),
+    unsubscribe: () => subscription.unsubscribe(),
+    isSubscribed: () => subscription.isSubscribed(),
+    promise: () => subscription.promise().then(subscription => reactive(mapSubscription(subscription))),
+  }
 }

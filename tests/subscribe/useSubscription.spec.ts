@@ -3,15 +3,15 @@ import { computed, h, reactive, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
 import { useSubscription } from '@/subscribe'
 import Manager from '@/subscribe/manager'
-import Subscription from '@/subscribe/subscription'
+import { UseSubscription } from '@/subscribe/types'
 
-function hello(number: number): boolean {
+function numberEqualsOne(number: number): boolean {
   return number === 1
 }
 
-function helloPromise(number: number, delay: number): Promise<boolean> {
+function numberEqualsOnePromise(number: number, delay: number): Promise<boolean> {
   return new Promise(resolve => {
-    setTimeout(() => resolve(hello(number)), delay)
+    setTimeout(() => resolve(numberEqualsOne(number)), delay)
   })
 }
 
@@ -20,52 +20,52 @@ afterEach(() => jest.useRealTimers())
 describe('subscribe', () => {
 
   it('returns the correct response', async () => {
-    const subscription = await uniqueSubscribe(hello, [1])
+    const subscription = await uniqueSubscribe(numberEqualsOne, [1])
 
-    expect(subscription.response.value).toBe(true)
+    expect(subscription.response).toBe(true)
   })
 
   it('returns the correct response when awaiting the promise', async () => {
     jest.useFakeTimers()
 
-    const promise = uniqueSubscribe(helloPromise, [1, 1000]).promise()
+    const promise = uniqueSubscribe(numberEqualsOnePromise, [1, 1000]).promise()
 
     jest.runAllTimers()
 
     const subscription = await promise
 
-    expect(subscription.response.value).toBe(true)
+    expect(subscription.response).toBe(true)
   })
 
   it('returns response undefined until action promise resolves', () => {
-    const subscription = uniqueSubscribe(helloPromise, [1, 10])
+    const subscription = uniqueSubscribe(numberEqualsOnePromise, [1, 10])
 
-    expect(subscription.response.value).toBe(undefined)
+    expect(subscription.response).toBe(undefined)
   })
 
   it('returns the correct response when action promise resolves', async () => {
     jest.useFakeTimers()
 
-    const subscription = uniqueSubscribe(helloPromise, [1, 10])
+    const subscription = uniqueSubscribe(numberEqualsOnePromise, [1, 10])
 
     jest.runAllTimers()
     jest.useRealTimers()
 
     await timeout()
 
-    expect(subscription.response.value).toBe(true)
+    expect(subscription.response).toBe(true)
   })
 
   it('sets loading to true', () => {
-    const subscription = uniqueSubscribe(hello, [1])
+    const subscription = uniqueSubscribe(numberEqualsOne, [1])
 
-    expect(subscription.loading.value).toBe(true)
+    expect(subscription.loading).toBe(true)
   })
 
   it('sets loading to false', async () => {
-    const subscription = await uniqueSubscribe(hello, [1])
+    const subscription = await uniqueSubscribe(numberEqualsOne, [1])
 
-    expect(subscription.loading.value).toBe(false)
+    expect(subscription.loading).toBe(false)
   })
 
   it('defaults errored to false', () => {
@@ -73,7 +73,7 @@ describe('subscribe', () => {
 
     const subscription = uniqueSubscribe(action, [])
 
-    expect(subscription.errored.value).toBe(false)
+    expect(subscription.errored).toBe(false)
   })
 
   it('sets errored to true', () => {
@@ -83,7 +83,7 @@ describe('subscribe', () => {
 
     const subscription = uniqueSubscribe(errors, [])
 
-    expect(subscription.errored.value).toBe(true)
+    expect(subscription.errored).toBe(true)
   })
 
   it('sets error if an error is thrown', () => {
@@ -95,7 +95,7 @@ describe('subscribe', () => {
 
     const subscription = uniqueSubscribe(errors, [])
 
-    expect(subscription.error.value).toBe(error)
+    expect(subscription.error).toBe(error)
   })
 
   it('rejects promise', async () => {
@@ -304,18 +304,17 @@ describe('subscribe', () => {
 
   it('updates response when args change', async () => {
     const number = ref(0)
-    const subscription = uniqueSubscribe(hello, [number])
-
+    const subscription = uniqueSubscribe(numberEqualsOne, [number])
     number.value = 1
 
     await timeout()
 
-    expect(subscription.response.value).toBe(true)
+    expect(subscription.response).toBe(true)
   })
 
   it('calls unsubscribe when component is unmounted', () => {
     const action = jest.fn()
-    let subscription: Subscription<typeof action>
+    let subscription: UseSubscription<typeof action>
 
     const { unmount } = render({
       setup() {
@@ -349,13 +348,13 @@ describe('subscribe', () => {
 
     await subscription2.refresh()
 
-    expect(subscription1.response.value).toBe(1)
-    expect(subscription2.response.value).toBe(2)
+    expect(subscription1.response).toBe(1)
+    expect(subscription2.response).toBe(2)
   })
 
   it('does not update subscription when args change if unsubscribed', async () => {
     const number = ref(0)
-    const subscription = uniqueSubscribe(hello, [number])
+    const subscription = uniqueSubscribe(numberEqualsOne, [number])
 
     await timeout()
 
@@ -365,7 +364,7 @@ describe('subscribe', () => {
 
     await timeout()
 
-    expect(subscription.response.value).toBe(false)
+    expect(subscription.response).toBe(false)
   })
 
   it('when using computed args', async () => {
@@ -412,7 +411,7 @@ describe('subscribe', () => {
 
     await timeout()
 
-    expect(subscription.response.value).toBe(originalValue)
+    expect(subscription.response).toBe(originalValue)
   })
 
   it('correctly sets response on additional subscriptions', async () => {
@@ -428,7 +427,7 @@ describe('subscribe', () => {
 
     const subscription = useSubscription(action, [], { manager })
 
-    expect(subscription.response.value).toBe(0)
+    expect(subscription.response).toBe(0)
   })
 
 })
