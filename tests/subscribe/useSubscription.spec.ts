@@ -430,4 +430,26 @@ describe('subscribe', () => {
     expect(subscription.response).toBe(0)
   })
 
+  it('correctly sets executed', async () => {
+    const action = jest.fn()
+    const subscription = uniqueSubscribe(action)
+
+    await timeout()
+
+    expect(subscription.executed).toBe(true)
+  })
+
+  it('correctly sets executed on additional subscriptions', async () => {
+    const action = jest.fn()
+    const manager = new Manager()
+
+    useSubscription(action, [], { manager })
+
+    await timeout()
+
+    const subscription = useSubscription(action, [], { manager })
+
+    expect(subscription.executed).toBe(true)
+  })
+
 })

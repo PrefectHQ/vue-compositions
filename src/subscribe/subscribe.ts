@@ -14,10 +14,10 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
   let unwatch: ReturnType<typeof watch> | undefined
 
   if (
-    isRef(args) ||
-    isReactive(args) ||
-    (unref(args) as Parameters<T>).some(isRef) ||
-    (unref(args) as Parameters<T>).some(isReactive)
+    isRef(argsWithDefault) ||
+    isReactive(argsWithDefault) ||
+    (unref(argsWithDefault) as Parameters<T>).some(isRef) ||
+    (unref(argsWithDefault) as Parameters<T>).some(isReactive)
   ) {
     const argsToWatch = watchableArgs(argsWithDefault)
 

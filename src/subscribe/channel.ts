@@ -28,8 +28,8 @@ class ChannelSignatureManager {
       ChannelSignatureManager.actionIds.set(action, actionId)
     }
 
-    const unreffed = unrefArgs(args)
-    const stringArgs = JSON.stringify(unreffed)
+    const unwrapped = unrefArgs(args)
+    const stringArgs = JSON.stringify(unwrapped)
 
     return `${actionId}-${stringArgs}`
   }
@@ -37,7 +37,6 @@ class ChannelSignatureManager {
 
 export default class Channel<T extends Action = Action> {
   public readonly signature: ChannelSignature
-  public executed: boolean = false
 
   private readonly manager: Manager
   private readonly action: T
@@ -46,6 +45,7 @@ export default class Channel<T extends Action = Action> {
   private response: ActionResponse<T> | undefined = undefined
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
+  private _executed: boolean = false
 
   public constructor(manager: Manager, action: T, args: ActionArguments<T>) {
     this.signature = ChannelSignatureManager.get(action, args)
@@ -60,6 +60,18 @@ export default class Channel<T extends Action = Action> {
       .map(subscription => subscription.options.interval ?? Infinity)
 
     return Math.min(...intervals)
+  }
+
+  private get executed(): boolean {
+    return this._executed
+  }
+
+  private set executed(executed: boolean) {
+    this._executed = executed
+
+    for (const subscription of this.subscriptions.values()) {
+      subscription.executed.value = executed
+    }
   }
 
   private set loading(loading: boolean) {
@@ -85,7 +97,9 @@ export default class Channel<T extends Action = Action> {
 
     this.subscriptions.set(subscription.id, subscription)
 
-    if (!this.executed) {
+    if (this.executed) {
+      subscription.executed.value = this.executed
+    } else {
       this.execute()
     }
 
@@ -129,7 +143,7 @@ export default class Channel<T extends Action = Action> {
     return this.subscriptions.has(id)
   }
 
-  private setResponse(response: Awaited<ReturnType<T>>) {
+  private setResponse(response: Awaited<ReturnType<T>>): void {
     this.response = response
 
     for (const subscription of this.subscriptions.values()) {
