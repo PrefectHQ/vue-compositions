@@ -53,17 +53,17 @@ export default class Subscription<T extends Action> {
         return
       }
 
-      const loadingWatcher = watch(this.loading, () => {
-        if (!this.loading.value) {
+      const executedWatcher = watch(this.executed, () => {
+        if (this.executed.value) {
           erroredWatcher()
-          loadingWatcher()
+          executedWatcher()
           resolve(this)
         }
       })
 
       const erroredWatcher = watch(this.errored, () => {
         if (this.errored.value) {
-          loadingWatcher()
+          executedWatcher()
           erroredWatcher()
           reject(this.error.value)
         }

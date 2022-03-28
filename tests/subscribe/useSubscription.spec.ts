@@ -108,7 +108,7 @@ describe('subscribe', () => {
     let caught
 
     try {
-      await uniqueSubscribe(action, []).promise()
+      await uniqueSubscribe(action).promise()
     } catch (err) {
       caught = err
     }
