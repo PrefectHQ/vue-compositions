@@ -1,4 +1,4 @@
-import { getCurrentInstance, isReactive, isRef, onUnmounted, reactive, unref, watch } from 'vue'
+import { getCurrentInstance, onUnmounted, reactive, watch } from 'vue'
 import Manager from './manager'
 import { Action, ActionArguments, SubscribeArguments, UseSubscription } from './types'
 import { mapSubscription, watchableArgs } from './utilities'
@@ -12,24 +12,18 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
   const response = reactive(mapSubscription(subscription))
 
   let unwatch: ReturnType<typeof watch> | undefined
+  const watchable = watchableArgs(argsWithDefault)
 
-  if (
-    isRef(argsWithDefault) ||
-    isReactive(argsWithDefault) ||
-    (unref(argsWithDefault) as Parameters<T>).some(isRef) ||
-    (unref(argsWithDefault) as Parameters<T>).some(isReactive)
-  ) {
-    const argsToWatch = watchableArgs(argsWithDefault)
-
+  if (watchable !== null) {
     unwatch = watch(
-      argsToWatch,
+      watchable,
       () => {
-        if (!subscription.isSubscribed()) {
+        if (!response.isSubscribed()) {
           unwatch!()
           return
         }
 
-        subscription.unsubscribe()
+        response.unsubscribe()
 
         const newSubscription = manager.subscribe(action, argsWithDefault, options)
 
