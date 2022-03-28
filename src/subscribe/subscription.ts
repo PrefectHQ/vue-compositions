@@ -18,6 +18,7 @@ export default class Subscription<T extends Action> {
   public response: Ref<ActionResponse<T>| undefined> = ref(undefined)
   public errored: Ref<boolean> = ref(false)
   public error: Ref<unknown> = ref(null)
+  public executed: Ref<boolean> = ref(false)
 
   private readonly channel: Channel<T>
 
@@ -42,7 +43,7 @@ export default class Subscription<T extends Action> {
 
   public promise(): Promise<Subscription<T>> {
     return new Promise((resolve, reject) => {
-      if (this.channel.executed) {
+      if (this.executed.value) {
         if (this.errored.value) {
           reject(this.error.value)
           return
@@ -52,17 +53,17 @@ export default class Subscription<T extends Action> {
         return
       }
 
-      const loadingWatcher = watch(this.loading, () => {
-        if (!this.loading.value) {
+      const executedWatcher = watch(this.executed, () => {
+        if (this.executed.value) {
           erroredWatcher()
-          loadingWatcher()
+          executedWatcher()
           resolve(this)
         }
       })
 
       const erroredWatcher = watch(this.errored, () => {
         if (this.errored.value) {
-          loadingWatcher()
+          executedWatcher()
           erroredWatcher()
           reject(this.error.value)
         }

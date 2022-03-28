@@ -1,47 +1,35 @@
-import { getCurrentInstance, isReactive, isRef, onUnmounted, shallowReactive, unref, watch } from 'vue'
+import { getCurrentInstance, onUnmounted, reactive, watch } from 'vue'
 import Manager from './manager'
-import Subscription from './subscription'
-import { Action, ActionArguments, SubscribeArguments, SubscriptionOptions } from './types'
-import { watchableArgs } from './utilities'
+import { Action, ActionArguments, SubscribeArguments, UseSubscription } from './types'
+import { mapSubscription, watchableArgs } from './utilities'
 
 const defaultManager = new Manager()
 
-/**
- * @deprecated use useSubscription instead
- */
-export function subscribe<T extends Action>(
-  action: T,
-  args: ActionArguments<T>,
-  options: SubscriptionOptions = {},
-): Subscription<T> {
+export function useSubscription<T extends Action>(...[action, args, options = {}]: SubscribeArguments<T>): UseSubscription<T> {
   const manager = options.manager ?? defaultManager
-  const subscription = shallowReactive(manager.subscribe(action, args, options))
+  const argsWithDefault = args ?? ([] as unknown as ActionArguments<T>)
+  const subscription = manager.subscribe(action, argsWithDefault, options)
+  const response = reactive(mapSubscription(subscription))
 
   let unwatch: ReturnType<typeof watch> | undefined
+  const watchable = watchableArgs(argsWithDefault)
 
-  if (
-    isRef(args) ||
-    isReactive(args) ||
-    (unref(args) as Parameters<T>).some(isRef) ||
-    (unref(args) as Parameters<T>).some(isReactive)
-  ) {
-    const argsToWatch = watchableArgs(args)
-
+  if (watchable !== null) {
     unwatch = watch(
-      argsToWatch,
+      watchable,
       () => {
-        if (!subscription.isSubscribed()) {
+        if (!response.isSubscribed()) {
           unwatch!()
           return
         }
 
-        subscription.unsubscribe()
+        response.unsubscribe()
 
-        const newSubscription = manager.subscribe(action, args, options)
+        const newSubscription = manager.subscribe(action, argsWithDefault, options)
 
         newSubscription.response.value ??= subscription.response.value
 
-        Object.assign(subscription, newSubscription)
+        Object.assign(response, mapSubscription(newSubscription))
       },
       { deep: true },
     )
@@ -49,7 +37,7 @@ export function subscribe<T extends Action>(
 
   if (getCurrentInstance()) {
     onUnmounted(() => {
-      subscription.unsubscribe()
+      response.unsubscribe()
 
       if (unwatch) {
         unwatch()
@@ -57,12 +45,5 @@ export function subscribe<T extends Action>(
     })
   }
 
-  return subscription
-}
-
-export function useSubscription<T extends Action>(...[action, args, options]: SubscribeArguments<T>): Subscription<T> {
-  const argsWithDefault = args ?? ([] as unknown as ActionArguments<T>)
-  const optionsWithDefault = options ?? {}
-
-  return subscribe(action, argsWithDefault, optionsWithDefault)
+  return response
 }
