@@ -4,11 +4,11 @@ type AnyFunction = (...args: any[]) => any
 type Callable<T> = keyof {
   [P in keyof T as T[P] extends AnyFunction ? P : never]: T[P]
 }
-type OnlyCallable<T> = Pick<T, Callable<T>>
+export type CreateActions<T> = Pick<T, Callable<T>>
 
 // we do specifically want any here. unknown breaks this for classes
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createActions<T extends Record<string, any>>(context: T): OnlyCallable<T> {
+export function createActions<T extends Record<string, any>>(context: T): CreateActions<T> {
   const objectPrototypeKeys = Reflect.ownKeys(Object.prototype)
   const actions: Record<string, unknown> = {}
   let prototype = Reflect.getPrototypeOf(context)
@@ -33,5 +33,5 @@ export function createActions<T extends Record<string, any>>(context: T): OnlyCa
     prototype = Reflect.getPrototypeOf(prototype)
   }
 
-  return actions as Required<OnlyCallable<T>>
+  return actions as Required<CreateActions<T>>
 }
