@@ -22,11 +22,16 @@ export default class Subscription<T extends Action> {
 
   private readonly channel: Channel<T>
 
-  public constructor(channel: Channel<T>, options: SubscriptionOptions, response?: ActionResponse<T>) {
+  public constructor(channel: Channel<T>, options: SubscriptionOptions) {
     this.id = SubscriptionIdManager.get()
     this.channel = channel
     this.options = options
-    this.response.value = response
+
+    this.loading.value = channel.loading
+    this.response.value = channel.response
+    this.errored.value = channel.errored
+    this.error.value = channel.error
+    this.executed.value = channel.executed
   }
 
   public async refresh(): Promise<void> {
