@@ -47,6 +47,7 @@ export default class Channel<T extends Action = Action> {
   private lastExecution: number = 0
   private _loading: boolean = false
   private _executed: boolean = false
+  private _errored: boolean = false
 
   public constructor(manager: Manager, action: T, args: ActionArguments<T>) {
     this.signature = ChannelSignatureManager.get(action, args)
@@ -83,12 +84,21 @@ export default class Channel<T extends Action = Action> {
 
   private set loading(loading: boolean) {
     this._loading = loading
+
     for (const subscription of this.subscriptions.values()) {
       subscription.loading.value = loading
     }
   }
 
+  // conflicting rules
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  private get errored(): boolean {
+    return this._errored
+  }
+
   private set errored(errored: boolean) {
+    this._errored = errored
+
     for (const subscription of this.subscriptions.values()) {
       subscription.errored.value = errored
     }
@@ -141,6 +151,7 @@ export default class Channel<T extends Action = Action> {
     } catch (error) {
       this.errored = true
       this.error = error
+      this.clearTimer()
     } finally {
       this.executed = true
       this.loading = false
