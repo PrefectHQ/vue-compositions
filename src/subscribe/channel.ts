@@ -159,12 +159,20 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  private setInterval(): void {
+  private clearTimer(): void {
     if (this.timer) {
       clearTimeout(this.timer)
     }
+  }
+
+  private setInterval(): void {
+    this.clearTimer()
 
     if (this.interval === Infinity) {
+      return
+    }
+
+    if (this.errored) {
       return
     }
 
