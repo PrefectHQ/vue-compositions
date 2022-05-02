@@ -452,4 +452,18 @@ describe('subscribe', () => {
     expect(subscription.executed).toBe(true)
   })
 
+  it('stops executing when action errors', () => {
+    const action = jest.fn(() => {
+      throw 'error'
+    })
+
+    jest.useFakeTimers()
+
+    uniqueSubscribe(action, [], { interval: 10000 })
+
+    jest.advanceTimersByTime(10000 * 2)
+
+    expect(action).toBeCalledTimes(1)
+  })
+
 })
