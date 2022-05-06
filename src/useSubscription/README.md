@@ -1,4 +1,4 @@
-# Subscribe
+# useSubscription
 The `useSubscription` composition manages data sharing across components. Multiple components can subscribe to an `action` (any method or function) and and share the response value. 
 
 ## Example
