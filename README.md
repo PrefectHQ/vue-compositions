@@ -7,5 +7,6 @@ npm i --save @prefecthq/vue-compositions
 ```
 
 ## Compositions
-- [useMedia](https://github.com/PrefectHQ/vue-compositions/tree/main/src/media)
-- [useSubscription](https://github.com/PrefectHQ/vue-compositions/tree/main/src/subscribe)
+- [useIntersectionObserver](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useIntersectionObserver)
+- [useMedia](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useMedia)
+- [useSubscription](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useSubscription)
