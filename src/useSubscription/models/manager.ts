@@ -1,11 +1,11 @@
-import Channel from './channel'
-import Subscription from './subscription'
 import {
   Action,
   ActionArguments,
-  ChannelSignature,
-  SubscriptionOptions
-} from './types'
+  ChannelSignature
+} from '../types/action'
+import { SubscriptionOptions } from '../types/subscription'
+import Channel from './channel'
+import Subscription from './subscription'
 
 export default class Manager {
   private readonly channels: Map<ChannelSignature, Channel> = new Map()

@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue'
 import { h, isRef, ref } from 'vue'
 import { timeout } from '../utils'
-import { media } from '@/media'
+import { useMedia } from '@/useMedia'
 
 describe('media', () => {
   const addEventListener = jest.fn()
@@ -26,14 +26,14 @@ describe('media', () => {
   afterEach(() => jest.resetAllMocks())
 
   it('returns a ref', () => {
-    const match = media('(hover)')
+    const match = useMedia('(hover)')
 
     expect(isRef(match)).toBe(true)
   })
 
   it('if query changes, media is called again', async () => {
     const query = ref('(hover)')
-    media(query)
+    useMedia(query)
 
     query.value = '(touch)'
     await timeout()
@@ -43,7 +43,7 @@ describe('media', () => {
 
   it('if query changes, event listener is updated', async () => {
     const query = ref('(hover)')
-    media(query)
+    useMedia(query)
 
     query.value = '(touch)'
     await timeout()
@@ -56,7 +56,7 @@ describe('media', () => {
   it('if vue component is unmounted, event listener is removed', () => {
     const { unmount } = render({
       setup() {
-        media('(hover)')
+        useMedia('(hover)')
 
         return () => h('p')
       },

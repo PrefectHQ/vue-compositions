@@ -1,7 +1,9 @@
 import { getCurrentInstance, onUnmounted, reactive, watch } from 'vue'
-import Manager from './manager'
-import { Action, ActionArguments, SubscribeArguments, UseSubscription } from './types'
-import { mapSubscription, watchableArgs } from './utilities'
+import Manager from './models/manager'
+import { Action, ActionArguments } from './types/action'
+import { SubscribeArguments, UseSubscription } from './types/subscription'
+import { watchableArgs } from './utilities/reactivity'
+import { mapSubscription } from './utilities/subscriptions'
 
 const defaultManager = new Manager()
 

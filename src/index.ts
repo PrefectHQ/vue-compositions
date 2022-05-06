@@ -1,2 +1,2 @@
-export * from './media'
-export * from './subscribe'
+export * from './useMedia'
+export * from './useSubscription'

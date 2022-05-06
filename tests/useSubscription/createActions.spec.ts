@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/class-literal-property-style */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createActions } from '@/subscribe'
+import { createActions } from '@/useSubscription'
 
 describe('createActions', () => {
 

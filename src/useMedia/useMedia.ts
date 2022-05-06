@@ -1,8 +1,11 @@
 import { getCurrentInstance, isRef, onUnmounted, ref, Ref, unref, watch } from 'vue'
+
 /**
  * @deprecated use useMedia instead
  */
-export function media(query: Ref<string> | string): Ref<boolean> {
+export const media = useMedia
+
+export function useMedia(query: Ref<string> | string): Ref<boolean> {
   let mediaQuery = window.matchMedia(unref(query))
   const matches = ref(mediaQuery.matches)
   let unwatch: ReturnType<typeof watch> | undefined
@@ -33,5 +36,3 @@ export function media(query: Ref<string> | string): Ref<boolean> {
 
   return matches
 }
-
-export const useMedia = media
