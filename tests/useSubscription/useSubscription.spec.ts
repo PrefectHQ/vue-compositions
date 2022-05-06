@@ -2,8 +2,8 @@ import { render } from '@testing-library/vue'
 import { computed, h, reactive, ref } from 'vue'
 import { timeout, uniqueSubscribe } from '../utils'
 import { useSubscription } from '@/useSubscription'
-import Manager from '@/useSubscription/manager'
-import { UseSubscription } from '@/useSubscription/types'
+import Manager from '@/useSubscription/models/manager'
+import { UseSubscription } from '@/useSubscription/types/subscription'
 
 function numberEqualsOne(number: number): boolean {
   return number === 1
