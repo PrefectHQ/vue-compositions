@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue'
 import { h, isRef, ref } from 'vue'
 import { timeout } from '../utils'
-import { media } from '@/media'
+import { media } from '@/useMedia'
 
 describe('media', () => {
   const addEventListener = jest.fn()

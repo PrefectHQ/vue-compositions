@@ -1,6 +1,6 @@
-import { useSubscription } from '@/subscribe'
-import Manager from '@/subscribe/manager'
-import { Action, SubscribeArguments, UseSubscription } from '@/subscribe/types'
+import { useSubscription } from '@/useSubscription'
+import Manager from '@/useSubscription/manager'
+import { Action, SubscribeArguments, UseSubscription } from '@/useSubscription/types'
 
 export function timeout(ms = 0): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
