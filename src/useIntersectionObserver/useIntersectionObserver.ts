@@ -15,7 +15,7 @@ export type UseIntersectionObserverOptions = {
 
 export type UseIntersectionObserverCallback = (entries: IntersectionObserverEntry[]) => void
 
-export function useIntersectionObserver(callback: UseIntersectionObserverCallback, options: UseIntersectionObserverOptions): UseIntersectionObserverResponse {
+export function useIntersectionObserver(callback: UseIntersectionObserverCallback, options: UseIntersectionObserverOptions = {}): UseIntersectionObserverResponse {
 
   let intersectionObserver: IntersectionObserver | null = null
 
