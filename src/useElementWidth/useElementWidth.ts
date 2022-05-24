@@ -6,7 +6,6 @@ export function useElementWidth(element: HTMLElement | undefined | Ref<HTMLEleme
   const widthInPixels = ref<number>(0)
 
   const callback: UseResizeObserverCallback = function([entry]: ResizeObserverEntry[]) {
-    console.log({ callback: entry })
     const { width } = entry.target.getBoundingClientRect()
 
     widthInPixels.value = width
@@ -16,7 +15,6 @@ export function useElementWidth(element: HTMLElement | undefined | Ref<HTMLEleme
 
   watchEffect(() => {
     if (elementRef.value) {
-      console.log({ watch: elementRef.value })
       const { width } = elementRef.value.getBoundingClientRect()
 
       widthInPixels.value = width
