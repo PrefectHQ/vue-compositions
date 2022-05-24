@@ -1,3 +1,4 @@
+export * from './useElementWidth'
 export * from './useIntersectionObserver'
 export * from './useMedia'
 export * from './useResizeObserver'
