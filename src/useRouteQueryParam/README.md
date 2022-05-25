@@ -6,6 +6,8 @@ The `useRouteQueryParam` gives you a reactive value for a query param. So you ca
 import { useRouteQueryParam } from '@prefecthq/vue-compositions'
 
 const foo = useRouteQueryParam('foo')
+
+foo.value = 'bar'
 ```
 
 ## Arguments
