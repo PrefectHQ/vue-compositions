@@ -29,20 +29,25 @@
     "@prefecthq/eslint-config": "1.0.9",
     "@testing-library/vue": "^6.4.2",
     "@types/jest": "^27.0.3",
+    "@types/lodash.debounce": "4.0.7",
     "auto-changelog": "^2.3.0",
     "eslint": "^8.5.0",
     "jest": "^27.4.3",
     "ts-jest": "^27.1.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2",
-    "vue": "^3.2.31",
     "vue-tsc": "^0.30.1"
   },
   "peerDependencies": {
+    "lodash.debounce": "^4.0.8",
+    "vue": "^3.2.36",
     "vue-router": "^4.0.15"
   },
   "peerDependenciesMeta": {
     "vue-router": {
+      "optional": true
+    },
+    "lodash.debounce": {
       "optional": true
     }
   }
