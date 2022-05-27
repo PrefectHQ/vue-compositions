@@ -1,12 +1,12 @@
 import debounce from 'lodash.debounce'
 import { ref, Ref, watchEffect } from 'vue'
 
-export function useDebouncedRef<T>(source: Ref<T>, wait: Ref<number> | number): Ref<T> {
+export function useDebouncedRef<T>(input: Ref<T>, wait: Ref<number> | number): Ref<T> {
   const waitRef = ref(wait)
-  const debounced = ref<T>(source.value) as Ref<T>
-  const update = debounce((value: T) => debounced.value = value, waitRef.value)
+  const copy = ref<T>(input.value) as Ref<T>
+  const update = debounce((value: T) => copy.value = value, waitRef.value)
 
-  watchEffect(() => update(source.value))
+  watchEffect(() => update(input.value))
 
-  return debounced
+  return copy
 }
