@@ -11,7 +11,11 @@ export function useRouteQueryParam(param: string, defaultValue: string | string[
   const initialValue = matchValueType(defaultValue, getRouteQueryParam(route, param) ?? defaultValue)
   const valueRef = ref<string | string[]>(initialValue)
 
-  watch(valueRef, () => {
+  watch(valueRef, (newValue, oldValue) => {
+    if (isSame(newValue, oldValue) || isSame(newValue, defaultValue)) {
+      return
+    }
+
     router.push({ query: { ...route.query, [param]: valueRef.value } })
   })
 
@@ -42,4 +46,8 @@ function matchValueType(previous: string | string[], next: string | string[]): s
   }
 
   return next
+}
+
+function isSame(valueA: string | string[], valueB: string | string[]): boolean {
+  return JSON.stringify(valueA) === JSON.stringify(valueB)
 }
