@@ -12,7 +12,7 @@ export function useRouteQueryParam(param: string, defaultValue: string | string[
   const valueRef = ref<string | string[]>(initialValue)
 
   watch(valueRef, (newValue, oldValue) => {
-    if (isSame(newValue, oldValue) || isSame(newValue, defaultValue)) {
+    if (isSame(newValue, oldValue)) {
       return
     }
 
