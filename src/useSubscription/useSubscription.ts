@@ -10,36 +10,32 @@ const defaultManager = new Manager()
 export function useSubscription<T extends Action>(...[action, args, options = {}]: SubscribeArguments<T>): UseSubscription<T> {
   const manager = options.manager ?? defaultManager
   const argsWithDefault = args ?? ([] as unknown as ActionArguments<T>)
-  const subscription = manager.subscribe(action, argsWithDefault, options)
-  const response = reactive(mapSubscription(subscription))
+  const originalSubscription = manager.subscribe(action, argsWithDefault, options)
+  const subscriptionResponse = reactive(mapSubscription(originalSubscription))
 
   let unwatch: ReturnType<typeof watch> | undefined
   const watchable = watchableArgs(argsWithDefault)
 
   if (watchable !== null) {
-    unwatch = watch(
-      watchable,
-      () => {
-        if (!response.isSubscribed()) {
-          unwatch!()
-          return
-        }
+    unwatch = watch(watchable, () => {
+      if (!subscriptionResponse.isSubscribed()) {
+        unwatch!()
+        return
+      }
 
-        response.unsubscribe()
+      subscriptionResponse.unsubscribe()
 
-        const newSubscription = manager.subscribe(action, argsWithDefault, options)
+      const newSubscription = manager.subscribe(action, argsWithDefault, options)
 
-        newSubscription.response.value ??= subscription.response.value
+      newSubscription.response.value ??= subscriptionResponse.response
 
-        Object.assign(response, mapSubscription(newSubscription))
-      },
-      { deep: true },
-    )
+      Object.assign(subscriptionResponse, mapSubscription(newSubscription))
+    }, { deep: true })
   }
 
   if (getCurrentInstance()) {
     onUnmounted(() => {
-      response.unsubscribe()
+      subscriptionResponse.unsubscribe()
 
       if (unwatch) {
         unwatch()
@@ -47,5 +43,5 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
     })
   }
 
-  return response
+  return subscriptionResponse
 }
