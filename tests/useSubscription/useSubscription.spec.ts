@@ -397,7 +397,7 @@ describe('subscribe', () => {
     jest.useFakeTimers()
 
     function action(value: number): Promise<number> {
-      return new Promise((resolve) => setTimeout(() => resolve(value), 100))
+      return new Promise((resolve) => setTimeout(() => resolve(value), 10))
     }
 
     const originalValue = 0
@@ -413,7 +413,7 @@ describe('subscribe', () => {
 
     expect(subscription.response).toBe(originalValue)
 
-    await timeout(110)
+    await timeout(15)
 
     expect(subscription.response).toBe(1)
   })
