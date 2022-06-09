@@ -397,7 +397,7 @@ describe('subscribe', () => {
     jest.useFakeTimers()
 
     function action(value: number): Promise<number> {
-      return new Promise((resolve) => setTimeout(() => resolve(value), 100))
+      return new Promise((resolve) => setTimeout(() => resolve(value), 10))
     }
 
     const originalValue = 0
@@ -412,6 +412,39 @@ describe('subscribe', () => {
     await timeout()
 
     expect(subscription.response).toBe(originalValue)
+
+    await timeout(15)
+
+    expect(subscription.response).toBe(1)
+  })
+
+  it('it does retain previous subscription response when arguments change', async () => {
+    jest.useFakeTimers()
+
+    function action(value: number): Promise<number> {
+      return new Promise((resolve) => setTimeout(() => resolve(value), 10))
+    }
+
+    const valueArg = ref(0)
+    const subscription = useSubscription(action, [valueArg])
+
+    jest.runAllTimers()
+    jest.useRealTimers()
+
+    while (valueArg.value < 2) {
+      valueArg.value++
+
+      // eslint-disable-next-line no-await-in-loop
+      await timeout()
+
+      expect(subscription.response).toBe(valueArg.value - 1)
+
+      // eslint-disable-next-line no-await-in-loop
+      await timeout(15)
+
+      expect(subscription.response).toBe(valueArg.value)
+    }
+
   })
 
   it('correctly sets response on additional subscriptions', async () => {
