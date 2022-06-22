@@ -1,4 +1,4 @@
-import { getCurrentInstance, onUnmounted, reactive, watch } from 'vue'
+import { getCurrentInstance, onUnmounted, reactive, unref, watch } from 'vue'
 import Manager from './models/manager'
 import { Action, ActionArguments } from './types/action'
 import { SubscribeArguments, UseSubscription } from './types/subscription'
@@ -18,7 +18,8 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
 
   if (watchable !== null) {
     unwatch = watch(watchable, () => {
-      if (!subscriptionResponse.isSubscribed()) {
+      // checking if args are null to support useSubscriptionWithDependencies
+      if (!subscriptionResponse.isSubscribed() || unref(argsWithDefault) === null) {
         unwatch!()
         return
       }
