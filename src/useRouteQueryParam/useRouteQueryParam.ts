@@ -2,9 +2,9 @@
 import { Ref, ref, watch } from 'vue'
 import { RouteLocationNormalized, useRoute, useRouter } from 'vue-router'
 
+export function useRouteQueryParam(param: string): Ref<string | string[]>
 export function useRouteQueryParam(param: string, defaultValue: string): Ref<string>
 export function useRouteQueryParam(param: string, defaultValue: string[]): Ref<string[]>
-export function useRouteQueryParam(param: string, defaultValue: string | string[]): Ref<string | string[]>
 export function useRouteQueryParam(param: string, defaultValue: string | string[] = ''): Ref<string | string[]> {
   const router = useRouter()
   const route = useRoute()
