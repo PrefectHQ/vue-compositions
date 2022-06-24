@@ -1,18 +1,17 @@
+/* eslint-disable no-redeclare */
 import { computed, Ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-export function useRouteParam(param: string): Ref<string> {
+export function useRouteParam(param: string, useFirstIfArray?: true): Ref<string>
+export function useRouteParam(param: string, useFirstIfArray: false): Ref<string | string[]>
+export function useRouteParam(param: string, useFirstIfArray = true): Ref<string | string[]> {
   const route = useRoute()
 
   return computed(() => {
     let paramValue = route.params[param]
 
-    if (Array.isArray(paramValue) && paramValue.length) {
+    if (useFirstIfArray && Array.isArray(paramValue) && paramValue.length) {
       [paramValue] = paramValue
-    }
-
-    if (!paramValue || paramValue.length === 0) {
-      paramValue = ''
     }
 
     return paramValue
