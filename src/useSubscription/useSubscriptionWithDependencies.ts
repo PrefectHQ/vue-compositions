@@ -1,4 +1,4 @@
-import { Ref, watchEffect } from 'vue'
+import { Ref, watch } from 'vue'
 import { Action, SubscriptionOptions, UseSubscription, ActionArguments } from './types'
 import { useSubscription } from './useSubscription'
 
@@ -13,8 +13,8 @@ type UseSubscriptionWithDependencies<T extends Action> = [
 export function useSubscriptionWithDependencies<T extends Action>(...[action, args, options = {}]: UseSubscriptionWithDependencies<T>): UseSubscription<T | typeof voidAction> {
   const subscription = useSubscription(voidAction)
 
-  watchEffect(() => {
-    if (args.value === null) {
+  watch(args, (value: Ref<Parameters<T> | null>, previousValue: Ref<Parameters<T> | null>) => {
+    if (value === null && value !== previousValue) {
       if (subscription.isSubscribed()) {
         subscription.unsubscribe()
       }
