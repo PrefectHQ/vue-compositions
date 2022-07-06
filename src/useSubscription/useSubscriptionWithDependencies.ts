@@ -13,7 +13,7 @@ type UseSubscriptionWithDependencies<T extends Action> = [
 export function useSubscriptionWithDependencies<T extends Action>(...[action, args, options = {}]: UseSubscriptionWithDependencies<T>): UseSubscription<T | typeof voidAction> {
   const subscription = useSubscription(voidAction)
 
-  watch(args, (value: Ref<Parameters<T> | null>, previousValue: Ref<Parameters<T> | null>) => {
+  watch(args, (value: Parameters<T> | null, previousValue: Parameters<T> | null | undefined) => {
     if (value === null && value !== previousValue) {
       if (subscription.isSubscribed()) {
         subscription.unsubscribe()
@@ -27,7 +27,7 @@ export function useSubscriptionWithDependencies<T extends Action>(...[action, ar
     const newSubscription = useSubscription(action, args as ActionArguments<T>, options)
 
     Object.assign(subscription, newSubscription)
-  })
+  }, { immediate: true })
 
   return subscription
 }
