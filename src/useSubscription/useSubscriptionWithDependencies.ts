@@ -1,4 +1,4 @@
-import { Ref, watch } from 'vue'
+import { reactive, Ref, toRaw, watch } from 'vue'
 import { Action, SubscriptionOptions, UseSubscription, ActionArguments } from './types'
 import { useSubscription } from './useSubscription'
 
@@ -11,20 +11,24 @@ type UseSubscriptionWithDependencies<T extends Action> = [
 ]
 
 export function useSubscriptionWithDependencies<T extends Action>(...[action, args, options = {}]: UseSubscriptionWithDependencies<T>): UseSubscription<T | typeof voidAction> {
-  const subscription = useSubscription(voidAction)
+  const subscription = reactive(toRaw(useSubscription(voidAction)))
 
   watch(args, (value: Parameters<T> | null, previousValue: Parameters<T> | null | undefined) => {
-    if (value === null && value !== previousValue) {
+    if (value === null && previousValue === undefined) {
+      return
+    }
+
+    if (value === null) {
       if (subscription.isSubscribed()) {
         subscription.unsubscribe()
       }
 
-      Object.assign(subscription, useSubscription(voidAction))
+      Object.assign(subscription, toRaw(useSubscription(voidAction)))
 
       return
     }
 
-    const newSubscription = useSubscription(action, args as ActionArguments<T>, options)
+    const newSubscription = toRaw(useSubscription(action, args as ActionArguments<T>, options))
 
     Object.assign(subscription, newSubscription)
   }, { immediate: true })
