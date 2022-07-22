@@ -19,6 +19,7 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
   if (watchable !== null) {
     unwatch = watch(watchable, () => {
       // checking if args are null to support useSubscriptionWithDependencies
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!subscriptionResponse.isSubscribed() || unref(argsWithDefault) === null) {
         unwatch!()
         return
@@ -29,6 +30,7 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
       const newSubscription = manager.subscribe(action, argsWithDefault, options)
 
       newSubscription.response.value ??= subscriptionResponse.response
+      newSubscription.executed.value = newSubscription.executed.value || subscriptionResponse.executed
 
       Object.assign(subscriptionResponse, mapSubscription(newSubscription))
     }, { deep: true })
