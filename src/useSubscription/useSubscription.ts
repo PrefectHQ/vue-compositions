@@ -30,7 +30,7 @@ export function useSubscription<T extends Action>(...[action, args, options = {}
       const newSubscription = manager.subscribe(action, argsWithDefault, options)
 
       newSubscription.response.value ??= subscriptionResponse.response
-      newSubscription.executed.value = subscriptionResponse.executed
+      newSubscription.executed.value = newSubscription.executed.value || subscriptionResponse.executed
 
       Object.assign(subscriptionResponse, mapSubscription(newSubscription))
     }, { deep: true })
