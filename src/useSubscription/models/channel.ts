@@ -177,6 +177,8 @@ export default class Channel<T extends Action = Action> {
       this.errored = true
       this.error = error
       this.clearTimer()
+
+      console.error(error)
     } finally {
       this.executed = true
       this.loading = false
