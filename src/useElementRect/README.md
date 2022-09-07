@@ -6,7 +6,7 @@ The `useElementRect` composition abstracts away the logic for tracking the clien
 import { useElementRect } from '@prefecthq/vue-compositions'
 
 const templateRef = ref<HTMLElement | undefined>()
-const { height, width, x, y } = useElementRect(templateRef)
+const rect = useElementRect(templateRef)
 ```
 
 ## Arguments
