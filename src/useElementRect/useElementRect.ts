@@ -1,5 +1,5 @@
 /* eslint-disable id-length */
-import { reactive, ref, Ref, toRefs, watchEffect } from 'vue'
+import { ref, Ref, watchEffect } from 'vue'
 import { useResizeObserver, UseResizeObserverCallback } from '../useResizeObserver/useResizeObserver'
 
 type ElementRect = {
@@ -52,5 +52,5 @@ export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElemen
     }
   })
 
-  return toRefs(clientRect)
+  return clientRect
 }
