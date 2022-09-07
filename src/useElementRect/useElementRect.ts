@@ -1,6 +1,6 @@
 /* eslint-disable id-length */
-import { ref, Ref, watchEffect } from 'vue'
-import { useResizeObserver, UseResizeObserverCallback } from '../useResizeObserver/useResizeObserver'
+import { ref, Ref, watch } from 'vue'
+import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
 
 type ElementRect = {
   height: Ref<number>,
@@ -26,7 +26,9 @@ export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElemen
     bottom: ref(0),
   }
 
-  function assignClientRect(rect: DOMRect): void {
+  function assignClientRect(element: Element): void {
+    const rect = element.getBoundingClientRect()
+
     clientRect.height.value = rect.height
     clientRect.width.value = rect.width
     clientRect.x.value = rect.x
@@ -37,20 +39,16 @@ export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElemen
     clientRect.bottom.value = rect.bottom
   }
 
-  const callback: UseResizeObserverCallback = function([entry]: ResizeObserverEntry[]) {
-    assignClientRect(entry.target.getBoundingClientRect())
-  }
+  const observer = useResizeObserver(([entry]) => assignClientRect(entry.target))
 
-  const observer = useResizeObserver(callback)
-
-  watchEffect(() => {
-    if (elementRef.value) {
-      assignClientRect(elementRef.value.getBoundingClientRect())
+  watch(elementRef, element => {
+    if (element) {
+      assignClientRect(elementRef)
 
       observer.disconnect()
       observer.observe(elementRef)
     }
-  })
+  }, { immediate: true })
 
   return clientRect
 }
