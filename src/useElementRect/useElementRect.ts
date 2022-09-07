@@ -2,41 +2,23 @@
 import { reactive, ref, Ref, watchEffect } from 'vue'
 import { useResizeObserver, UseResizeObserverCallback } from '../useResizeObserver/useResizeObserver'
 
-type Rect = {
-  width: number,
-  height: number,
-  x: number,
-  y: number,
-}
-
-export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElement | undefined>): Rect {
+export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElement | undefined>): DOMRect {
   const elementRef = ref(element)
-  const clientRect = reactive<Rect>({
-    width: 0,
-    height: 0,
-    x: 0,
-    y: 0,
-  })
+  const clientRect = reactive(new DOMRect())
 
   const callback: UseResizeObserverCallback = function([entry]: ResizeObserverEntry[]) {
-    const { width, height, x, y } = entry.target.getBoundingClientRect()
+    const targetRect = entry.target.getBoundingClientRect()
 
-    clientRect.width = width
-    clientRect.height = height
-    clientRect.x = x
-    clientRect.y = y
+    Object.assign(clientRect, targetRect)
   }
 
   const observer = useResizeObserver(callback)
 
   watchEffect(() => {
     if (elementRef.value) {
-      const { width, height, x, y } = elementRef.value.getBoundingClientRect()
+      const targetRect = elementRef.value.getBoundingClientRect()
 
-      clientRect.width = width
-      clientRect.height = height
-      clientRect.x = x
-      clientRect.y = y
+      Object.assign(clientRect, targetRect)
 
       observer.disconnect()
       observer.observe(elementRef)

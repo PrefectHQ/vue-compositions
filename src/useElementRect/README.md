@@ -1,5 +1,5 @@
 # useElementRect
-The `useElementRect` composition abstracts away the logic for tracking the client rect of an HTMLElement, even when the client rect changes on resize thanks to [useResizeObserver](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useResizeObserver).
+The `useElementRect` composition abstracts away the logic for tracking the client DOMRect of an HTMLElement, even when the client DOMRect changes on resize thanks to [useResizeObserver](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useResizeObserver).
 
 ## Example
 ```typescript
@@ -15,4 +15,4 @@ const { height, width, x, y } = useElementRect(templateRef)
 | element | `HTMLElement \| undefined \| Ref<HTMLElement \| undefined>` |
 
 ## Returns
-`Ref<number>` (in px)
+`Ref<DOMRect>`
