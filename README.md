@@ -8,7 +8,7 @@ npm i --save @prefecthq/vue-compositions
 
 ## Compositions
 - [useDebouncedRef](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useDebouncedRef)
-- [useElementWidth](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useElementWidth)
+- [useElementRect](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useElementRect)
 - [useIntersectionObserver](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useIntersectionObserver)
 - [useMedia](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useMedia)
 - [useResizeObserver](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useResizeObserver)

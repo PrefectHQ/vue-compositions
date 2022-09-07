@@ -1,6 +1,9 @@
 import { ref, Ref, watchEffect } from 'vue'
 import { useResizeObserver, UseResizeObserverCallback } from '../useResizeObserver/useResizeObserver'
 
+/**
+ * @deprecated use useElementRect instead
+ */
 export function useElementWidth(element: HTMLElement | undefined | Ref<HTMLElement | undefined>): Ref<number> {
   const elementRef = ref(element)
   const widthInPixels = ref<number>(0)

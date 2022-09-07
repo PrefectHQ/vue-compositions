@@ -1,5 +1,6 @@
 export * from './useDebouncedRef'
 export * from './useElementWidth'
+export * from './useElementRect'
 export * from './useIntersectionObserver'
 export * from './useMedia'
 export * from './useResizeObserver'
