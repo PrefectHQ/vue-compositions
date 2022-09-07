@@ -1,40 +1,56 @@
 /* eslint-disable id-length */
-import { reactive, ref, Ref, watchEffect } from 'vue'
+import { reactive, ref, Ref, toRefs, watchEffect } from 'vue'
 import { useResizeObserver, UseResizeObserverCallback } from '../useResizeObserver/useResizeObserver'
 
-type ElementRect = Omit<DOMRect, 'toJSON'>
+type ElementRect = {
+  height: Ref<number>,
+  width: Ref<number>,
+  x: Ref<number>,
+  y: Ref<number>,
+  left: Ref<number>,
+  top: Ref<number>,
+  right: Ref<number>,
+  bottom: Ref<number>,
+}
 
 export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElement | undefined>): ElementRect {
   const elementRef = ref(element)
-  const clientRect = reactive({
-    height: 0,
-    width: 0,
-    x: 0,
-    y: 0,
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-  })
+  const clientRect = {
+    height: ref(0),
+    width: ref(0),
+    x: ref(0),
+    y: ref(0),
+    left: ref(0),
+    top: ref(0),
+    right: ref(0),
+    bottom: ref(0),
+  }
+
+  function assignClientRect(rect: DOMRect): void {
+    clientRect.height.value = rect.height
+    clientRect.width.value = rect.width
+    clientRect.x.value = rect.x
+    clientRect.y.value = rect.y
+    clientRect.left.value = rect.left
+    clientRect.top.value = rect.top
+    clientRect.right.value = rect.right
+    clientRect.bottom.value = rect.bottom
+  }
 
   const callback: UseResizeObserverCallback = function([entry]: ResizeObserverEntry[]) {
-    const targetRect = entry.target.getBoundingClientRect()
-
-    Object.assign(clientRect, targetRect)
+    assignClientRect(entry.target.getBoundingClientRect())
   }
 
   const observer = useResizeObserver(callback)
 
   watchEffect(() => {
     if (elementRef.value) {
-      const targetRect = elementRef.value.getBoundingClientRect()
-
-      Object.assign(clientRect, targetRect)
+      assignClientRect(elementRef.value.getBoundingClientRect())
 
       observer.disconnect()
       observer.observe(elementRef)
     }
   })
 
-  return clientRect
+  return toRefs(clientRect)
 }
