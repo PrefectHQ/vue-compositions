@@ -43,7 +43,7 @@ export function useElementRect(element: HTMLElement | undefined | Ref<HTMLElemen
 
   watch(elementRef, element => {
     if (element) {
-      assignClientRect(elementRef)
+      assignClientRect(element)
 
       observer.disconnect()
       observer.observe(elementRef)
