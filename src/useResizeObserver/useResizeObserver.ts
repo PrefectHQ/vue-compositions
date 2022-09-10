@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, Ref } from 'vue'
+import { onMounted, onUnmounted, ref, Ref } from 'vue'
 
 export type UseResizeObserverResponse = {
   observe: (element: Ref<HTMLElement | undefined>) => void,
@@ -13,19 +13,21 @@ export function useResizeObserver(callback: UseResizeObserverCallback): UseResiz
 
   let intersectionObserver: ResizeObserver | null = null
 
-  function observe(element: Ref<HTMLElement | undefined>): void {
+  function observe(element: HTMLElement | Ref<HTMLElement | undefined>): void {
+    const elementRef = ref(element)
     const observer = getObserver()
 
-    if (element.value) {
-      observer.observe(element.value)
+    if (elementRef.value) {
+      observer.observe(elementRef.value)
     }
   }
 
-  function unobserve(element: Ref<HTMLElement | undefined>): void {
+  function unobserve(element: HTMLElement | Ref<HTMLElement | undefined>): void {
+    const elementRef = ref(element)
     const observer = getObserver()
 
-    if (element.value) {
-      observer.unobserve(element.value)
+    if (elementRef.value) {
+      observer.unobserve(elementRef.value)
     }
   }
 
@@ -35,14 +37,15 @@ export function useResizeObserver(callback: UseResizeObserverCallback): UseResiz
     observer.disconnect()
   }
 
-  function check(element: Ref<HTMLElement | undefined>): void {
-    if (!element.value) {
+  function check(element: HTMLElement | Ref<HTMLElement | undefined>): void {
+    const elementRef = ref(element)
+    if (!elementRef.value) {
       return
     }
 
     const observer = new ResizeObserver(callback)
 
-    observer.observe(element.value)
+    observer.observe(elementRef.value)
 
     setTimeout(() => observer.disconnect(), 100)
   }
