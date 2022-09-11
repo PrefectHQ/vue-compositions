@@ -1,10 +1,10 @@
 import { onMounted, onUnmounted, ref, Ref } from 'vue'
 
 export type UseResizeObserverResponse = {
-  observe: (element: Ref<HTMLElement | undefined>) => void,
-  unobserve: (element: Ref<HTMLElement | undefined>) => void,
+  observe: (element: HTMLElement | Ref<HTMLElement | undefined>) => void,
+  unobserve: (element: HTMLElement | Ref<HTMLElement | undefined>) => void,
   disconnect: () => void,
-  check: (element: Ref<HTMLElement | undefined>) => void,
+  check: (element: HTMLElement | Ref<HTMLElement | undefined>) => void,
 }
 
 export type UseResizeObserverCallback = (entries: ResizeObserverEntry[]) => void
@@ -13,7 +13,7 @@ export function useResizeObserver(callback: UseResizeObserverCallback): UseResiz
 
   let intersectionObserver: ResizeObserver | null = null
 
-  function observe(element: HTMLElement | Ref<HTMLElement | undefined>): void {
+  const observe: UseResizeObserverResponse['observe'] = (element) => {
     const elementRef = ref(element)
     const observer = getObserver()
 
@@ -22,7 +22,7 @@ export function useResizeObserver(callback: UseResizeObserverCallback): UseResiz
     }
   }
 
-  function unobserve(element: HTMLElement | Ref<HTMLElement | undefined>): void {
+  const unobserve: UseResizeObserverResponse['unobserve'] = (element) => {
     const elementRef = ref(element)
     const observer = getObserver()
 
@@ -31,13 +31,13 @@ export function useResizeObserver(callback: UseResizeObserverCallback): UseResiz
     }
   }
 
-  function disconnect(): void {
+  const disconnect: UseResizeObserverResponse['disconnect'] = () => {
     const observer = getObserver()
 
     observer.disconnect()
   }
 
-  function check(element: HTMLElement | Ref<HTMLElement | undefined>): void {
+  const check: UseResizeObserverResponse['check'] = (element) => {
     const elementRef = ref(element)
     if (!elementRef.value) {
       return
