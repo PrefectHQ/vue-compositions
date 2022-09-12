@@ -1,5 +1,5 @@
 /* eslint-disable no-redeclare */
-import { reactive, ref, Ref, ToRefs, toRefs, watchEffect } from 'vue'
+import { reactive, ref, Ref, ToRefs, toRefs, watch } from 'vue'
 import { useMutationObserver } from '@/useMutationObserver/useMutationObserver'
 import { useResizeObserver } from '@/useResizeObserver/useResizeObserver'
 import { globalExists } from '@/utilities/global'
@@ -8,16 +8,16 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): T
   const elementRef = ref(element)
   const style = reactive({})
 
-  watchEffect(() => {
-    if (elementRef.value && globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(elementRef.value, null))
+  watch(elementRef, element => {
+    if (element && globalExists('window')) {
+      Object.assign(style, window.getComputedStyle(element, null))
 
       mutationObserver.disconnect()
       mutationObserver.observe(elementRef)
       resizeObserver.disconnect()
       resizeObserver.observe(elementRef)
     }
-  })
+  }, { immediate: true })
 
   function handleMutation([entry]: MutationRecord[]): void {
     if (nodeIsElement(entry.target) && globalExists('window')) {
