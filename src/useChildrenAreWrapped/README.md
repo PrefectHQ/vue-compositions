@@ -1,5 +1,5 @@
 # useChildrenAreWrapped
-The `useChildrenAreWrapped` composition returns a computed boolean that can be used in a component to react to the fact that children all fit within a single row, or they do not. This component uses [useElementRect](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useElementRect) for sizing both, so keep in mind that if the container has padding, it will think there is more room for children than there actually is. 
+The `useChildrenAreWrapped` composition returns a computed boolean that can be used in a component to react to the fact that children all fit within a single row, or they do not. This component uses [useElementRect](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useElementRect) for sizing both. This component also uses [useComputedStyle](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useComputedStyle) to attempt to account for container padding, container gap, child border, and child margin.
 
 ## Example
 ```typescript

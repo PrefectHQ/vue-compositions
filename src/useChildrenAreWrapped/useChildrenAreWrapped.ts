@@ -10,9 +10,18 @@ export function useChildrenAreWrapped(children: Element[] | Ref<Element[]>, cont
   const { gap, paddingLeft, paddingRight } = useComputedStyle(container)
 
   const childrenWidthSum = computed(() => {
-    const rects = childrenRef.value.map(useElementRect)
+    const childrenSize = childrenRef.value.map(element => ({
+      rect: useElementRect(element),
+      style: useComputedStyle(element),
+    }))
 
-    return rects.reduce((sum, { width }) => sum += width.value + getPxValue(gap), 0)
+    return childrenSize.reduce((sum, { rect, style }) => {
+      const margin = getPxValue(style.marginLeft) + getPxValue(style.marginRight)
+      const border = getPxValue(style.borderTopWidth) + getPxValue(style.borderBottomWidth)
+      const containerGap = getPxValue(gap)
+
+      return sum += rect.width.value + margin + border + containerGap
+    }, 0)
   })
 
   const containerWidthWithoutPadding = computed(() => {
