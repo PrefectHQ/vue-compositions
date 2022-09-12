@@ -5,7 +5,7 @@ The `useChildrenAreWrapped` composition returns a computed boolean that can be u
 ```typescript
 import { useChildrenAreWrapped } from '@prefecthq/vue-compositions'
 
-const wrapped = useCongruentHeight(cogs, machine)
+const wrapped = useChildrenAreWrapped(children, container)
 const classes = computed(() => ({
   container: {
     'p-container--wrapped': wrapped.value,
@@ -29,8 +29,8 @@ const classes = computed(() => ({
 ## Arguments
 | Name     | Type                              |
 |----------|-----------------------------------|
-| children | `HTMLElement[] \| Ref<HTMLElement[]` |
-| container | `HTMLElement \| Ref<HTMLElement | undefined` |
+| children | `HTMLElement[] \| Ref<HTMLElement[]>` |
+| container | `HTMLElement \| Ref<HTMLElement | undefined>` |
 
 ## Returns
 `ComputedRef<boolean>`
