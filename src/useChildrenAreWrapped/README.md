@@ -29,8 +29,8 @@ const classes = computed(() => ({
 ## Arguments
 | Name     | Type                              |
 |----------|-----------------------------------|
-| children | `HTMLElement[] \| Ref<HTMLElement[]>` |
-| container | `HTMLElement \| Ref<HTMLElement | undefined>` |
+| children | `Element[] \| Ref<Element[]>` |
+| container | `Element \| Ref<Element | undefined>` |
 
 ## Returns
 `ComputedRef<boolean>`

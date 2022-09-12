@@ -13,7 +13,7 @@ type ElementRect = {
   bottom: Ref<number>,
 }
 
-export function useElementRect(element: HTMLElement | Ref<HTMLElement | undefined>): ElementRect {
+export function useElementRect(element: Element | Ref<Element | undefined>): ElementRect {
   const elementRef = ref(element)
   const clientRect = {
     height: ref(0),

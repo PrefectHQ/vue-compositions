@@ -11,7 +11,7 @@ const { paddingLeft, paddingRight } = useComputedStyle(element)
 ## Arguments
 | Name     | Type                              |
 |----------|-----------------------------------|
-| element | `HTMLElement \| Ref<HTMLElement | undefined>` |
+| element | `Element \| Ref<Element | undefined>` |
 
 ## Returns
 `ToRefs<CSSStyleDeclaration>`
