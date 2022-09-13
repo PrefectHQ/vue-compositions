@@ -1,6 +1,6 @@
 import { computed, ComputedRef, ref, Ref } from 'vue'
-import { useComputedStyle } from '@/useComputedStyle/useComputedStyle'
-import { useElementRect } from '@/useElementRect/useElementRect'
+import { useComputedStyle } from '../useComputedStyle/useComputedStyle'
+import { useElementRect } from '../useElementRect/useElementRect'
 
 export function useChildrenAreWrapped(children: Element[] | Ref<Element[]>, container: Element | Ref<Element | undefined>): ComputedRef<boolean> {
   const childrenRef = ref(children)
