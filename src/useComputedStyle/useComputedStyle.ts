@@ -8,17 +8,6 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): T
   const elementRef = ref(element)
   const style = reactive({})
 
-  watch(elementRef, element => {
-    if (element && globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(element, null))
-
-      mutationObserver.disconnect()
-      mutationObserver.observe(elementRef, { attributes: true })
-      resizeObserver.disconnect()
-      resizeObserver.observe(elementRef)
-    }
-  }, { immediate: true })
-
   function handleMutation([entry]: MutationRecord[]): void {
     if (nodeIsElement(entry.target) && globalExists('window')) {
       Object.assign(style, window.getComputedStyle(entry.target, null))
@@ -32,6 +21,17 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): T
     }
   }
   const resizeObserver = useResizeObserver(handleResize)
+
+  watch(elementRef, element => {
+    if (element && globalExists('window')) {
+      Object.assign(style, window.getComputedStyle(element, null))
+
+      mutationObserver.disconnect()
+      mutationObserver.observe(elementRef, { attributes: true, childList: true })
+      resizeObserver.disconnect()
+      resizeObserver.observe(elementRef)
+    }
+  }, { immediate: true })
 
   return toRefs(style)
 }
