@@ -1,8 +1,8 @@
 /* eslint-disable no-redeclare */
 import { reactive, ref, Ref, ToRefs, toRefs, watch } from 'vue'
-import { useMutationObserver } from '@/useMutationObserver/useMutationObserver'
-import { useResizeObserver } from '@/useResizeObserver/useResizeObserver'
-import { globalExists } from '@/utilities/global'
+import { useMutationObserver } from '../useMutationObserver/useMutationObserver'
+import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
+import { globalExists } from '../utilities/global'
 
 export function useComputedStyle(element: Element | Ref<Element | undefined>): ToRefs<Partial<CSSStyleDeclaration>> {
   const elementRef = ref(element)
