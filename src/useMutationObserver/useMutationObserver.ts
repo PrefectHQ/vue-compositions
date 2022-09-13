@@ -1,21 +1,21 @@
 import { onMounted, onUnmounted, ref, Ref } from 'vue'
 
 export type UseMutationObserverResponse = {
-  observe: (element: Element | Ref<Element | undefined>) => void,
+  observe: (element: Element | Ref<Element | undefined>, options: MutationObserverInit) => void,
   disconnect: () => void,
-  check: (element: Element | Ref<Element | undefined>) => void,
+  check: (element: Element | Ref<Element | undefined>, options: MutationObserverInit) => void,
 }
 
 export function useMutationObserver(callback: MutationCallback): UseMutationObserverResponse {
 
   let mutationObserver: MutationObserver | null = null
 
-  const observe: UseMutationObserverResponse['observe'] = (element) => {
+  const observe: UseMutationObserverResponse['observe'] = (element, options) => {
     const elementRef = ref(element)
     const observer = getObserver()
 
     if (elementRef.value) {
-      observer.observe(elementRef.value)
+      observer.observe(elementRef.value, options)
     }
   }
 
@@ -25,7 +25,7 @@ export function useMutationObserver(callback: MutationCallback): UseMutationObse
     observer.disconnect()
   }
 
-  const check: UseMutationObserverResponse['check'] = (element) => {
+  const check: UseMutationObserverResponse['check'] = (element, options) => {
     const elementRef = ref(element)
     if (!elementRef.value) {
       return
@@ -33,7 +33,7 @@ export function useMutationObserver(callback: MutationCallback): UseMutationObse
 
     const observer = new MutationObserver(callback)
 
-    observer.observe(elementRef.value)
+    observer.observe(elementRef.value, options)
 
     setTimeout(() => observer.disconnect(), 100)
   }

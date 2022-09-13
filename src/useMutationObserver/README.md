@@ -17,6 +17,7 @@ const observer = useMutationObserver(callback)
 | Name     | Type                        |
 |----------|-----------------------------|
 | callback | `MutationCallback` |
+| options | `MutationObserverInit` |
 
 ## Returns
 `UseMutationObserverResponse`
