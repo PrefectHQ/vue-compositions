@@ -1,17 +1,17 @@
 import { onMounted, onUnmounted, ref, Ref } from 'vue'
 
 export type UseResizeObserverResponse = {
-  observe: (element: HTMLElement | Ref<HTMLElement | undefined>) => void,
-  unobserve: (element: HTMLElement | Ref<HTMLElement | undefined>) => void,
+  observe: (element: Element | Ref<Element | undefined>) => void,
+  unobserve: (element: Element | Ref<Element | undefined>) => void,
   disconnect: () => void,
-  check: (element: HTMLElement | Ref<HTMLElement | undefined>) => void,
+  check: (element: Element | Ref<Element | undefined>) => void,
 }
 
 export type UseResizeObserverCallback = (entries: ResizeObserverEntry[]) => void
 
 export function useResizeObserver(callback: UseResizeObserverCallback): UseResizeObserverResponse {
 
-  let intersectionObserver: ResizeObserver | null = null
+  let resizeObserver: ResizeObserver | null = null
 
   const observe: UseResizeObserverResponse['observe'] = (element) => {
     const elementRef = ref(element)
@@ -51,15 +51,15 @@ export function useResizeObserver(callback: UseResizeObserverCallback): UseResiz
   }
 
   function getObserver(): ResizeObserver {
-    if (!intersectionObserver) {
+    if (!resizeObserver) {
       createObserver()
     }
 
-    return intersectionObserver!
+    return resizeObserver!
   }
 
   function createObserver(): void {
-    intersectionObserver = new ResizeObserver(callback)
+    resizeObserver = new ResizeObserver(callback)
   }
 
   onMounted(() => {
