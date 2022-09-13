@@ -10,23 +10,27 @@ export function useChildrenAreWrapped(children: Element[] | Ref<Element[]>, cont
   const { width } = useElementRect(containerRef)
   const { columnGap, paddingLeft, paddingRight } = useComputedStyle(container)
 
-  function getChildrenWidth(): number {
-    const styles = childrenRef.value.map(getComputedStyleRecord)
+  function getChildrenWidth(elements: Element[]): number {
+    const styles = elements.map(getComputedStyleRecord)
 
     return styles.reduce((sum, style) => {
       if (style) {
-        sum += style.width
-        sum += style.marginLeft + style.marginRight
-        sum += style.borderTopWidth + style.borderBottomWidth
+        sum += parseInt(style.width)
+        sum += parseInt(style.marginLeft) + parseInt(style.marginRight)
+        sum += parseInt(columnGap.value)
+
+        if (style.boxSizing === 'border-box') {
+          sum += parseInt(style.borderLeftWidth) + parseInt(style.borderRightWidth)
+        }
       }
 
-      return sum + columnGap.value
+      return sum
     }, 0)
   }
 
   return computed(() => {
-    const containerWidth = width.value - paddingLeft.value - paddingRight.value
-    const childrenWidth = getChildrenWidth()
+    const containerWidth = width.value - parseInt(paddingLeft.value) - parseInt(paddingRight.value)
+    const childrenWidth = getChildrenWidth(childrenRef.value)
 
     return childrenWidth > containerWidth
   })
