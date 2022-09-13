@@ -2,29 +2,33 @@
 import { reactive, ref, Ref, ToRefs, toRefs, watch } from 'vue'
 import { useMutationObserver } from '../useMutationObserver/useMutationObserver'
 import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
-import { globalExists } from '../utilities/global'
+import { DocumentDoesNotExist } from './documentDoesNotExist'
+import { globalExists } from '@/utilities/global'
+import { ComputedStyleRecord, getComputedStyleRecord } from '@/utilities/window'
 
-export function useComputedStyle(element: Element | Ref<Element | undefined>): ToRefs<Partial<CSSStyleDeclaration>> {
+export function useComputedStyle(element: Element | Ref<Element | undefined>): ToRefs<ComputedStyleRecord> {
   const elementRef = ref(element)
-  const style = reactive({})
+  const style = reactive(getComputedStyleRecord(elementRef.value ?? getDefaultElement())!)
 
-  function handleMutation([entry]: MutationRecord[]): void {
-    if (nodeIsElement(entry.target) && globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(entry.target, null))
+  function handleChange([entry]: { target: Node }[]): void {
+    if (nodeIsElement(entry.target)) {
+      const computedStyleRecord = getComputedStyleRecord(entry.target)
+
+      if (computedStyleRecord) {
+        Object.assign(style, computedStyleRecord)
+      }
     }
   }
-  const mutationObserver = useMutationObserver(handleMutation)
 
-  function handleResize([entry]: ResizeObserverEntry[]): void {
-    if (globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(entry.target, null))
-    }
-  }
-  const resizeObserver = useResizeObserver(handleResize)
+  const mutationObserver = useMutationObserver(handleChange)
+  const resizeObserver = useResizeObserver(handleChange)
 
   watch(elementRef, element => {
-    if (element && globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(element, null))
+    if (element) {
+      const computedStyleRecord = getComputedStyleRecord(element)
+      if (computedStyleRecord) {
+        Object.assign(style, computedStyleRecord)
+      }
 
       mutationObserver.disconnect()
       mutationObserver.observe(elementRef, { attributes: true, childList: true })
@@ -34,6 +38,14 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): T
   }, { immediate: true })
 
   return toRefs(style)
+}
+
+function getDefaultElement(): Element {
+  if (!globalExists('document')) {
+    throw new DocumentDoesNotExist()
+  }
+
+  return document.createElement('span')
 }
 
 function nodeIsElement(node: Node): node is Element {
