@@ -13,7 +13,7 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): T
       Object.assign(style, window.getComputedStyle(element, null))
 
       mutationObserver.disconnect()
-      mutationObserver.observe(elementRef)
+      mutationObserver.observe(elementRef, { attributes: true })
       resizeObserver.disconnect()
       resizeObserver.observe(elementRef)
     }
