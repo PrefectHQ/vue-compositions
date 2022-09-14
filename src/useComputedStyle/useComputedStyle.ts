@@ -5,7 +5,7 @@ import { getWindowComputedStyle } from '@/utilities/window'
 
 export function useComputedStyle(element: Element | Ref<Element | undefined>): Ref<CSSStyleDeclaration | undefined> {
   const elementRef = ref(element)
-  const initialStyle = getComputedStyleRecord(elementRef.value)
+  const initialStyle = getWindowComputedStyle(elementRef.value)
   const style = ref(initialStyle)
 
   function observerCallback([entry]: { target: Node }[]): void {
