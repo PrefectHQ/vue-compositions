@@ -1,9 +1,9 @@
 import { ref, Ref, watch } from 'vue'
 import { useMutationObserver } from '../useMutationObserver/useMutationObserver'
 import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
-import { ComputedStyleRecord, getComputedStyleRecord } from '@/utilities/window'
+import { getComputedStyleRecord } from '@/utilities/window'
 
-export function useComputedStyle(element: Element | Ref<Element | undefined>): Ref<ComputedStyleRecord | undefined> {
+export function useComputedStyle(element: Element | Ref<Element | undefined>): Ref<CSSStyleDeclaration | undefined> {
   const elementRef = ref(element)
   const initialStyle = getComputedStyleRecord(elementRef.value)
   const style = ref(initialStyle)
