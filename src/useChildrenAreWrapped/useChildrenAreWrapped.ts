@@ -32,7 +32,7 @@ function getPxInt(style: string | undefined): number {
 
 function getChildrenWidth(elements: Element[], gap: number): number {
   return elements
-    .map(getComputedStyleRecord)
+    .map(getWindowComputedStyle)
     .reduce((sum, style) => {
       if (style) {
         sum += parseInt(style.width)
