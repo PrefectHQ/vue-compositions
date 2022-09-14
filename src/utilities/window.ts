@@ -1,6 +1,6 @@
 import { globalExists } from './global'
 
-export function getComputedStyleRecord(element: Element | undefined): CSSStyleDeclaration | undefined {
+export function getWindowComputedStyle(element: Element | undefined): CSSStyleDeclaration | undefined {
   if (!globalExists('window') || !element) {
     return undefined
   }
