@@ -4,8 +4,8 @@ import { kebabCase } from './strings'
 
 export type ComputedStyleRecord = Record<keyof CSSStyleDeclaration, string>
 
-export function getComputedStyleRecord(element: Element): ComputedStyleRecord | undefined {
-  if (!globalExists('window')) {
+export function getComputedStyleRecord(element: Element | undefined): ComputedStyleRecord | undefined {
+  if (!globalExists('window') || !element) {
     return undefined
   }
 
