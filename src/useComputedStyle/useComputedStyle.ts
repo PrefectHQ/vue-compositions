@@ -1,30 +1,33 @@
-/* eslint-disable no-redeclare */
-import { reactive, ref, Ref, ToRefs, toRefs, watch } from 'vue'
+import { ref, Ref, watch } from 'vue'
 import { useMutationObserver } from '../useMutationObserver/useMutationObserver'
 import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
-import { globalExists } from '../utilities/global'
+import { getWindowComputedStyle } from '@/utilities/window'
 
-export function useComputedStyle(element: Element | Ref<Element | undefined>): ToRefs<Partial<CSSStyleDeclaration>> {
+export function useComputedStyle(element: Element | Ref<Element | undefined>): Ref<CSSStyleDeclaration | undefined> {
   const elementRef = ref(element)
-  const style = reactive({})
+  const initialStyle = getWindowComputedStyle(elementRef.value)
+  const style = ref(initialStyle)
 
-  function handleMutation([entry]: MutationRecord[]): void {
-    if (nodeIsElement(entry.target) && globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(entry.target, null))
+  function observerCallback([entry]: { target: Node }[]): void {
+    if (nodeIsElement(entry.target)) {
+      updateStyleRef(entry.target)
     }
   }
-  const mutationObserver = useMutationObserver(handleMutation)
 
-  function handleResize([entry]: ResizeObserverEntry[]): void {
-    if (globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(entry.target, null))
+  function updateStyleRef(element: Element): void {
+    const computedStyle = getWindowComputedStyle(element)
+
+    if (computedStyle) {
+      style.value = computedStyle
     }
   }
-  const resizeObserver = useResizeObserver(handleResize)
+
+  const mutationObserver = useMutationObserver(observerCallback)
+  const resizeObserver = useResizeObserver(observerCallback)
 
   watch(elementRef, element => {
-    if (element && globalExists('window')) {
-      Object.assign(style, window.getComputedStyle(element, null))
+    if (element) {
+      updateStyleRef(element)
 
       mutationObserver.disconnect()
       mutationObserver.observe(elementRef, { attributes: true, childList: true })
@@ -33,7 +36,7 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): T
     }
   }, { immediate: true })
 
-  return toRefs(style)
+  return style
 }
 
 function nodeIsElement(node: Node): node is Element {

@@ -1,36 +1,48 @@
 import { computed, ComputedRef, ref, Ref } from 'vue'
 import { useComputedStyle } from '../useComputedStyle/useComputedStyle'
 import { useElementRect } from '../useElementRect/useElementRect'
+import { getWindowComputedStyle } from '@/utilities/window'
 
 export function useChildrenAreWrapped(children: Element[] | Ref<Element[]>, container: Element | Ref<Element | undefined>): ComputedRef<boolean> {
   const childrenRef = ref(children)
   const containerRef = ref(container)
 
   const { width } = useElementRect(containerRef)
-  const { gap, paddingLeft, paddingRight } = useComputedStyle(container)
+  const containerStyles = useComputedStyle(containerRef)
 
-  const childrenWidthSum = computed(() => {
-    const childrenSize = childrenRef.value.map(element => ({
-      rect: useElementRect(element),
-      style: useComputedStyle(element),
-    }))
+  return computed(() => {
+    const paddingLeft = getPxInt(containerStyles.value?.paddingLeft)
+    const paddingRight = getPxInt(containerStyles.value?.paddingRight)
+    const containerGap = getPxInt(containerStyles.value?.columnGap)
 
-    return childrenSize.reduce((sum, { rect, style }) => {
-      const margin = getPxValue(style.marginLeft) + getPxValue(style.marginRight)
-      const border = getPxValue(style.borderTopWidth) + getPxValue(style.borderBottomWidth)
-      const containerGap = getPxValue(gap)
+    const containerWidth = width.value - paddingLeft - paddingRight
+    const childrenWidth = getChildrenWidth(childrenRef.value, containerGap)
 
-      return sum += rect.width.value + margin + border + containerGap
-    }, 0)
+    return childrenWidth > containerWidth
   })
-
-  const containerWidthWithoutPadding = computed(() => {
-    return width.value - getPxValue(paddingLeft) - getPxValue(paddingRight)
-  })
-
-  return computed(() => childrenWidthSum.value > containerWidthWithoutPadding.value)
 }
 
-function getPxValue(property: Ref<string | undefined> | undefined): number {
-  return parseInt(property?.value ?? '0')
+function getPxInt(style: string | undefined): number {
+  if (!style) {
+    return 0
+  }
+
+  return parseInt(style)
+}
+
+function getChildrenWidth(elements: Element[], gap: number): number {
+  return elements
+    .map(getWindowComputedStyle)
+    .reduce((sum, style) => {
+      if (style) {
+        sum += parseInt(style.width)
+        sum += parseInt(style.marginLeft) + parseInt(style.marginRight)
+
+        if (style.boxSizing === 'border-box') {
+          sum += parseInt(style.borderLeftWidth) + parseInt(style.borderRightWidth)
+        }
+      }
+
+      return sum + gap
+    }, 0)
 }
