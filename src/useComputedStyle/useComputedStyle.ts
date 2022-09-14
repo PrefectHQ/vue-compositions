@@ -17,8 +17,8 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): R
   function updateStyleRef(element: Element): void {
     const computedStyleRecord = getWindowComputedStyle(element)
 
-    if (computedStyleRecord) {
-      style.value = computedStyleRecord
+    if (computedStyle) {
+      style.value = computedStyle
     }
   }
 
