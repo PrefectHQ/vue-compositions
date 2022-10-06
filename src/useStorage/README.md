@@ -6,7 +6,7 @@ The `useStorage` composition is a reactive wrapper around localStorage and sessi
 import { useStorage } from '@prefecthq/vue-compositions'
 
 const { values: foo } = useStorage('local', 'foo') // type is `unknown`
-const { values: bar } = useStorage<boolean>('local', false) // type is `boolean`
+const { values: bar } = useStorage<boolean>('local', 'bar') // type is `boolean`
 const { values: bas } = useStorage('local', 'bas', false) // type 'boolean'
 ```
 Two additional compositions are exported as a convenience for each type of storage. `useLocalStorage` and `useSessionStorage`. 
