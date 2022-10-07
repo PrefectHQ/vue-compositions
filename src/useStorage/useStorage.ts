@@ -1,12 +1,12 @@
 /* eslint-disable no-redeclare */
-import { ref, Ref, watchEffect } from 'vue'
+import { ref, Ref, UnwrapRef, watchEffect } from 'vue'
 import { StorageManager, StorageType } from './storage'
 
 type UseStorage<T> = {
-  value: Ref<T>,
+  value: Ref<UnwrapRef<T>>,
   initialValue: T,
   remove: () => void,
-  set: (value: NonNullable<T>) => void,
+  set: (value: NonNullable<UnwrapRef<T>>) => void,
 }
 
 export function useStorage<T>(type: StorageType, key: string): UseStorage<T | null>
@@ -14,14 +14,14 @@ export function useStorage<T>(type: StorageType, key: string, defaultValue: T): 
 export function useStorage<T>(type: StorageType, key: string, defaultValue: T | null = null): UseStorage<T | null> {
   const storage = new StorageManager(type)
   const initialValue = storage.get(key, defaultValue)
-  const data = ref(initialValue) as Ref<T | null>
+  const data = ref(initialValue)
 
   const remove = (): void => {
     storage.remove(key)
     data.value = null
   }
 
-  const set = (value: T): void => {
+  const set = (value: NonNullable<UnwrapRef<T>>): void => {
     data.value = value
   }
 
