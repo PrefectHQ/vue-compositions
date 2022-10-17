@@ -1,6 +1,6 @@
 /* eslint-disable no-redeclare */
 import { Ref, ref, watch } from 'vue'
-import { RouteLocationNormalized, useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, RouteLocationNormalized, useRoute, useRouter } from 'vue-router'
 
 export function useRouteQueryParam(param: string): Ref<string | string[]>
 export function useRouteQueryParam(param: string, defaultValue: string): Ref<string>
@@ -11,7 +11,7 @@ export function useRouteQueryParam(param: string, defaultValue: string | string[
   const initialValue = matchValueType(defaultValue, getRouteQueryParam(route, param) ?? defaultValue)
   const valueRef = ref<string | string[]>(initialValue)
 
-  watch(valueRef, (newValue, oldValue) => {
+  const unwatchValue = watch(valueRef, (newValue, oldValue) => {
     if (isSame(newValue, oldValue)) {
       return
     }
@@ -19,7 +19,7 @@ export function useRouteQueryParam(param: string, defaultValue: string | string[
     router.push({ query: { ...route.query, [param]: valueRef.value } })
   })
 
-  watch(route, (newRoute, oldRoute) => {
+  const unwatchRoute = watch(route, (newRoute, oldRoute) => {
     const newValue = getRouteQueryParam(newRoute, param) ?? defaultValue
     const oldValue = getRouteQueryParam(oldRoute, param) ?? defaultValue
     const matched = matchValueType(oldValue, newValue)
@@ -28,6 +28,11 @@ export function useRouteQueryParam(param: string, defaultValue: string | string[
       valueRef.value = matched
     }
   }, { deep: true })
+
+  onBeforeRouteLeave(() => {
+    unwatchValue()
+    unwatchRoute()
+  })
 
   return valueRef
 }
