@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/PrefectHQ/vue-compositions#readme",
   "devDependencies": {
-    "@prefecthq/eslint-config": "1.0.16",
+    "@prefecthq/eslint-config": "1.0.17",
     "@testing-library/vue": "^6.4.2",
     "@types/jest": "^27.0.3",
     "@types/lodash.debounce": "4.0.7",
