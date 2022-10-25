@@ -33,9 +33,7 @@ export function useStorage<T>(type: StorageType, key: string, defaultValue: T | 
   }
 
   watchEffect(() => {
-    if (data.value !== null) {
-      storage.set(key, data.value)
-    }
+    storage.set(key, data.value)
   })
 
   return {
