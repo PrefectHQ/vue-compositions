@@ -34,7 +34,11 @@ export class StorageManager {
       return defaultValue
     }
 
-    return JSON.parse(value) as T
+    try {
+      return JSON.parse(value) as T
+    } catch {
+      return defaultValue
+    }
   }
 
   public set<T>(key: string, value: T): void {
