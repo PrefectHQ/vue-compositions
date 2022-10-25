@@ -11,7 +11,7 @@ const { values: bas } = useStorage('local', 'bas', false) // type 'boolean'
 ```
 Two additional compositions are exported as a convenience for each type of storage. `useLocalStorage` and `useSessionStorage`. 
 ```typescript
-import { useLocalStorage, useSessionStorage } from '@prefect/vue-compositions'
+import { useLocalStorage, useSessionStorage } from '@prefecthq/vue-compositions'
 
 // this
 const { values: foo } = useLocalStorage('foo')
