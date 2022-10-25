@@ -6,22 +6,29 @@ type UseStorage<T> = {
   value: Ref<UnwrapRef<T>>,
   initialValue: T,
   remove: () => void,
-  set: (value: NonNullable<UnwrapRef<T>>) => void,
+  set: (value: UnwrapRef<T>) => void,
 }
 
-export function useStorage<T>(type: StorageType, key: string): UseStorage<T | null>
+type UseNullableStorage<T> = {
+  value: Ref<UnwrapRef<T> | null>,
+  initialValue: T | null,
+  remove: () => void,
+  set: (value: UnwrapRef<T> | null) => void,
+}
+
+export function useStorage<T>(type: StorageType, key: string): UseNullableStorage<T>
 export function useStorage<T>(type: StorageType, key: string, defaultValue: T): UseStorage<T>
-export function useStorage<T>(type: StorageType, key: string, defaultValue: T | null = null): UseStorage<T | null> {
+export function useStorage<T>(type: StorageType, key: string, defaultValue: T | null = null): UseNullableStorage<T> {
   const storage = new StorageManager(type)
   const initialValue = storage.get(key, defaultValue)
   const data = ref(initialValue)
 
-  const remove = (): void => {
+  const remove: UseNullableStorage<T>['remove'] = () => {
     storage.remove(key)
     data.value = null
   }
 
-  const set = (value: NonNullable<UnwrapRef<T>>): void => {
+  const set: UseNullableStorage<T>['set'] = (value) => {
     data.value = value
   }
 
