@@ -22,8 +22,10 @@ export function useStorage<T>(type: StorageType, key: string, defaultValue: T | 
   const storage = new StorageManager(type)
   const initialValue = storage.get(key, defaultValue)
   const data = ref(initialValue)
+  let stopped = false
 
   const remove: UseNullableStorage<T>['remove'] = () => {
+    stopped = true
     storage.remove(key)
     data.value = null
   }
@@ -33,6 +35,11 @@ export function useStorage<T>(type: StorageType, key: string, defaultValue: T | 
   }
 
   watchEffect(() => {
+    if (stopped) {
+      console.warn(`Storage for key ${key} as been removed and cannot be updated`)
+      return
+    }
+
     storage.set(key, data.value)
   })
 
