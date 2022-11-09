@@ -8,7 +8,7 @@ export type UseVisibilityObserverResponse = {
 
 export type UseVisibilityObserverOptions = UseIntersectionObserverOptions & { disconnectWhenVisible: boolean }
 
-export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, options: UseVisibilityObserverOptions = { disconnectWhenVisible: false } ): UseVisibilityObserverResponse {
+export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, options: UseVisibilityObserverOptions = { disconnectWhenVisible: false }): UseVisibilityObserverResponse {
   const visible = ref(false)
 
   function intersect(entries: IntersectionObserverEntry[]): void {
