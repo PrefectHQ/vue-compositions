@@ -20,3 +20,4 @@ npm i --save @prefecthq/vue-compositions
 - [useRouteQueryParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParam)
 - [useStorage](https://github.com/prefecthq/vue-compositions/tree/main/src/useStorage)
 - [useSubscription](https://github.com/prefecthq/vue-compositions/tree/main/src/useSubscription)
+- [useVisibilityObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useVisibilityObserver)
