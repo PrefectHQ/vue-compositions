@@ -6,7 +6,7 @@ The `useVisibilityObserver` composition is based on `useIntersectionObserver` co
 import { useVisibilityObserver } from '@prefecthq/vue-compositions'
 
 const element = ref<HTMLDivElement>()
-  const { visible } = useVisibilityObserver(element)
+const { visible } = useVisibilityObserver(element)
 ```
 
 ## Arguments
