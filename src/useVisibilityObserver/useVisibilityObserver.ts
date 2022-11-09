@@ -6,20 +6,24 @@ export type UseVisibilityObserverResponse = {
   disconnect: () => void,
 }
 
-export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, disconnectWhenVisible: boolean = false, options: UseIntersectionObserverOptions = {}): UseVisibilityObserverResponse {
+export type UseVisibilityObserverOptions = UseIntersectionObserverOptions & { disconnectWhenVisible: boolean }
+
+export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, options: UseVisibilityObserverOptions = { disconnectWhenVisible: false } ): UseVisibilityObserverResponse {
   const visible = ref(false)
 
   function intersect(entries: IntersectionObserverEntry[]): void {
     entries.forEach(entry => {
-        visible.value = entry.isIntersecting
+      visible.value = entry.isIntersecting
 
-        if (disconnectWhenVisible) {
-          disconnect()
-        }
+      if (options.disconnectWhenVisible && entry.isIntersecting) {
+        disconnect()
+      }
     })
   }
 
-  const { observe, disconnect } = useIntersectionObserver(intersect, options)
+  const { root, rootMargin, threshold } = options
+
+  const { observe, disconnect } = useIntersectionObserver(intersect, { root, rootMargin, threshold })
 
   onMounted(() => {
     observe(element)

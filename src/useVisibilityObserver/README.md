@@ -13,8 +13,7 @@ const { visible } = useVisibilityObserver(element)
 | Name  | Type                    |
 |-------|-------------------------|
 | element | `Ref<HTMLElement>` |
-| disconnectWhenVisible | `boolean` |
-| options  | `UseIntersectionObserverOptions`  |
+| options  | `UseVisibilityObserverOptions`  |
 
 ## Returns
 `UseVisibilityObserverResponse`
