@@ -1,6 +1,5 @@
-
-import { useIntersectionObserver } from '@/useIntersectionObserver'
 import { onMounted, ref, Ref } from 'vue'
+import { useIntersectionObserver } from '@/useIntersectionObserver'
 
 export function useVisibilityObserver(element: Ref<HTMLElement | undefined>): Ref<boolean> {
   const visible = ref(false)
