@@ -6,13 +6,15 @@ The `useVisibilityObserver` composition is based on `useIntersectionObserver` co
 import { useVisibilityObserver } from '@prefecthq/vue-compositions'
 
 const element = ref<HTMLDivElement>()
-const visible = useVisibility(element)
+  const { visible } = useVisibilityObserver(element)
 ```
 
 ## Arguments
 | Name  | Type                    |
 |-------|-------------------------|
 | element | `Ref<HTMLElement>` |
+| disconnectWhenVisible | `boolean` |
+| options  | `UseIntersectionObserverOptions`  |
 
 ## Returns
-`Ref<boolean>`
+`UseVisibilityObserverResponse`

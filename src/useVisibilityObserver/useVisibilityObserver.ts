@@ -1,24 +1,29 @@
 import { onMounted, ref, Ref } from 'vue'
-import { useIntersectionObserver } from '@/useIntersectionObserver'
+import { useIntersectionObserver, UseIntersectionObserverOptions } from '@/useIntersectionObserver'
 
-export function useVisibilityObserver(element: Ref<HTMLElement | undefined>): Ref<boolean> {
+export type UseVisibilityObserverResponse = {
+  visible: Ref<boolean>,
+  disconnect: () => void,
+}
+
+export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, disconnectWhenVisible: boolean = false, options: UseIntersectionObserverOptions = {}): UseVisibilityObserverResponse {
   const visible = ref(false)
 
   function intersect(entries: IntersectionObserverEntry[]): void {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        visible.value = true
-        disconnect()
-      }
+        visible.value = entry.isIntersecting
+
+        if (disconnectWhenVisible) {
+          disconnect()
+        }
     })
   }
 
-  const { observe, disconnect } = useIntersectionObserver(intersect)
+  const { observe, disconnect } = useIntersectionObserver(intersect, options)
 
   onMounted(() => {
     observe(element)
   })
 
-  return visible
+  return { visible, disconnect }
 }
-
