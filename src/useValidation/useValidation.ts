@@ -1,82 +1,137 @@
-import { computed, inject, InjectionKey, onUnmounted, provide, reactive, ref, Ref, watch } from 'vue'
+/* eslint-disable max-classes-per-file */
+import { computed, inject, InjectionKey, onMounted, onUnmounted, provide, reactive, ref, Ref, UnwrapRef, watch } from 'vue'
 
 type MaybePromise<T> = T | Promise<T>
+type MaybeRef<T> = T | Ref<T>
+type MaybeUnwrapRef<T> = T | UnwrapRef<T>
 
 type UseValidationMethod<T> = (
-  value: Ref<T>,
-  name: string,
-  rules: ValidationRule<T>[]
+  value: MaybeRef<T>,
+  name: MaybeRef<string>,
+  rules: MaybeRef<ValidationRule<T>[]>
 ) => UseValidation
 
 type UseValidationParameters<T> = Parameters<UseValidationMethod<T>>
+
+const USE_VALIDATION_SYMBOL = Symbol('_UseValidationSymbol')
 
 type UseValidation = {
   valid: Ref<boolean>,
   error: Ref<ValidationError>,
   pending: Ref<boolean>,
+  validate: () => Promise<boolean>,
+  USE_VALIDATION_SYMBOL: symbol,
+}
+
+function isUseValidation(value: unknown): value is UseValidation {
+  return typeof value === 'object' && value !== null && USE_VALIDATION_SYMBOL in value
 }
 
 type ValidationError = string | false
-type ValidationRule<T> = (value: T, name: string) => MaybePromise<true | string>
+type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<true | string>
 
 // overload so name is optional. or remove name?
 export function useValidation<T>(...[value, name, rules]: UseValidationParameters<T>): UseValidation {
+  const valueRef = ref(value)
+  const nameRef = ref(name)
+  const rulesRef = ref(rules)
+
   const error = ref<string | false>(false)
   const valid = computed(() => error.value !== false)
   const pending = ref(false)
 
-  const observer = inject(VALIDATION_OBSERVER_INJECTION_KEY)
-  const unregister = observer?.register(error)
+  const validate = async (): Promise<boolean> => {
+    executor.abort()
 
-  watch(value, async value => {
     pending.value = true
 
     try {
-      error.value = await check(value, name, rules)
+      error.value = await executor.validate(valueRef.value, nameRef.value, rulesRef.value)
     } catch (error) {
-      console.warn('There was an error during validation')
-      console.error(error)
+      if (!(error instanceof ValidationAbortedError)) {
+        console.warn('There was an error during validation')
+        console.error(error)
+      }
     }
 
     pending.value = false
+
+    return valid.value
+  }
+
+  const result: UseValidation = {
+    error,
+    valid,
+    pending,
+    validate,
+    USE_VALIDATION_SYMBOL,
+  }
+
+  const mounted = ref(false)
+  const executor = new ValidationRuleExecutor<T>()
+  const observer = inject(VALIDATION_OBSERVER_INJECTION_KEY)
+  const unregister = observer?.register(result)
+
+  watch(valueRef, () => {
+    // not sure this is needed
+    if (!mounted.value) {
+      return
+    }
+
+    validate()
   }, { deep: true })
+
+  onMounted(() => {
+    mounted.value = true
+  })
 
   onUnmounted(() => {
     unregister?.()
   })
 
-  return {
-    valid,
-    error,
-    pending,
-  }
+  return result
 }
 
-// need to be able to abort this in case the value changes while check is being run
-async function check<T>(value: T, name: string, rules: ValidationRule<T>[]): Promise<ValidationError> {
-  for (const rule of rules) {
-    // we do want to await each validation rule
-    // eslint-disable-next-line no-await-in-loop
-    const result = await rule(value, name)
+class ValidationAbortedError extends Error {}
 
-    if (typeof result === 'string') {
-      return result
+class ValidationRuleExecutor<T> {
+  private controller = new AbortController()
+
+  public abort(): void {
+    this.controller.abort()
+
+    this.controller = new AbortController()
+  }
+
+  public async validate(value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, rules: MaybeUnwrapRef<ValidationRule<T>>[]): Promise<ValidationError> {
+    const { signal } = this.controller
+
+    for (const rule of rules) {
+      if (signal.aborted) {
+        throw new ValidationAbortedError()
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      const result = await rule(value, name, signal)
+
+      if (typeof result === 'string') {
+        return result
+      }
     }
+
+    return false
   }
 
-  return false
 }
-
 
 type UseValidationObserver = {
-  // validate: () => void,
+  validate: () => Promise<boolean>,
   valid: Ref<boolean>,
-  // errors: ValidationErrors<T>,
   errors: Ref<string[]>,
 }
 
 type ValidationObserverUnregister = () => void
-type ValidationObserverRegister = (error: Ref<ValidationError>) => ValidationObserverUnregister
+type ValidationObserverRegister = (error: UseValidation) => ValidationObserverUnregister
 
 type ProvideValidationObserver = {
   register: ValidationObserverRegister,
@@ -84,35 +139,60 @@ type ProvideValidationObserver = {
 
 const VALIDATION_OBSERVER_INJECTION_KEY: InjectionKey<ProvideValidationObserver> = Symbol('useValidationObserverKey')
 
-type ErrorsStore = Record<symbol, Ref<ValidationError>>
+type ValidationStore = Record<symbol, UseValidation>
 type RegistrationsStore = Record<symbol, ValidationObserverUnregister | undefined>
 
 export function useValidationObserver(): UseValidationObserver {
-  const observer = inject(VALIDATION_OBSERVER_INJECTION_KEY)
-  const errorsStore = reactive<ErrorsStore>({})
-  const registrationStore: RegistrationsStore = {}
-  const register: ValidationObserverRegister = (error) => {
-    const unregister = observer?.register(error)
+  const parent = inject(VALIDATION_OBSERVER_INJECTION_KEY)
+  const validations = reactive<ValidationStore>({})
+  const registrations: RegistrationsStore = {}
+
+  const register: ValidationObserverRegister = (validation) => {
+    const unregister = parent?.register(validation)
     const key = Symbol()
 
-    registrationStore[key] = unregister
-    errorsStore[key] = error
+    registrations[key] = unregister
+    validations[key] = validation
 
     return () => {
-      delete errorsStore[key]
-      delete registrationStore[key]
+      delete validations[key]
+      delete registrations[key]
       unregister?.()
     }
   }
 
-  // typescript is annoying sometimes. Can this be written cleaner?
-  const allErrors = computed<Ref<ValidationError>[]>(() => Object.values(errorsStore))
-  const errors = computed(() => allErrors.value.filter(error => error.value !== false).map(error => error.value) as string[])
+  const validate = (): Promise<boolean> => {
+    const promises: Promise<boolean>[] = []
+
+    Object.values(validations).forEach(validation => {
+      if (isUseValidation(validation)) {
+        promises.push(validation.validate())
+      }
+    })
+
+    return Promise.all(promises).then(results => results.every(valid => valid))
+  }
+
+  const errors = computed<string[]>(() => {
+    const errors: string[] = []
+
+    Object.values(validations).forEach(validation => {
+      if (isUseValidation(validation)) {
+        return validation.error.value
+      }
+    })
+
+    return errors
+  })
+
   const valid = computed(() => errors.value.length > 0)
 
   onUnmounted(() => {
-    // typescript is annoying sometimes. Can this be written cleaner?
-    Object.values(registrationStore).forEach(unregister => (unregister as ValidationObserverUnregister | undefined)?.())
+    Object.values(registrations).forEach(unregister => {
+      if (typeof unregister === 'function') {
+        unregister()
+      }
+    })
   })
 
   provide(VALIDATION_OBSERVER_INJECTION_KEY, { register })
@@ -120,5 +200,6 @@ export function useValidationObserver(): UseValidationObserver {
   return {
     errors,
     valid,
+    validate,
   }
 }
