@@ -54,8 +54,8 @@ export function useValidationObserver(): UseValidationObserver {
     const errors: string[] = []
 
     Object.values(validations).forEach(validation => {
-      if (isUseValidation(validation)) {
-        return validation.error.value
+      if (isUseValidation(validation) && typeof validation.error.value === 'string') {
+        errors.push(validation.error.value)
       }
     })
 
