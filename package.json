@@ -1,18 +1,18 @@
 {
   "name": "@prefecthq/vue-compositions",
   "private": false,
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "A collection of reusable vue compositions.",
   "main": "./dist/vue-compositions.umd.js",
   "module": "./dist/vue-compositions.es.js",
   "exports": {
-      ".": {
-          "import": "./dist/vue-compositions.es.js",
-          "require": "./dist/vue-compositions.umd.js"
-      }
+    ".": {
+      "import": "./dist/vue-compositions.es.js",
+      "require": "./dist/vue-compositions.umd.js"
+    }
   },
   "files": [
-      "dist"
+    "dist"
   ],
   "types": "./dist/types/src/index.d.ts",
   "scripts": {
