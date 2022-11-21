@@ -8,11 +8,20 @@
     "strict": true,
     "esModuleInterop": true,
     "baseUrl": ".",
+    "outDir": "./dist/types/",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "exclude": [
     "node_modules"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "tests/**/*.ts",
+    "tests/**/*.d.ts",
+    "./*.ts",
+    "./*.d.ts",
   ]
 }
