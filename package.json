@@ -4,10 +4,10 @@
   "version": "0.2.11",
   "description": "A collection of reusable vue compositions.",
   "main": "./dist/vue-compositions.umd.js",
-  "module": "./dist/vue-compositions.es.js",
+  "module": "./dist/vue-compositions.mjs",
   "exports": {
     ".": {
-      "import": "./dist/vue-compositions.es.js",
+      "import": "./dist/vue-compositions.mjs",
       "require": "./dist/vue-compositions.umd.js"
     }
   },
