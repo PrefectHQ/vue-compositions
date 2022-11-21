@@ -3,7 +3,18 @@
   "private": false,
   "version": "0.2.9",
   "description": "A collection of reusable vue compositions.",
-  "main": "index.ts",
+  "main": "./dist/vue-compositions.umd.js",
+  "module": "./dist/vue-compositions.es.js",
+  "exports": {
+      ".": {
+          "import": "./dist/vue-compositions.es.js",
+          "require": "./dist/vue-compositions.umd.js"
+      }
+  },
+  "files": [
+      "dist"
+  ],
+  "types": "./dist/types/src/index.d.ts",
   "scripts": {
     "dev": "tsc -w & tsc-alias -w & vite build -w",
     "build": "tsc && tsc-alias && vite build",
