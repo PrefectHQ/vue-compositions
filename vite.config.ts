@@ -11,7 +11,6 @@ export default {
     ],
   },
   build: {
-    emptyOutDir: false,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'vue-compositions',
