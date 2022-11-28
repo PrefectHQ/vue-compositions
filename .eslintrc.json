@@ -10,7 +10,7 @@
   "extends": ["@prefecthq"],
   "overrides": [
     {
-      "files": ["**/*.spec.js", "**/*.spec.ts"],
+      "files": ["**/*.spec.js", "**/*.spec.ts"]
     }
   ],
   "globals": {
