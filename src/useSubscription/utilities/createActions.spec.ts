@@ -2,6 +2,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createActions } from '@/useSubscription'
+import { describe, it, expect } from 'vitest'
 
 describe('createActions', () => {
 

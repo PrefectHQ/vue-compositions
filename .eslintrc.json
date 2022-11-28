@@ -11,9 +11,6 @@
   "overrides": [
     {
       "files": ["**/*.spec.js", "**/*.spec.ts"],
-      "env": {
-        "jest": true
-      }
     }
   ],
   "globals": {
