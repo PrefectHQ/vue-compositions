@@ -2,6 +2,7 @@ import { computed, inject, InjectionKey, onUnmounted, provide, reactive, Ref } f
 import { isUseValidation, UseValidation } from '@/useValidation/useValidation'
 
 type UseValidationObserver = {
+  register: ValidationObserverRegister,
   validate: () => Promise<boolean>,
   valid: Ref<boolean>,
   errors: Ref<string[]>,
@@ -78,5 +79,6 @@ export function useValidationObserver(): UseValidationObserver {
     errors,
     valid,
     validate,
+    register,
   }
 }

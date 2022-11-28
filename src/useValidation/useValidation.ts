@@ -12,7 +12,7 @@ type UseValidationMethod<T> = (
 
 type UseValidationParameters<T> = Parameters<UseValidationMethod<T>>
 
-const USE_VALIDATION_SYMBOL = Symbol('_UseValidationSymbol')
+const USE_VALIDATION_SYMBOL = Symbol('UseValidationSymbol')
 
 export type UseValidation = {
   valid: Ref<boolean>,
