@@ -1,7 +1,8 @@
 import { resolve } from 'path'
+import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
-export default {
+export default defineConfig(() => ({
   resolve: {
     alias: [
       {
@@ -9,6 +10,10 @@ export default {
         replacement: resolve(__dirname, './src'),
       },
     ],
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
   },
   build: {
     emptyOutDir: false,
@@ -26,4 +31,4 @@ export default {
       },
     },
   },
-}
+}))
