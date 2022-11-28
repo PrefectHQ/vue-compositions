@@ -1,9 +1,10 @@
 import { render } from '@testing-library/vue'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { computed, h, reactive, ref } from 'vue'
-import { timeout, uniqueSubscribe } from '../utils'
 import { useSubscription } from '@/useSubscription'
 import Manager from '@/useSubscription/models/manager'
 import { UseSubscription } from '@/useSubscription/types/subscription'
+import { timeout, uniqueSubscribe } from '@/utilities/tests'
 
 function numberEqualsOne(number: number): boolean {
   return number === 1
@@ -15,7 +16,9 @@ function numberEqualsOnePromise(number: number, delay: number): Promise<boolean>
   })
 }
 
-afterEach(() => jest.useRealTimers())
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 describe('subscribe', () => {
 
@@ -26,11 +29,11 @@ describe('subscribe', () => {
   })
 
   it('returns the correct response when awaiting the promise', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const promise = uniqueSubscribe(numberEqualsOnePromise, [1, 1000]).promise()
 
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     const subscription = await promise
 
@@ -44,12 +47,12 @@ describe('subscribe', () => {
   })
 
   it('returns the correct response when action promise resolves', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const subscription = uniqueSubscribe(numberEqualsOnePromise, [1, 10])
 
-    jest.runAllTimers()
-    jest.useRealTimers()
+    vi.runAllTimers()
+    vi.useRealTimers()
 
     await timeout()
 
@@ -69,7 +72,7 @@ describe('subscribe', () => {
   })
 
   it('defaults errored to false', () => {
-    const action = jest.fn()
+    const action = vi.fn()
 
     const subscription = uniqueSubscribe(action, [])
 
@@ -118,7 +121,7 @@ describe('subscribe', () => {
 
   it('executes the action once when two subscriptions are created', () => {
     const manager = new Manager()
-    const action = jest.fn()
+    const action = vi.fn()
 
     useSubscription(action, [], { manager })
     useSubscription(action, [], { manager })
@@ -127,10 +130,10 @@ describe('subscribe', () => {
   })
 
   it('calculates the poll interval correctly', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const manager = new Manager()
-    const action = jest.fn()
+    const action = vi.fn()
     const initialExecutions = 1
     const additionalExecutions = 3
     const minInterval = 10
@@ -139,16 +142,16 @@ describe('subscribe', () => {
     useSubscription(action, [], { interval: minInterval, manager })
     useSubscription(action, [], { interval: maxInterval, manager })
 
-    jest.advanceTimersByTime(additionalExecutions * minInterval)
+    vi.advanceTimersByTime(additionalExecutions * minInterval)
 
     expect(action).toBeCalledTimes(initialExecutions + additionalExecutions)
   })
 
   it('calculates the poll interval correctly when a subscription is unsubscribed', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const manager = new Manager()
-    const action = jest.fn()
+    const action = vi.fn()
     const initialExecutions = 1
     const additionalExecutions = 3
     const minInterval = 10
@@ -160,16 +163,16 @@ describe('subscribe', () => {
 
     subscription1.unsubscribe()
 
-    jest.advanceTimersByTime(additionalExecutions * maxInterval)
+    vi.advanceTimersByTime(additionalExecutions * maxInterval)
 
     expect(action).toBeCalledTimes(initialExecutions + additionalExecutions)
   })
 
   it('stops polling when all subscriptions with interval unsubscribe', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const manager = new Manager()
-    const action = jest.fn()
+    const action = vi.fn()
     const minInterval = 10
     const maxInterval = 20
 
@@ -181,37 +184,37 @@ describe('subscribe', () => {
     subscription1.unsubscribe()
     subscription2.unsubscribe()
 
-    jest.advanceTimersByTime(maxInterval)
+    vi.advanceTimersByTime(maxInterval)
 
     expect(action).toBeCalledTimes(1)
   })
 
   it('executes the correct number of times when interval is set', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const initialExecutions = 1
     const additionalExecutions = Math.floor(Math.random() * 10) + 1
 
-    const action = jest.fn()
+    const action = vi.fn()
 
     uniqueSubscribe(action, [], { interval: 50 })
 
     for (let i = 0; i < additionalExecutions; i++) {
-      jest.runOnlyPendingTimers()
+      vi.runOnlyPendingTimers()
     }
 
     expect(action).toBeCalledTimes(initialExecutions + additionalExecutions)
   })
 
   it('stops executing when unsubscribed', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
-    const action = jest.fn()
+    const action = vi.fn()
 
     const subscription = uniqueSubscribe(action, [], { interval: 50 })
     subscription.unsubscribe()
 
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
 
     expect(action).toBeCalledTimes(1)
   })
@@ -219,7 +222,7 @@ describe('subscribe', () => {
   describe('executes action again when args change', () => {
 
     it('when using reactive args', async () => {
-      const action = jest.fn()
+      const action = vi.fn()
       const args = reactive([0])
 
       uniqueSubscribe(action, args)
@@ -232,7 +235,7 @@ describe('subscribe', () => {
     })
 
     it('when using ref args', async () => {
-      const action = jest.fn()
+      const action = vi.fn()
       const args = ref([0])
 
       uniqueSubscribe(action, args)
@@ -245,7 +248,7 @@ describe('subscribe', () => {
     })
 
     it('when using args containing a ref value', async () => {
-      const action = jest.fn()
+      const action = vi.fn()
       const number = ref(0)
       const args = [number]
 
@@ -259,7 +262,7 @@ describe('subscribe', () => {
     })
 
     it('when using args containing a ref value and a non reactive value', async () => {
-      const action = jest.fn()
+      const action = vi.fn()
       const number = ref(0)
       const args = [number, 0]
 
@@ -273,7 +276,7 @@ describe('subscribe', () => {
     })
 
     it('when using args containing a reactive value', async () => {
-      const action = jest.fn()
+      const action = vi.fn()
       const argument = reactive({ number: 0 })
       const args = [argument]
 
@@ -287,7 +290,7 @@ describe('subscribe', () => {
     })
 
     it('when using args containing a reactive value and a non reactive value', async () => {
-      const action = jest.fn()
+      const action = vi.fn()
       const argument = reactive({ number: 0 })
       const args = [argument, 0]
 
@@ -313,7 +316,7 @@ describe('subscribe', () => {
   })
 
   it('calls unsubscribe when component is unmounted', () => {
-    const action = jest.fn()
+    const action = vi.fn()
     let subscription: UseSubscription<typeof action>
 
     const { unmount } = render({
@@ -324,7 +327,7 @@ describe('subscribe', () => {
       },
     })
 
-    const spy = jest.spyOn(subscription!, 'unsubscribe')
+    const spy = vi.spyOn(subscription!, 'unsubscribe')
 
     unmount()
 
@@ -368,7 +371,7 @@ describe('subscribe', () => {
   })
 
   it('when using computed args', async () => {
-    const action = jest.fn()
+    const action = vi.fn()
     const valueRef = ref(0)
     const valueComputed = computed(() => valueRef.value)
 
@@ -382,7 +385,7 @@ describe('subscribe', () => {
   })
 
   it('fails when using nested computed args', () => {
-    const action = jest.fn()
+    const action = vi.fn()
     const valueRef = ref(0)
     const valueComputed = computed(() => valueRef)
     const valueComputedComputed = computed(() => valueComputed)
@@ -394,7 +397,7 @@ describe('subscribe', () => {
   })
 
   it('it does not return undefined when a subscription changes', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     function action(value: number): Promise<number> {
       return new Promise((resolve) => setTimeout(() => resolve(value), 10))
@@ -404,8 +407,8 @@ describe('subscribe', () => {
     const valueArg = ref(originalValue)
     const subscription = useSubscription(action, [valueArg])
 
-    jest.runAllTimers()
-    jest.useRealTimers()
+    vi.runAllTimers()
+    vi.useRealTimers()
 
     valueArg.value = 1
 
@@ -419,7 +422,7 @@ describe('subscribe', () => {
   })
 
   it('it does retain previous subscription response when arguments change', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     function action(value: number): Promise<number> {
       return new Promise((resolve) => setTimeout(() => resolve(value), 10))
@@ -428,8 +431,8 @@ describe('subscribe', () => {
     const valueArg = ref(0)
     const subscription = useSubscription(action, [valueArg])
 
-    jest.runAllTimers()
-    jest.useRealTimers()
+    vi.runAllTimers()
+    vi.useRealTimers()
 
     while (valueArg.value < 2) {
       valueArg.value++
@@ -464,7 +467,7 @@ describe('subscribe', () => {
   })
 
   it('correctly sets executed', async () => {
-    const action = jest.fn()
+    const action = vi.fn()
     const subscription = uniqueSubscribe(action)
 
     await timeout()
@@ -473,7 +476,7 @@ describe('subscribe', () => {
   })
 
   it('correctly sets executed on additional subscriptions', async () => {
-    const action = jest.fn()
+    const action = vi.fn()
     const manager = new Manager()
 
     useSubscription(action, [], { manager })
@@ -486,15 +489,15 @@ describe('subscribe', () => {
   })
 
   it('stops executing when action errors', () => {
-    const action = jest.fn(() => {
+    const action = vi.fn(() => {
       throw 'error'
     })
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     uniqueSubscribe(action, [], { interval: 10000 })
 
-    jest.advanceTimersByTime(10000 * 2)
+    vi.advanceTimersByTime(10000 * 2)
 
     expect(action).toBeCalledTimes(1)
   })
