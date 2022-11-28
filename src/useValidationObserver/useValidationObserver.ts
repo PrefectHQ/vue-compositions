@@ -1,21 +1,24 @@
 import { computed, inject, InjectionKey, onUnmounted, provide, reactive, Ref } from 'vue'
 import { isUseValidation, UseValidation } from '@/useValidation/useValidation'
 
-type UseValidationObserver = {
+const USE_VALIDATION_OBSERVER_SYMBOL = Symbol('UseValidationObserverSymbol')
+
+export type UseValidationObserver = {
   register: ValidationObserverRegister,
   validate: () => Promise<boolean>,
   valid: Ref<boolean>,
   errors: Ref<string[]>,
+  USE_VALIDATION_OBSERVER_SYMBOL: symbol,
 }
 
-type ValidationObserverUnregister = () => void
-type ValidationObserverRegister = (error: UseValidation) => ValidationObserverUnregister
-
-type ProvideValidationObserver = {
-  register: ValidationObserverRegister,
+export function isUseValidationObserver(value: unknown): value is UseValidationObserver {
+  return typeof value === 'object' && value !== null && USE_VALIDATION_OBSERVER_SYMBOL in value
 }
 
-export const VALIDATION_OBSERVER_INJECTION_KEY: InjectionKey<ProvideValidationObserver> = Symbol('useValidationObserverKey')
+export type ValidationObserverUnregister = () => void
+export type ValidationObserverRegister = (error: UseValidation) => ValidationObserverUnregister
+
+export const VALIDATION_OBSERVER_INJECTION_KEY: InjectionKey<UseValidationObserver> = Symbol('useValidationObserverKey')
 
 type ValidationStore = Record<symbol, UseValidation>
 type RegistrationsStore = Record<symbol, ValidationObserverUnregister | undefined>
@@ -73,12 +76,15 @@ export function useValidationObserver(): UseValidationObserver {
     })
   })
 
-  provide(VALIDATION_OBSERVER_INJECTION_KEY, { register })
-
-  return {
+  const observer: UseValidationObserver = {
     errors,
     valid,
     validate,
     register,
+    USE_VALIDATION_OBSERVER_SYMBOL,
   }
+
+  provide(VALIDATION_OBSERVER_INJECTION_KEY, observer)
+
+  return observer
 }

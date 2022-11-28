@@ -1,8 +1,9 @@
-import { computed, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
+import { ComponentInternalInstance, computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
 import { MaybePromise, MaybeRef, MaybeUnwrapRef } from '@/types/maybe'
-import { VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
+import { isUseValidationObserver, UseValidationObserver, ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
+import { getSymbolForInjectionKey } from '@/utilities/symbols'
 
 type UseValidationMethod<T> = (
   value: MaybeRef<T>,
@@ -28,6 +29,20 @@ export function isUseValidation(value: unknown): value is UseValidation {
 
 export type ValidationError = string | false
 export type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<true | string>
+
+type ComponentInstanceWithProvide = ComponentInternalInstance & { provides: Record<symbol, unknown> } | null
+
+function getValidationObserver(): UseValidationObserver | undefined {
+  const vm = getCurrentInstance() as ComponentInstanceWithProvide
+  const symbol = getSymbolForInjectionKey(VALIDATION_OBSERVER_INJECTION_KEY)
+  const observer = vm?.provides[symbol]
+
+  if (isUseValidationObserver(observer)) {
+    return observer
+  }
+
+  return inject(VALIDATION_OBSERVER_INJECTION_KEY)
+}
 
 // overload so name is optional. or remove name?
 export function useValidation<T>(...[value, name, rules]: UseValidationParameters<T>): UseValidation {
@@ -58,7 +73,7 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
     return valid.value
   }
 
-  const result: UseValidation = {
+  const validation: UseValidation = {
     error,
     valid,
     pending,
@@ -68,8 +83,9 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
 
   const mounted = ref(false)
   const executor = new ValidationRuleExecutor<T>()
-  const observer = inject(VALIDATION_OBSERVER_INJECTION_KEY)
-  const unregister = observer?.register(result)
+  const observer = getValidationObserver()
+
+  let unregister: ValidationObserverUnregister | undefined
 
   watch(valueRef, () => {
     // not sure this is needed
@@ -82,11 +98,13 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
 
   onMounted(() => {
     mounted.value = true
+
+    unregister = observer?.register(validation)
   })
 
   onUnmounted(() => {
     unregister?.()
   })
 
-  return result
+  return validation
 }
