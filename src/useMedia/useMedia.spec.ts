@@ -1,5 +1,5 @@
 import { render } from '@testing-library/vue'
-import { describe, beforeEach, it, vi } from 'vitest'
+import { describe, beforeEach, afterEach, it, vi, expect } from 'vitest'
 import { h, isRef, ref } from 'vue'
 import { useMedia } from '@/useMedia'
 import { timeout } from '@/utilities/tests'
@@ -24,7 +24,9 @@ describe('media', () => {
     })
   })
 
-  afterEach(() => vi.resetAllMocks())
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   it('returns a ref', () => {
     const match = useMedia('(hover)')
