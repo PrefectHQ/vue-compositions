@@ -1,7 +1,7 @@
 import { computed, ComputedRef, inject, InjectionKey, onUnmounted, provide, reactive, UnwrapNestedRefs } from 'vue'
 import { isUseValidation, UseValidation } from '@/useValidation/useValidation'
 
-const USE_VALIDATION_OBSERVER_SYMBOL = Symbol('UseValidationObserverSymbol')
+const USE_VALIDATION_OBSERVER_SYMBOL: unique symbol = Symbol('UseValidationObserverSymbol')
 
 export type UseValidationObserver = {
   register: ValidationObserverRegister,
@@ -9,11 +9,11 @@ export type UseValidationObserver = {
   valid: ComputedRef<boolean>,
   errors: ComputedRef<string[]>,
   pending: ComputedRef<boolean>,
-  USE_VALIDATION_OBSERVER_SYMBOL: typeof USE_VALIDATION_OBSERVER_SYMBOL,
+  [USE_VALIDATION_OBSERVER_SYMBOL]: true,
 }
 
 export function isUseValidationObserver(value: unknown): value is UseValidationObserver {
-  return typeof value === 'object' && value !== null && 'USE_VALIDATION_OBSERVER_SYMBOL' in value
+  return typeof value === 'object' && value !== null && USE_VALIDATION_OBSERVER_SYMBOL in value
 }
 
 export type ValidationObserverUnregister = () => void
@@ -101,7 +101,7 @@ export function useValidationObserver(): UseValidationObserver {
     pending,
     validate,
     register,
-    USE_VALIDATION_OBSERVER_SYMBOL,
+    [USE_VALIDATION_OBSERVER_SYMBOL]: true,
   }
 
   provide(VALIDATION_OBSERVER_INJECTION_KEY, observer)

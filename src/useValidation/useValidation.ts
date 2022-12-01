@@ -2,29 +2,22 @@ import { ComponentInternalInstance, computed, getCurrentInstance, inject, onMoun
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
 import { MaybePromise, MaybeRef, MaybeUnwrapRef } from '@/types/maybe'
+import { NoInfer } from '@/types/utilities'
 import { isUseValidationObserver, UseValidationObserver, ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { getSymbolForInjectionKey } from '@/utilities/symbols'
 
-type UseValidationMethod<T> = (
-  value: MaybeRef<T>,
-  name: MaybeRef<string>,
-  rules: MaybeRef<ValidationRule<T>[]>
-) => UseValidation
-
-type UseValidationParameters<T> = Parameters<UseValidationMethod<T>>
-
-const USE_VALIDATION_SYMBOL = Symbol('UseValidationSymbol')
+const USE_VALIDATION_SYMBOL: unique symbol = Symbol('UseValidationSymbol')
 
 export type UseValidation = {
   valid: Ref<boolean>,
   error: Ref<string>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
-  USE_VALIDATION_SYMBOL: typeof USE_VALIDATION_SYMBOL,
+  [USE_VALIDATION_SYMBOL]: true,
 }
 
 export function isUseValidation(value: unknown): value is UseValidation {
-  return typeof value === 'object' && value !== null && 'USE_VALIDATION_SYMBOL' in value
+  return typeof value === 'object' && value !== null && USE_VALIDATION_SYMBOL in value
 }
 
 export type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<boolean | string>
@@ -44,7 +37,11 @@ function getValidationObserver(): UseValidationObserver | undefined {
 }
 
 // overload so name is optional. or remove name?
-export function useValidation<T>(...[value, name, rules]: UseValidationParameters<T>): UseValidation {
+export function useValidation<T>(
+  value: MaybeRef<T>,
+  name: MaybeRef<string>,
+  rules: MaybeRef<ValidationRule<NoInfer<T>>[]>,
+): UseValidation {
   const valueRef = ref(value)
   const nameRef = ref(name)
   const rulesRef = ref(rules)
@@ -77,7 +74,7 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
     valid,
     pending,
     validate,
-    USE_VALIDATION_SYMBOL,
+    [USE_VALIDATION_SYMBOL]: true,
   }
 
   const executor = new ValidationRuleExecutor<T>()
@@ -99,3 +96,16 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
 
   return validation
 }
+
+// const value = ref(0)
+// const isGreaterThanZero: ValidationRule<number> = (value, name) => {
+//   if (value <= 0) {
+//     return `${name} must be greater than 0`
+//   }
+
+//   return true
+// }
+
+// const validation = useValidation(value, 'value', [isGreaterThanZero])
+
+// validation[USE_VALIDATION_SYMBOL]
