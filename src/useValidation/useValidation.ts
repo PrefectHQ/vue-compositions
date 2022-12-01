@@ -17,7 +17,7 @@ const USE_VALIDATION_SYMBOL = Symbol('UseValidationSymbol')
 
 export type UseValidation = {
   valid: Ref<boolean>,
-  error: Ref<ValidationError>,
+  error: Ref<string>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
   USE_VALIDATION_SYMBOL: typeof USE_VALIDATION_SYMBOL,
@@ -27,7 +27,6 @@ export function isUseValidation(value: unknown): value is UseValidation {
   return typeof value === 'object' && value !== null && 'USE_VALIDATION_SYMBOL' in value
 }
 
-export type ValidationError = string | false
 export type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<boolean | string>
 
 type ComponentInstanceWithProvide = ComponentInternalInstance & { provides: Record<symbol, unknown> } | null
@@ -50,8 +49,8 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
   const nameRef = ref(name)
   const rulesRef = ref(rules)
 
-  const error = ref<string | false>(false)
-  const valid = computed(() => error.value === false)
+  const error = ref<string>('')
+  const valid = computed(() => !!error.value)
   const pending = ref(false)
 
   const validate = async (): Promise<boolean> => {

@@ -62,7 +62,7 @@ export function useValidationObserver(): UseValidationObserver {
     keys.forEach(key => {
       const validation = validations[key]
 
-      if (typeof validation.error === 'string') {
+      if (validation.error) {
         errors.push(validation.error)
       }
     })

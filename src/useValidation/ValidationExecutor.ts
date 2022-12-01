@@ -1,4 +1,4 @@
-import { ValidationError, ValidationRule } from './useValidation'
+import { ValidationRule } from './useValidation'
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { MaybeUnwrapRef } from '@/types/maybe'
 
@@ -11,7 +11,7 @@ export class ValidationRuleExecutor<T> {
     this.controller = new AbortController()
   }
 
-  public async validate(value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, rules: MaybeUnwrapRef<ValidationRule<T>>[]): Promise<ValidationError> {
+  public async validate(value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, rules: MaybeUnwrapRef<ValidationRule<T>>[]): Promise<string> {
     const { signal } = this.controller
 
     for (const rule of rules) {
@@ -31,7 +31,7 @@ export class ValidationRuleExecutor<T> {
       }
     }
 
-    return false
+    return ''
   }
 
 }
