@@ -20,15 +20,15 @@ export type UseValidation = {
   error: Ref<ValidationError>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
-  USE_VALIDATION_SYMBOL: symbol,
+  USE_VALIDATION_SYMBOL: typeof USE_VALIDATION_SYMBOL,
 }
 
 export function isUseValidation(value: unknown): value is UseValidation {
-  return typeof value === 'object' && value !== null && USE_VALIDATION_SYMBOL in value
+  return typeof value === 'object' && value !== null && 'USE_VALIDATION_SYMBOL' in value
 }
 
 export type ValidationError = string | false
-export type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<true | string>
+export type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<boolean | string>
 
 type ComponentInstanceWithProvide = ComponentInternalInstance & { provides: Record<symbol, unknown> } | null
 
@@ -41,7 +41,7 @@ function getValidationObserver(): UseValidationObserver | undefined {
     return observer
   }
 
-  return inject(VALIDATION_OBSERVER_INJECTION_KEY)
+  return inject(VALIDATION_OBSERVER_INJECTION_KEY, undefined)
 }
 
 // overload so name is optional. or remove name?
@@ -51,7 +51,7 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
   const rulesRef = ref(rules)
 
   const error = ref<string | false>(false)
-  const valid = computed(() => error.value !== false)
+  const valid = computed(() => error.value === false)
   const pending = ref(false)
 
   const validate = async (): Promise<boolean> => {
@@ -81,25 +81,19 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
     USE_VALIDATION_SYMBOL,
   }
 
-  const mounted = ref(false)
   const executor = new ValidationRuleExecutor<T>()
   const observer = getValidationObserver()
 
   let unregister: ValidationObserverUnregister | undefined
 
   watch(valueRef, () => {
-    // not sure this is needed
-    if (!mounted.value) {
-      return
-    }
-
     validate()
   }, { deep: true })
 
   onMounted(() => {
-    mounted.value = true
-
     unregister = observer?.register(validation)
+
+    validate()
   })
 
   onUnmounted(() => {

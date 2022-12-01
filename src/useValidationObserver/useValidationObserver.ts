@@ -8,11 +8,11 @@ export type UseValidationObserver = {
   validate: () => Promise<boolean>,
   valid: Ref<boolean>,
   errors: Ref<string[]>,
-  USE_VALIDATION_OBSERVER_SYMBOL: symbol,
+  USE_VALIDATION_OBSERVER_SYMBOL: typeof USE_VALIDATION_OBSERVER_SYMBOL,
 }
 
 export function isUseValidationObserver(value: unknown): value is UseValidationObserver {
-  return typeof value === 'object' && value !== null && USE_VALIDATION_OBSERVER_SYMBOL in value
+  return typeof value === 'object' && value !== null && 'USE_VALIDATION_OBSERVER_SYMBOL' in value
 }
 
 export type ValidationObserverUnregister = () => void
@@ -24,7 +24,7 @@ type ValidationStore = Record<symbol, UseValidation>
 type RegistrationsStore = Record<symbol, ValidationObserverUnregister | undefined>
 
 export function useValidationObserver(): UseValidationObserver {
-  const parent = inject(VALIDATION_OBSERVER_INJECTION_KEY)
+  const parent = inject(VALIDATION_OBSERVER_INJECTION_KEY, undefined)
   const validations = reactive<ValidationStore>({})
   const registrations: RegistrationsStore = {}
 
@@ -57,16 +57,18 @@ export function useValidationObserver(): UseValidationObserver {
   const errors = computed<string[]>(() => {
     const errors: string[] = []
 
-    Object.values(validations).forEach(validation => {
-      if (isUseValidation(validation) && typeof validation.error.value === 'string') {
-        errors.push(validation.error.value)
+    Reflect.ownKeys(validations).forEach(key => {
+      const validation = validations[key as symbol]
+
+      if (isUseValidation(validation) && typeof validation.error === 'string') {
+        errors.push(validation.error)
       }
     })
 
     return errors
   })
 
-  const valid = computed(() => errors.value.length > 0)
+  const valid = computed(() => errors.value.length === 0)
 
   onUnmounted(() => {
     Object.values(registrations).forEach(unregister => {
