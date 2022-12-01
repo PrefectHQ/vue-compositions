@@ -22,6 +22,10 @@ export class ValidationRuleExecutor<T> {
       // eslint-disable-next-line no-await-in-loop
       const result = await rule(value, name, signal)
 
+      if (result === false) {
+        return `${name} is not valid`
+      }
+
       if (typeof result === 'string') {
         return result
       }
