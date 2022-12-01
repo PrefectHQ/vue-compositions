@@ -96,16 +96,3 @@ export function useValidation<T>(
 
   return validation
 }
-
-// const value = ref(0)
-// const isGreaterThanZero: ValidationRule<number> = (value, name) => {
-//   if (value <= 0) {
-//     return `${name} must be greater than 0`
-//   }
-
-//   return true
-// }
-
-// const validation = useValidation(value, 'value', [isGreaterThanZero])
-
-// validation[USE_VALIDATION_SYMBOL]
