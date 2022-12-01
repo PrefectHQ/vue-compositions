@@ -1,4 +1,4 @@
-import { computed, inject, InjectionKey, onUnmounted, provide, reactive, Ref } from 'vue'
+import { computed, ComputedRef, inject, InjectionKey, onUnmounted, provide, reactive, UnwrapNestedRefs } from 'vue'
 import { isUseValidation, UseValidation } from '@/useValidation/useValidation'
 
 const USE_VALIDATION_OBSERVER_SYMBOL = Symbol('UseValidationObserverSymbol')
@@ -6,8 +6,9 @@ const USE_VALIDATION_OBSERVER_SYMBOL = Symbol('UseValidationObserverSymbol')
 export type UseValidationObserver = {
   register: ValidationObserverRegister,
   validate: () => Promise<boolean>,
-  valid: Ref<boolean>,
-  errors: Ref<string[]>,
+  valid: ComputedRef<boolean>,
+  errors: ComputedRef<string[]>,
+  pending: ComputedRef<boolean>,
   USE_VALIDATION_OBSERVER_SYMBOL: typeof USE_VALIDATION_OBSERVER_SYMBOL,
 }
 
@@ -20,7 +21,7 @@ export type ValidationObserverRegister = (error: UseValidation) => ValidationObs
 
 export const VALIDATION_OBSERVER_INJECTION_KEY: InjectionKey<UseValidationObserver> = Symbol('useValidationObserverKey')
 
-type ValidationStore = Record<symbol, UseValidation>
+type ValidationStore = Record<symbol, UnwrapNestedRefs<UseValidation>>
 type RegistrationsStore = Record<symbol, ValidationObserverUnregister | undefined>
 
 export function useValidationObserver(): UseValidationObserver {
@@ -33,7 +34,7 @@ export function useValidationObserver(): UseValidationObserver {
     const key = Symbol()
 
     registrations[key] = unregister
-    validations[key] = validation
+    validations[key] = reactive(validation)
 
     return () => {
       delete validations[key]
@@ -55,17 +56,33 @@ export function useValidationObserver(): UseValidationObserver {
   }
 
   const errors = computed<string[]>(() => {
+    const keys = Reflect.ownKeys(validations) as symbol[]
     const errors: string[] = []
 
-    Reflect.ownKeys(validations).forEach(key => {
-      const validation = validations[key as symbol]
+    keys.forEach(key => {
+      const validation = validations[key]
 
-      if (isUseValidation(validation) && typeof validation.error === 'string') {
+      if (typeof validation.error === 'string') {
         errors.push(validation.error)
       }
     })
 
     return errors
+  })
+
+  const pending = computed<boolean>(() => {
+    const keys = Reflect.ownKeys(validations) as symbol[]
+
+    for (const key of keys) {
+      const validation = validations[key]
+
+      if (validation.pending) {
+        return true
+      }
+
+    }
+
+    return false
   })
 
   const valid = computed(() => errors.value.length === 0)
@@ -81,6 +98,7 @@ export function useValidationObserver(): UseValidationObserver {
   const observer: UseValidationObserver = {
     errors,
     valid,
+    pending,
     validate,
     register,
     USE_VALIDATION_OBSERVER_SYMBOL,
