@@ -75,17 +75,24 @@ export function useValidation<T, R extends ValidationRule<T>>(
     [USE_VALIDATION_SYMBOL]: true,
   }
 
+  let mounted = false
   const executor = new ValidationRuleExecutor<T>()
   const observer = getValidationObserver()
 
   let unregister: ValidationObserverUnregister | undefined
 
   watch(valueRef, () => {
+    if (!mounted) {
+      return
+    }
+
     validate()
   }, { deep: true })
 
   onMounted(() => {
     unregister = observer?.register(validation)
+
+    mounted = true
   })
 
   onUnmounted(() => {
