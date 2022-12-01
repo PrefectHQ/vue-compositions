@@ -10,10 +10,7 @@
   "extends": ["@prefecthq"],
   "overrides": [
     {
-      "files": ["**/*.spec.js", "**/*.spec.ts"],
-      "env": {
-        "jest": true
-      }
+      "files": ["**/*.spec.js", "**/*.spec.ts"]
     }
   ],
   "globals": {

@@ -1,29 +1,32 @@
 import { render } from '@testing-library/vue'
+import { describe, beforeEach, afterEach, it, vi, expect } from 'vitest'
 import { h, isRef, ref } from 'vue'
-import { timeout } from '../utils'
 import { useMedia } from '@/useMedia'
+import { timeout } from '@/utilities/tests'
 
 describe('media', () => {
-  const addEventListener = jest.fn()
-  const removeEventListener = jest.fn()
+  const addEventListener = vi.fn()
+  const removeEventListener = vi.fn()
 
   beforeEach(() => {
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation(query => ({
+      value: vi.fn().mockImplementation(query => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
         addEventListener,
         removeEventListener,
-        dispatchEvent: jest.fn(),
+        dispatchEvent: vi.fn(),
       })),
     })
   })
 
-  afterEach(() => jest.resetAllMocks())
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   it('returns a ref', () => {
     const match = useMedia('(hover)')
