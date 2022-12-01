@@ -92,8 +92,6 @@ export function useValidation<T>(...[value, name, rules]: UseValidationParameter
 
   onMounted(() => {
     unregister = observer?.register(validation)
-
-    validate()
   })
 
   onUnmounted(() => {
