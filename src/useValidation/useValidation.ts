@@ -2,7 +2,6 @@ import { ComponentInternalInstance, computed, getCurrentInstance, inject, onMoun
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
 import { MaybePromise, MaybeRef, MaybeUnwrapRef } from '@/types/maybe'
-import { NoInfer } from '@/types/utilities'
 import { isUseValidationObserver, UseValidationObserver, ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { getSymbolForInjectionKey } from '@/utilities/symbols'
 
@@ -36,11 +35,10 @@ function getValidationObserver(): UseValidationObserver | undefined {
   return inject(VALIDATION_OBSERVER_INJECTION_KEY, undefined)
 }
 
-// overload so name is optional. or remove name?
-export function useValidation<T>(
+export function useValidation<T, R extends ValidationRule<T>>(
   value: MaybeRef<T>,
   name: MaybeRef<string>,
-  rules: MaybeRef<ValidationRule<NoInfer<T>>[]>,
+  rules: MaybeRef<R[]>,
 ): UseValidation {
   const valueRef = ref(value)
   const nameRef = ref(name)
