@@ -42,6 +42,7 @@
   "devDependencies": {
     "@prefecthq/eslint-config": "1.0.17",
     "@testing-library/vue": "^6.4.2",
+    "@types/flat": "^5.0.2",
     "@types/lodash.debounce": "4.0.7",
     "auto-changelog": "^2.3.0",
     "eslint": "^8.5.0",
@@ -66,6 +67,7 @@
     }
   },
   "dependencies": {
+    "flat": "^5.0.2",
     "jsdom": "^20.0.3"
   }
 }
