@@ -1,7 +1,7 @@
 {
   "name": "@prefecthq/vue-compositions",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A collection of reusable vue compositions.",
   "main": "./dist/vue-compositions.umd.js",
   "module": "./dist/vue-compositions.mjs",
@@ -23,10 +23,7 @@
     "lint:fix": "eslint ./ --fix",
     "types": "vue-tsc --noEmit",
     "changelog": "auto-changelog --package --commit-limit 0",
-    "changelog:commit": "npm run changelog && git add -A && git commit -m 'Update CHANGELOG.md'",
-    "release:patch": "npm version patch && npm run changelog:commit",
-    "release:minor": "npm version minor && npm run changelog:commit",
-    "release:major": "npm version major && npm run changelog:commit'"
+    "version": "npm run changelog && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",
