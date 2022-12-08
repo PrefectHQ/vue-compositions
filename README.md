@@ -15,6 +15,7 @@ npm i --save @prefecthq/vue-compositions
 - [useIntersectionObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useIntersectionObserver)
 - [useMedia](https://github.com/prefecthq/vue-compositions/tree/main/src/useMedia)
 - [useMutationObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useMutationObserver)
+- [usePatchRef](https://github.com/prefecthq/vue-compositions/tree/main/src/usePatchRef)
 - [useResizeObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useResizeObserver)
 - [useRouteParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteParam)
 - [useRouteQueryParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParam)
