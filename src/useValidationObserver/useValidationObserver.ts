@@ -44,9 +44,12 @@ export function useValidationObserver(): UseValidationObserver {
   }
 
   const validate = (): Promise<boolean> => {
+    const keys = Reflect.ownKeys(validations) as symbol[]
     const promises: Promise<boolean>[] = []
 
-    Object.values(validations).forEach(validation => {
+    keys.forEach(key => {
+      const validation = validations[key]
+
       if (isUseValidation(validation)) {
         promises.push(validation.validate())
       }
