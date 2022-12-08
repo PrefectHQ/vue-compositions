@@ -1,6 +1,7 @@
 import { ComponentInternalInstance, computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
+import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
 import { isUseValidationObserver, UseValidationObserver, ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { getSymbolForInjectionKey } from '@/utilities/symbols'
@@ -35,10 +36,10 @@ function getValidationObserver(): UseValidationObserver | undefined {
   return inject(VALIDATION_OBSERVER_INJECTION_KEY, undefined)
 }
 
-export function useValidation<T, R extends ValidationRule<T>>(
+export function useValidation<T>(
   value: MaybeRef<T>,
   name: MaybeRef<string>,
-  rules: MaybeRef<R[]>,
+  rules: MaybeRef<ValidationRule<NoInfer<T>>[]>,
 ): UseValidation {
   const valueRef = ref(value)
   const nameRef = ref(name)

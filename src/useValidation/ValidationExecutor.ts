@@ -1,5 +1,6 @@
 import { ValidationRule } from './useValidation'
 import { ValidationAbortedError } from './ValidationAbortedError'
+import { NoInfer } from '@/types/generics'
 
 export class ValidationRuleExecutor<T> {
   private controller = new AbortController()
@@ -10,7 +11,7 @@ export class ValidationRuleExecutor<T> {
     this.controller = new AbortController()
   }
 
-  public async validate(value: T, name: string, rules: ValidationRule<T>[]): Promise<string> {
+  public async validate(value: T, name: string, rules: ValidationRule<NoInfer<T>>[]): Promise<string> {
     const { signal } = this.controller
 
     for (const rule of rules) {
