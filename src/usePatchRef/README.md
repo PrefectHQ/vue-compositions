@@ -1,4 +1,4 @@
-# useElementWidth
+# usePatchRef
 The `usePatchRef` abstracts away the get/set pattern for updating a computed object that has a setter. Normally you would need a get/set for each property you want to reactively set. Using the `usePatchRef` composition makes this simpler.
 
 ## Example
