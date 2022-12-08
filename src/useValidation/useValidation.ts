@@ -1,7 +1,7 @@
 import { ComponentInternalInstance, computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
-import { MaybePromise, MaybeRef, MaybeUnwrapRef } from '@/types/maybe'
+import { MaybePromise, MaybeRef } from '@/types/maybe'
 import { isUseValidationObserver, UseValidationObserver, ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { getSymbolForInjectionKey } from '@/utilities/symbols'
 
@@ -19,7 +19,7 @@ export function isUseValidation(value: unknown): value is UseValidation {
   return typeof value === 'object' && value !== null && USE_VALIDATION_SYMBOL in value
 }
 
-export type ValidationRule<T> = (value: MaybeUnwrapRef<T>, name: MaybeUnwrapRef<string>, signal: AbortSignal) => MaybePromise<boolean | string>
+export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
 
 type ComponentInstanceWithProvide = ComponentInternalInstance & { provides: Record<symbol, unknown> } | null
 
@@ -45,7 +45,7 @@ export function useValidation<T, R extends ValidationRule<T>>(
   const rulesRef = ref(rules)
 
   const error = ref<string>('')
-  const valid = computed(() => !!error.value)
+  const valid = computed(() => error.value === '')
   const pending = ref(false)
 
   const validate = async (): Promise<boolean> => {
@@ -54,7 +54,7 @@ export function useValidation<T, R extends ValidationRule<T>>(
     pending.value = true
 
     try {
-      error.value = await executor.validate(valueRef.value, nameRef.value, rulesRef.value)
+      error.value = await executor.validate(valueRef.value as T, nameRef.value, rulesRef.value)
     } catch (error) {
       if (!(error instanceof ValidationAbortedError)) {
         console.warn('There was an error during validation')
