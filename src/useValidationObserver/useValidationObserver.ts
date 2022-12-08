@@ -7,6 +7,7 @@ export type UseValidationObserver = {
   register: ValidationObserverRegister,
   validate: () => Promise<boolean>,
   valid: ComputedRef<boolean>,
+  invalid: ComputedRef<boolean>,
   errors: ComputedRef<string[]>,
   pending: ComputedRef<boolean>,
   [USE_VALIDATION_OBSERVER_SYMBOL]: true,
@@ -89,6 +90,7 @@ export function useValidationObserver(): UseValidationObserver {
   })
 
   const valid = computed(() => errors.value.length === 0)
+  const invalid = computed(() => !valid.value)
 
   onUnmounted(() => {
     Object.values(registrations).forEach(unregister => {
@@ -101,6 +103,7 @@ export function useValidationObserver(): UseValidationObserver {
   const observer: UseValidationObserver = {
     errors,
     valid,
+    invalid,
     pending,
     validate,
     register,

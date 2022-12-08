@@ -1,4 +1,4 @@
-import { ComponentInternalInstance, computed, getCurrentInstance, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
+import { ComponentInternalInstance, computed, ComputedRef, getCurrentInstance, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
 import { NoInfer } from '@/types/generics'
@@ -9,7 +9,8 @@ import { getSymbolForInjectionKey } from '@/utilities/symbols'
 const USE_VALIDATION_SYMBOL: unique symbol = Symbol('UseValidationSymbol')
 
 export type UseValidation = {
-  valid: Ref<boolean>,
+  valid: ComputedRef<boolean>,
+  invalid: ComputedRef<boolean>,
   error: Ref<string>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
@@ -47,6 +48,7 @@ export function useValidation<T>(
 
   const error = ref<string>('')
   const valid = computed(() => error.value === '')
+  const invalid = computed(() => !valid.value)
   const pending = ref(false)
 
   const validate = async (): Promise<boolean> => {
@@ -71,6 +73,7 @@ export function useValidation<T>(
   const validation: UseValidation = {
     error,
     valid,
+    invalid,
     pending,
     validate,
     [USE_VALIDATION_SYMBOL]: true,
