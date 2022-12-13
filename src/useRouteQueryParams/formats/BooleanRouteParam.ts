@@ -1,13 +1,13 @@
+import { LocationQueryValue } from 'vue-router'
 import { RouteParam } from './RouteParam'
 
 export class BooleanRouteParam extends RouteParam<boolean> {
-  protected override default = false
 
-  protected override parse(value: string): boolean {
+  protected override parse(value: LocationQueryValue): boolean {
     return value === 'true'
   }
 
-  protected format(value: boolean): string {
+  protected override format(value: boolean): LocationQueryValue {
     return value ? 'true' : 'false'
   }
 

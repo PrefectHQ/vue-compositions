@@ -1,16 +1,12 @@
-// eslint-disable-next-line max-classes-per-file
 import { LocationQueryValue, LocationQuery } from 'vue-router'
-import { InvalidRouteParamValue } from './InvalidRouteParamValue'
+import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from './InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
-import { isString } from '@/utilities/strings'
 
 export type RouteParamClass<T> = new (key: string) => RouteParam<T>
 
 export abstract class RouteParam<T> {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  protected abstract default: T & {}
-  protected abstract parse(value: string): T
-  protected abstract format(value: T): string
+  protected abstract parse(value: LocationQueryValue): T
+  protected abstract format(value: T): LocationQueryValue
 
   private readonly key: string
 
@@ -18,70 +14,74 @@ export abstract class RouteParam<T> {
     this.key = key
   }
 
-  private parseValue(value: LocationQueryValue): T {
+  private safeParseValue(value: LocationQueryValue): T | InvalidRouteParamValue {
     try {
-      if (value === null) {
-        throw new InvalidRouteParamValue()
-      }
-
       return this.parse(value)
     } catch (error) {
-      if (!(error instanceof InvalidRouteParamValue)) {
-        throw error
+      if (!isInvalidRouteParamValue(error)) {
+        console.error(error)
       }
-    }
 
-    return this.default
+      return new InvalidRouteParamValue()
+    }
   }
 
-  private formatValue(value: T): string {
+  private safeFormatValue(value: T): LocationQueryValue | InvalidRouteParamValue {
     try {
       return this.format(value)
     } catch (error) {
-      if (!(error instanceof InvalidRouteParamValue)) {
-        throw error
+      if (!isInvalidRouteParamValue(error)) {
+        console.error(error)
       }
-    }
 
-    return this.format(this.default)
+      return new InvalidRouteParamValue()
+    }
   }
 
-  public getSingleValue(currentQuery: LocationQuery): T {
+  public getSingleValue(currentQuery: LocationQuery): T | InvalidRouteParamValue {
     const [value] = asArray(currentQuery[this.key])
 
-    return this.parseValue(value)
+    return this.safeParseValue(value)
   }
 
   public getArrayValue(currentQuery: LocationQuery): T[] {
-    const values = asArray(currentQuery[this.key]).filter(isString)
+    const raw = asArray(currentQuery[this.key])
+    const parsed = raw.map(value => this.safeParseValue(value))
+    const valid = parsed.filter(isNotInvalidRouteParamValue)
 
-    return values.map(value => this.parseValue(value))
+    return valid
   }
 
   public setSingleValue(currentQuery: LocationQuery, value: T): LocationQuery {
-    if (value === this.default) {
-      // eslint-disable-next-line id-length
-      const { [this.key]: _, ...query } = currentQuery
+    const formatted = this.safeFormatValue(value)
 
-      return query
+    if (isInvalidRouteParamValue(formatted)) {
+      return this.removeKeyFromQuery(currentQuery, this.key)
     }
-
-    const formatted = this.formatValue(value)
 
     return { ...currentQuery, [this.key]: formatted }
   }
 
   public setArrayValue(currentQuery: LocationQuery, values: T[]): LocationQuery {
     if (values.length === 0) {
-      // eslint-disable-next-line id-length
-      const { [this.key]: _, ...query } = currentQuery
-
-      return query
+      return this.removeKeyFromQuery(currentQuery, this.key)
     }
 
-    const valuesFormatted = values.map(value => this.formatValue(value))
+    const formatted = values.map(value => this.safeFormatValue(value))
+    const valid = formatted.filter(isNotInvalidRouteParamValue)
 
-    return { ...currentQuery, [this.key]: valuesFormatted }
+    if (valid.length === 0) {
+      return this.removeKeyFromQuery(currentQuery, this.key)
+    }
+
+    return { ...currentQuery, [this.key]: valid }
+  }
+
+  private removeKeyFromQuery(query: LocationQuery, key: string): LocationQuery {
+    // eslint-disable-next-line id-length
+    const { [key]: _, ...queryWithKeyRemoved } = query
+
+    return queryWithKeyRemoved
   }
 
 }

@@ -1,22 +1,36 @@
 /* eslint-disable no-redeclare */
-import { computed, Ref } from 'vue'
+import { computed, Ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { isInvalidRouteParamValue } from './formats/InvalidRouteParamValue'
 import { RouteParamClass } from './formats/RouteParam'
+import { NoInfer } from '@/types/generics'
 import { asArray } from '@/utilities/arrays'
 
-export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>): Ref<T>
-export function useRouteQueryParam<T>(key: string, formatter: [RouteParamClass<T>]): Ref<T[]>
-export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T> | [RouteParamClass<T>]): Ref<T | T[]> {
+export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>): Ref<T>
+export function useRouteQueryParam<T>(key: string, formatter: [RouteParamClass<T>], defaultValue: NoInfer<T>[]): Ref<T[]>
+export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T> | [RouteParamClass<T>], defaultValue: NoInfer<T> | NoInfer<T>[]): Ref<T | T[]> {
   const route = useRoute()
   const router = useRouter()
-  const multiple = Array.isArray(formatter)
   const [formatterClass] = asArray(formatter)
   const { getSingleValue, getArrayValue, setSingleValue, setArrayValue } = new formatterClass(key)
 
-  if (multiple) {
+  if (Array.isArray(defaultValue)) {
+    let useDefaultValue = true
+
+    const unwatch = watch(() => getArrayValue(route.query), () => {
+      useDefaultValue = false
+      unwatch()
+    })
+
     return computed({
       get() {
-        return getArrayValue(route.query)
+        const value = getArrayValue(route.query)
+
+        if (value.length === 0 && useDefaultValue) {
+          return defaultValue
+        }
+
+        return value
       },
       set(values: T[]) {
         const query = setArrayValue(route.query, values)
@@ -28,7 +42,13 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
 
   return computed({
     get() {
-      return getSingleValue(route.query)
+      const value = getSingleValue(route.query)
+
+      if (isInvalidRouteParamValue(value)) {
+        return defaultValue
+      }
+
+      return value
     },
     set(value: T) {
       const query = setSingleValue(route.query, value)
