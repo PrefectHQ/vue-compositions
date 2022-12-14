@@ -1,12 +1,10 @@
-import { ComponentInternalInstance, computed, ComputedRef, getCurrentInstance, inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
+import { computed, ComputedRef, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
 import { ValidationAbortedError } from './ValidationAbortedError'
 import { ValidationRuleExecutor } from './ValidationExecutor'
 import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
-import { isUseValidationObserver, UseValidationObserver, ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
-import { getSymbolForInjectionKey } from '@/utilities/symbols'
-
-const USE_VALIDATION_SYMBOL: unique symbol = Symbol('UseValidationSymbol')
+import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
+import { injectFromSelfOrAncestor } from '@/utilities/injection'
 
 export type UseValidation = {
   valid: ComputedRef<boolean>,
@@ -14,28 +12,9 @@ export type UseValidation = {
   error: Ref<string>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
-  [USE_VALIDATION_SYMBOL]: true,
-}
-
-export function isUseValidation(value: unknown): value is UseValidation {
-  return typeof value === 'object' && value !== null && USE_VALIDATION_SYMBOL in value
 }
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
-
-type ComponentInstanceWithProvide = ComponentInternalInstance & { provides: Record<symbol, unknown> } | null
-
-function getValidationObserver(): UseValidationObserver | undefined {
-  const vm = getCurrentInstance() as ComponentInstanceWithProvide
-  const symbol = getSymbolForInjectionKey(VALIDATION_OBSERVER_INJECTION_KEY)
-  const observer = vm?.provides[symbol]
-
-  if (isUseValidationObserver(observer)) {
-    return observer
-  }
-
-  return inject(VALIDATION_OBSERVER_INJECTION_KEY, undefined)
-}
 
 export function useValidation<T>(
   value: MaybeRef<T>,
@@ -76,12 +55,11 @@ export function useValidation<T>(
     invalid,
     pending,
     validate,
-    [USE_VALIDATION_SYMBOL]: true,
   }
 
   let mounted = false
   const executor = new ValidationRuleExecutor<T>()
-  const observer = getValidationObserver()
+  const observer = injectFromSelfOrAncestor(VALIDATION_OBSERVER_INJECTION_KEY)
 
   let unregister: ValidationObserverUnregister | undefined
 
