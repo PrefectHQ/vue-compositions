@@ -61,17 +61,9 @@ export function useValidationObserver(): UseValidationObserver {
 
   const errors = computed<string[]>(() => {
     const keys = Reflect.ownKeys(validations) as symbol[]
-    const errors: string[] = []
-
-    keys.forEach(key => {
-      const validation = validations[key]
-
-      if (validation.error) {
-        errors.push(validation.error)
-      }
-    })
-
-    return errors
+    return keys
+      .map(key => validations[key].error)
+      .filter(error => !!error)
   })
 
   const pending = computed<boolean>(() => {
