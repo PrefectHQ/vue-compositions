@@ -1,10 +1,12 @@
 /* eslint-disable no-redeclare */
+import { flatten, unflatten } from 'flat'
 import { computed, Ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { isInvalidRouteParamValue } from './formats/InvalidRouteParamValue'
 import { RouteParamClass } from './formats/RouteParam'
 import { NoInfer } from '@/types/generics'
 import { asArray } from '@/utilities/arrays'
+import { isRecord } from '@/utilities/objects'
 
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>): Ref<T>
 export function useRouteQueryParam<T>(key: string, formatter: [RouteParamClass<T>], defaultValue: NoInfer<T>[]): Ref<T[]>
@@ -48,6 +50,10 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
         return defaultValue
       }
 
+      if (isRecord(value) && isRecord(defaultValue)) {
+        return mergeValueWithDefaultValue(value, defaultValue)
+      }
+
       return value
     },
     set(value: T) {
@@ -55,5 +61,15 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
 
       router.push({ query })
     },
+  })
+}
+
+function mergeValueWithDefaultValue<T extends Record<string, unknown>>(value: T, defaultValue: NoInfer<T>): T {
+  const defaultValueFlattened: T = flatten(defaultValue)
+  const valueFlattened: T = flatten(value)
+
+  return unflatten({
+    ...defaultValueFlattened,
+    ...valueFlattened,
   })
 }
