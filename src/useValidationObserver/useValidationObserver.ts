@@ -77,16 +77,7 @@ export function useValidationObserver(): UseValidationObserver {
   const pending = computed<boolean>(() => {
     const keys = Reflect.ownKeys(validations) as symbol[]
 
-    for (const key of keys) {
-      const validation = validations[key]
-
-      if (validation.pending) {
-        return true
-      }
-
-    }
-
-    return false
+    return keys.some(key => validations[key].pending)
   })
 
   const valid = computed(() => errors.value.length === 0)
