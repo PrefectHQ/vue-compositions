@@ -14,19 +14,19 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
   const route = useRoute()
   const router = useRouter()
   const [formatterClass] = asArray(formatter)
-  const { getSingleValue, getArrayValue, setSingleValue, setArrayValue } = new formatterClass(key)
+  const format = new formatterClass(key)
 
   if (Array.isArray(defaultValue)) {
     let useDefaultValue = true
 
-    const unwatch = watch(() => getArrayValue(route.query), () => {
+    const unwatch = watch(() => format.getArrayValue(route.query), () => {
       useDefaultValue = false
       unwatch()
     })
 
     return computed({
       get() {
-        const value = getArrayValue(route.query)
+        const value = format.getArrayValue(route.query)
 
         if (value.length === 0 && useDefaultValue) {
           return defaultValue
@@ -35,7 +35,7 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
         return value
       },
       set(values: T[]) {
-        const query = setArrayValue(route.query, values)
+        const query = format.setArrayValue(route.query, values)
 
         router.push({ query })
       },
@@ -44,7 +44,7 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
 
   return computed({
     get() {
-      const value = getSingleValue(route.query)
+      const value = format.getSingleValue(route.query)
 
       if (isInvalidRouteParamValue(value)) {
         return defaultValue
@@ -57,7 +57,7 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
       return value
     },
     set(value: T) {
-      const query = setSingleValue(route.query, value)
+      const query = format.setSingleValue(route.query, value)
 
       router.push({ query })
     },

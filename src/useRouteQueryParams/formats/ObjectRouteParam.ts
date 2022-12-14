@@ -2,7 +2,7 @@ import { flatten, unflatten } from 'flat'
 import { LocationQuery, LocationQueryValue } from 'vue-router'
 import { RouteParam, RouteParamClass } from './RouteParam'
 
-type ObjectRouteParamSchema<T extends Record<string, unknown>> = {
+export type ObjectRouteParamSchema<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown> ? ObjectRouteParamSchema<T[P]> : RouteParamClass<NonNullable<T[P]>>
 }
 
