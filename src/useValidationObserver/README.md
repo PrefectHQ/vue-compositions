@@ -1,5 +1,5 @@
 # useValidationObserver
-The `useValidationObserver` combines 
+The `useValidationObserver` observes all validation from all `useValidation` compositions in the same component or nested within a component.
 
 ## Example
 ```typescript
