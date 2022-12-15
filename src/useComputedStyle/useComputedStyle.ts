@@ -40,5 +40,7 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): R
 }
 
 function nodeIsElement(node: Node): node is Element {
-  return !!node as Element.attributes
+  const element = node as Element
+
+  return !!element.attributes
 }
