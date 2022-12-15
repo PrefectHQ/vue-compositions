@@ -1,14 +1,14 @@
 /* eslint-disable max-classes-per-file */
+import Manager from '@/useSubscription/models/manager'
+import Subscription from '@/useSubscription/models/subscription'
 import {
   Action,
   ActionArguments,
   ActionResponse,
   ChannelSignature
-} from '../types/action'
-import { SubscriptionOptions } from '../types/subscription'
-import { unrefArgs } from '../utilities/reactivity'
-import Manager from './manager'
-import Subscription from './subscription'
+} from '@/useSubscription/types/action'
+import { SubscriptionOptions } from '@/useSubscription/types/subscription'
+import { unrefArgs } from '@/useSubscription/utilities/reactivity'
 
 class ChannelSignatureManager {
   private static actionId: number = 0

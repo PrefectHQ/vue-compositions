@@ -1,6 +1,6 @@
-import Manager from '../models/manager'
-import Subscription from '../models/subscription'
-import { Action, ActionArguments, ActionParamsRequired, ActionResponse } from './action'
+import Manager from '@/useSubscription/models/manager'
+import Subscription from '@/useSubscription/models/subscription'
+import { Action, ActionArguments, ActionParamsRequired, ActionResponse } from '@/useSubscription/types/action'
 
 export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> extends never[]
   ? [action: T, args?: ActionArguments<T>, options?: SubscriptionOptions]
