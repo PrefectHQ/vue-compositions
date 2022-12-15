@@ -1,4 +1,4 @@
-import { globalExists } from '../utilities/global'
+import { globalExists } from '@/utilities/global'
 
 export type StorageType = 'session' | 'local'
 

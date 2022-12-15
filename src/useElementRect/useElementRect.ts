@@ -1,6 +1,6 @@
 /* eslint-disable id-length */
 import { ref, Ref, watch } from 'vue'
-import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
+import { useResizeObserver } from '@/useResizeObserver/useResizeObserver'
 
 type ElementRect = {
   height: Ref<number>,

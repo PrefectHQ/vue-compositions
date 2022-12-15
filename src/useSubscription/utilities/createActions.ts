@@ -26,7 +26,7 @@ export function createActions<T extends Record<string, any>>(context: T): Create
       if (typeof key === 'string' && typeof actions[key] === 'undefined' && typeof context[key] === 'function' && !objectPrototypeKeys.includes(key)) {
         // any necessary because Reflect.getPrototypeOf returns object
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        actions[key] = (prototype as any)[key].bind(context)
+        actions[key] = prototype as any[key].bind(context)
       }
     })
 

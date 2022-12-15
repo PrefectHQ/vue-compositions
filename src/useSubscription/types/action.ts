@@ -1,4 +1,4 @@
-import { MaybeRefs, OnlyRequired } from './utilities'
+import { MaybeRefs, OnlyRequired } from '@/useSubscription/types/utilities'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Action = (...args: any[]) => any
