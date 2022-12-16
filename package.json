@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/PrefectHQ/vue-compositions#readme",
   "devDependencies": {
-    "@prefecthq/eslint-config": "1.0.19",
+    "@prefecthq/eslint-config": "1.0.20",
     "@testing-library/vue": "^6.4.2",
     "@types/lodash.debounce": "4.0.7",
     "auto-changelog": "^2.3.0",
