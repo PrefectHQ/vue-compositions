@@ -1,6 +1,7 @@
 import { flatten, unflatten } from 'flat'
 import { LocationQuery, LocationQueryValue } from 'vue-router'
-import { RouteParam, RouteParamClass } from './RouteParam'
+import { isNotInvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
+import { RouteParam, RouteParamClass } from '@/useRouteQueryParams/formats/RouteParam'
 
 export type ObjectRouteParamSchema<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown> ? ObjectRouteParamSchema<T[P]> : RouteParamClass<NonNullable<T[P]>>
@@ -22,9 +23,12 @@ export abstract class ObjectRouteParam<T extends Record<string, unknown>> extend
     const response: Record<string, unknown> = {}
 
     Object.entries(schema).forEach(([key, formatter]) => {
-      const { getSingleValue } = new formatter(key)
+      const format = new formatter(`${this.key}.${key}`)
+      const value = format.getSingleValue(query)
 
-      response[key] = getSingleValue(query)
+      if (isNotInvalidRouteParamValue(value)) {
+        response[key] = format.getSingleValue(query)
+      }
     })
 
     return unflatten(response) as T
@@ -40,9 +44,9 @@ export abstract class ObjectRouteParam<T extends Record<string, unknown>> extend
     let query: LocationQuery = { ...currentQuery }
 
     Object.entries(schema).forEach(([key, formatter]) => {
-      const { setSingleValue } = new formatter(key)
+      const format = new formatter(`${this.key}.${key}`)
 
-      query = setSingleValue(query, valueFlat[key])
+      query = format.setSingleValue(query, valueFlat[key])
     })
 
     return query

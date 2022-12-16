@@ -1,8 +1,8 @@
-import { BooleanRouteParam } from './formats/BooleanRouteParam'
-import { NumberRouteParam } from './formats/NumberRouteParam'
-import { ObjectRouteParam } from './formats/ObjectRouteParam'
-import { StringRouteParam } from './formats/StringRouteParam'
-import { useRouteQueryParam } from './useRouteQueryParams'
+import { BooleanRouteParam } from '@/useRouteQueryParams/formats/BooleanRouteParam'
+import { NumberRouteParam } from '@/useRouteQueryParams/formats/NumberRouteParam'
+import { ObjectRouteParam } from '@/useRouteQueryParams/formats/ObjectRouteParam'
+import { StringRouteParam } from '@/useRouteQueryParams/formats/StringRouteParam'
+import { useRouteQueryParam } from '@/useRouteQueryParams/useRouteQueryParams'
 
 useRouteQueryParam('foo', StringRouteParam, '')
 useRouteQueryParam('foo', NumberRouteParam, 0)

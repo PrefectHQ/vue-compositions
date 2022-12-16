@@ -1,5 +1,5 @@
 import { LocationQueryValue, LocationQuery } from 'vue-router'
-import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from './InvalidRouteParamValue'
+import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
 export type RouteParamClass<T> = new (key: string) => RouteParam<T>
@@ -8,7 +8,7 @@ export abstract class RouteParam<T> {
   protected abstract parse(value: LocationQueryValue): T
   protected abstract format(value: T): LocationQueryValue
 
-  private readonly key: string
+  protected readonly key: string
 
   public constructor(key: string) {
     this.key = key
@@ -78,7 +78,7 @@ export abstract class RouteParam<T> {
   }
 
   private removeKeyFromQuery(query: LocationQuery, key: string): LocationQuery {
-    // eslint-disable-next-line id-length
+    // eslint-disable-next-line id-length, no-unused-vars
     const { [key]: _, ...queryWithKeyRemoved } = query
 
     return queryWithKeyRemoved

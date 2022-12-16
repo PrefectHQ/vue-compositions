@@ -2,9 +2,9 @@
 import { flatten, unflatten } from 'flat'
 import { computed, Ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { isInvalidRouteParamValue } from './formats/InvalidRouteParamValue'
-import { RouteParamClass } from './formats/RouteParam'
 import { NoInfer } from '@/types/generics'
+import { isInvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
+import { RouteParamClass } from '@/useRouteQueryParams/formats/RouteParam'
 import { asArray } from '@/utilities/arrays'
 import { isRecord } from '@/utilities/objects'
 
