@@ -1,5 +1,5 @@
 import { isReactive, isRef, unref, WatchSource } from 'vue'
-import { Action, ActionArguments } from '../types/action'
+import { Action, ActionArguments } from '@/useSubscription/types/action'
 
 export function unrefArgs<T extends Action>(args: ActionArguments<T>): Parameters<T> {
   const argsUnref = unref(args) as Parameters<T>

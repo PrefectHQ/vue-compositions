@@ -1,5 +1,5 @@
 import { onMounted, ref, Ref } from 'vue'
-import { useIntersectionObserver, UseIntersectionObserverOptions } from '../useIntersectionObserver'
+import { useIntersectionObserver, UseIntersectionObserverOptions } from '@/useIntersectionObserver'
 
 export type UseVisibilityObserverResponse = {
   visible: Ref<boolean>,

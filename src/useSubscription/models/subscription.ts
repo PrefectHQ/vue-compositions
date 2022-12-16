@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import { ref, Ref, watch } from 'vue'
-import { Action, ActionResponse } from '../types/action'
-import { SubscriptionOptions } from '../types/subscription'
-import Channel from './channel'
+import Channel from '@/useSubscription/models/channel'
+import { Action, ActionResponse } from '@/useSubscription/types/action'
+import { SubscriptionOptions } from '@/useSubscription/types/subscription'
 
 class SubscriptionIdManager {
   private static id: number = 0

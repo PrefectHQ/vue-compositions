@@ -1,6 +1,6 @@
 import { reactive, ref, Ref, toRaw, watch } from 'vue'
-import { Action, SubscriptionOptions, UseSubscription, ActionArguments, MappedSubscription } from './types'
-import { useSubscription } from './useSubscription'
+import { Action, SubscriptionOptions, UseSubscription, ActionArguments, MappedSubscription } from '@/useSubscription/types'
+import { useSubscription } from '@/useSubscription/useSubscription'
 
 const voidAction = (): undefined => undefined
 

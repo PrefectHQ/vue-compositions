@@ -1,5 +1,5 @@
 import { ref, Ref, watchEffect } from 'vue'
-import { useResizeObserver, UseResizeObserverCallback } from '../useResizeObserver/useResizeObserver'
+import { useResizeObserver, UseResizeObserverCallback } from '@/useResizeObserver/useResizeObserver'
 
 /**
  * @deprecated use useElementRect instead

@@ -1,4 +1,5 @@
-import { globalExists } from '../utilities/global'
+/* eslint-disable no-dupe-class-members */
+import { globalExists } from '@/utilities/global'
 
 export type StorageType = 'session' | 'local'
 

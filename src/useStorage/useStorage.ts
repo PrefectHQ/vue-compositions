@@ -1,6 +1,6 @@
 /* eslint-disable no-redeclare */
 import { ref, Ref, UnwrapRef, watchEffect } from 'vue'
-import { StorageManager, StorageType } from './storage'
+import { StorageManager, StorageType } from '@/useStorage/storage'
 
 type UseStorage<T> = {
   value: Ref<UnwrapRef<T>>,

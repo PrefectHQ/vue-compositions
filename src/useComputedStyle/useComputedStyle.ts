@@ -1,7 +1,7 @@
 import { ref, Ref, watch } from 'vue'
-import { useMutationObserver } from '../useMutationObserver/useMutationObserver'
-import { useResizeObserver } from '../useResizeObserver/useResizeObserver'
-import { getWindowComputedStyle } from '../utilities/window'
+import { useMutationObserver } from '@/useMutationObserver/useMutationObserver'
+import { useResizeObserver } from '@/useResizeObserver/useResizeObserver'
+import { getWindowComputedStyle } from '@/utilities/window'
 
 export function useComputedStyle(element: Element | Ref<Element | undefined>): Ref<CSSStyleDeclaration | undefined> {
   const elementRef = ref(element)
@@ -40,5 +40,7 @@ export function useComputedStyle(element: Element | Ref<Element | undefined>): R
 }
 
 function nodeIsElement(node: Node): node is Element {
-  return !!(node as Element).attributes
+  const element = node as Element
+
+  return !!element.attributes
 }
