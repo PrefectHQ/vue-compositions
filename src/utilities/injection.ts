@@ -1,5 +1,5 @@
 import { InjectionKey, getCurrentInstance, inject, ComponentInternalInstance } from 'vue'
-import { getSymbolForInjectionKey } from './symbols'
+import { getSymbolForInjectionKey } from '@/utilities/symbols'
 
 type ComponentInstanceWithProvide = ComponentInternalInstance & { provides: Record<symbol, unknown> } | null
 
