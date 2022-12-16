@@ -1,7 +1,6 @@
-import { computed, ComputedRef, onMounted, onUnmounted, reactive, ref, Ref, unref, watch } from 'vue'
+import { computed, ComputedRef, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
-import { State } from '@/useValidation/state'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
@@ -13,7 +12,7 @@ export type UseValidation = {
   error: Ref<string>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
-  state: State,
+  validated: Ref<boolean>,
 }
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
@@ -31,9 +30,6 @@ export function useValidation<T>(
   const valid = computed(() => error.value === '')
   const invalid = computed(() => !valid.value)
   const pending = ref(false)
-  const initialValue = unref(value)
-  const touched = ref(false)
-  const dirty = ref(false)
   const validated = ref(false)
 
   const validate = async (): Promise<boolean> => {
@@ -56,22 +52,13 @@ export function useValidation<T>(
     return valid.value
   }
 
-  const state: State = reactive({
-    touched,
-    pending,
-    dirty,
-    valid,
-    validated,
-    initialValue,
-  })
-
   const validation: UseValidation = {
     error,
     valid,
     invalid,
     pending,
     validate,
-    state,
+    validated,
   }
 
   let mounted = false
@@ -80,13 +67,10 @@ export function useValidation<T>(
 
   let unregister: ValidationObserverUnregister | undefined
 
-  watch(valueRef, value => {
+  watch(valueRef, () => {
     if (!mounted) {
       return
     }
-
-    touched.value = true
-    dirty.value = value !== initialValue
 
     validate()
   }, { deep: true })
