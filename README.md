@@ -21,4 +21,6 @@ npm i --save @prefecthq/vue-compositions
 - [useRouteQueryParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParam)
 - [useStorage](https://github.com/prefecthq/vue-compositions/tree/main/src/useStorage)
 - [useSubscription](https://github.com/prefecthq/vue-compositions/tree/main/src/useSubscription)
+- [useValidation](https://github.com/prefecthq/vue-compositions/tree/main/src/useValidation)
+- [useValidationObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useValidationObserver)
 - [useVisibilityObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useVisibilityObserver)
