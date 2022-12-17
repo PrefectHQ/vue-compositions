@@ -1,6 +1,6 @@
-import { ValidationRule } from './useValidation'
-import { ValidationAbortedError } from './ValidationAbortedError'
 import { NoInfer } from '@/types/generics'
+import { ValidationRule } from '@/useValidation/useValidation'
+import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 
 export class ValidationRuleExecutor<T> {
   private controller = new AbortController()

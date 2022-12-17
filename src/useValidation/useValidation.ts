@@ -1,8 +1,8 @@
 import { computed, ComputedRef, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
-import { ValidationAbortedError } from './ValidationAbortedError'
-import { ValidationRuleExecutor } from './ValidationExecutor'
 import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
+import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
+import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
 
@@ -12,6 +12,7 @@ export type UseValidation = {
   error: Ref<string>,
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
+  validated: Ref<boolean>,
 }
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
@@ -29,6 +30,7 @@ export function useValidation<T>(
   const valid = computed(() => error.value === '')
   const invalid = computed(() => !valid.value)
   const pending = ref(false)
+  const validated = ref(false)
 
   const validate = async (): Promise<boolean> => {
     executor.abort()
@@ -45,6 +47,7 @@ export function useValidation<T>(
     }
 
     pending.value = false
+    validated.value = true
 
     return valid.value
   }
@@ -55,6 +58,7 @@ export function useValidation<T>(
     invalid,
     pending,
     validate,
+    validated,
   }
 
   let mounted = false
