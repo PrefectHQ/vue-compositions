@@ -4,6 +4,10 @@ import { asArray } from '@/utilities/arrays'
 
 export type RouteParamClass<T> = new (key: string, defaultValue: T | T[]) => RouteParam<T>
 
+export function isRouteParamClass(value: unknown): value is RouteParamClass<unknown> {
+  return value instanceof RouteParam
+}
+
 export abstract class RouteParam<T> {
   protected abstract parse(value: LocationQueryValue): T
   protected abstract format(value: T): LocationQueryValue
