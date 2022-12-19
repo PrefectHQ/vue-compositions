@@ -28,6 +28,7 @@ type UseRouteQuery = {
   query: LocationQuery,
   clear: () => void,
   set: (key: string, value: string) => void,
+  get: (key: string) => LocationQueryValue | LocationQueryValue[],
   remove: (key: string) => void,
 }
 ```

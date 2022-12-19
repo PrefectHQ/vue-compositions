@@ -1,10 +1,11 @@
 import { reactive, watch } from 'vue'
-import { LocationQuery, useRoute, useRouter } from 'vue-router'
+import { LocationQuery, LocationQueryValue, useRoute, useRouter } from 'vue-router'
 
 type UseRouteQuery = {
   query: LocationQuery,
   clear: () => void,
   set: (key: string, value: string) => void,
+  get: (key: string) => LocationQueryValue | LocationQueryValue[],
   remove: (key: string) => void,
 }
 
@@ -22,6 +23,10 @@ export function useRouteQuery(): UseRouteQuery {
 
   const set = (key: string, value: string): void => {
     query[key] = value
+  }
+
+  const get = (key: string): LocationQueryValue | LocationQueryValue[] => {
+    return query[key]
   }
 
   const remove = (key: string): void => {
@@ -72,6 +77,7 @@ export function useRouteQuery(): UseRouteQuery {
   return {
     clear,
     set,
+    get,
     remove,
     query,
   }
