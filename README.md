@@ -18,6 +18,7 @@ npm i --save @prefecthq/vue-compositions
 - [usePatchRef](https://github.com/prefecthq/vue-compositions/tree/main/src/usePatchRef)
 - [useResizeObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useResizeObserver)
 - [useRouteParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteParam)
+- [useRouteQuery](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQuery)
 - [useRouteQueryParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParam)
 - [useStorage](https://github.com/prefecthq/vue-compositions/tree/main/src/useStorage)
 - [useSubscription](https://github.com/prefecthq/vue-compositions/tree/main/src/useSubscription)
