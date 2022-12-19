@@ -1,20 +1,22 @@
-import { computed, ComputedRef, onMounted, onUnmounted, reactive, ref, Ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
-import { ValidationState } from '@/useValidation/validationState'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
 
-export type UseValidation = {
-  valid: ComputedRef<boolean>,
-  invalid: ComputedRef<boolean>,
-  error: Ref<string>,
-  pending: Ref<boolean>,
+export type UseValidationState = {
+  valid: boolean,
+  invalid: boolean,
+  error: string,
+  pending: boolean,
+  validated: boolean,
+}
+
+export type UseValidation = ToRefs<UseValidationState> & {
   validate: () => Promise<boolean>,
-  validated: Ref<boolean>,
-  state: ValidationState,
+  state: UseValidationState,
 }
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
@@ -55,18 +57,20 @@ export function useValidation<T>(
   }
 
   const state = reactive({
-    pending,
     valid,
+    invalid,
+    error,
+    pending,
     validated,
   })
 
   const validation: UseValidation = {
-    error,
     valid,
     invalid,
+    error,
     pending,
-    validate,
     validated,
+    validate,
     state,
   }
 
