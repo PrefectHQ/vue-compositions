@@ -1,19 +1,5 @@
-import { debounce } from 'lodash'
 import { reactive, watch } from 'vue'
 import { LocationQuery, useRoute, useRouter } from 'vue-router'
-
-type QueryUpdate = {
-  type: 'update',
-  key: string,
-  value: string,
-}
-
-type QueryDelete = {
-  type: 'delete',
-  key: string,
-}
-
-type QueryOperation = QueryUpdate | QueryDelete
 
 type UseRouteQuery = {
   query: LocationQuery,
@@ -21,6 +7,8 @@ type UseRouteQuery = {
   set: (key: string, value: string) => void,
   remove: (key: string) => void,
 }
+
+type QueryOperation = (query: LocationQuery) => LocationQuery
 
 export function useRouteQuery(): UseRouteQuery {
   const route = useRoute()
@@ -55,7 +43,7 @@ export function useRouteQuery(): UseRouteQuery {
         return Reflect.set(target, property, value)
       }
 
-      operations.push({ type: 'update', key: property, value })
+      operations.push(updateOperation(property, value))
 
       return true
     },
@@ -64,7 +52,7 @@ export function useRouteQuery(): UseRouteQuery {
         return Reflect.deleteProperty(target, property)
       }
 
-      operations.push({ type: 'delete', key: property })
+      operations.push(deleteOperation(property))
 
       return true
     },
@@ -90,34 +78,29 @@ export function useRouteQuery(): UseRouteQuery {
 }
 
 function applyQueryOperations(currentQuery: LocationQuery, operations: QueryOperation[]): LocationQuery {
-  let query = { ...currentQuery }
+  let query: LocationQuery = { ...currentQuery }
 
-  operations.forEach(operation => {
-    switch (operation.type) {
-      case 'update':
-        query = updateQueryParam(query, operation)
-        break
-      case 'delete':
-        query = deleteQueryParam(query, operation)
-        break
-      default:
-        throw new Error('Invalid query operation')
-    }
-  })
+  for (const operation of operations) {
+    query = operation(query)
+  }
 
   return query
 }
 
-function updateQueryParam(currentQuery: LocationQuery, { key, value }: QueryUpdate): LocationQuery {
-  const query = { ...currentQuery, [key]: value }
+function updateOperation(key: string, value: string): QueryOperation {
+  return (currentQuery: LocationQuery) => {
+    const query = { ...currentQuery, [key]: value }
 
-  return query
+    return query
+  }
 }
 
-function deleteQueryParam(currentQuery: LocationQuery, { key }: QueryDelete): LocationQuery {
-  const query = { ...currentQuery }
+function deleteOperation(key: string): QueryOperation {
+  return (currentQuery: LocationQuery) => {
+    const query = { ...currentQuery }
 
-  delete query[key]
+    delete query[key]
 
-  return query
+    return query
+  }
 }
