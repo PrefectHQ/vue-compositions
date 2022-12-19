@@ -1,8 +1,9 @@
-import { computed, ComputedRef, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
+import { computed, ComputedRef, onMounted, onUnmounted, reactive, ref, Ref, watch } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
+import { ValidationState } from '@/useValidation/validationState'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
 
@@ -13,6 +14,7 @@ export type UseValidation = {
   pending: Ref<boolean>,
   validate: () => Promise<boolean>,
   validated: Ref<boolean>,
+  state: ValidationState,
 }
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
@@ -52,6 +54,12 @@ export function useValidation<T>(
     return valid.value
   }
 
+  const state = reactive({
+    pending,
+    valid,
+    validated,
+  })
+
   const validation: UseValidation = {
     error,
     valid,
@@ -59,6 +67,7 @@ export function useValidation<T>(
     pending,
     validate,
     validated,
+    state,
   }
 
   let mounted = false
