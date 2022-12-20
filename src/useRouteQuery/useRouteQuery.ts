@@ -48,7 +48,9 @@ export function useRouteQuery(): UseRouteQuery {
         return Reflect.set(target, property, value)
       }
 
-      operations.push(updateOperation(property, value))
+      const operation = updateOperationFactory(property, value)
+
+      operations.push(operation)
 
       return true
     },
@@ -57,7 +59,9 @@ export function useRouteQuery(): UseRouteQuery {
         return Reflect.deleteProperty(target, property)
       }
 
-      operations.push(deleteOperation(property))
+      const operation = deleteOperationFactory(property)
+
+      operations.push(operation)
 
       return true
     },
@@ -93,7 +97,7 @@ function applyQueryOperations(currentQuery: LocationQuery, operations: QueryOper
   return query
 }
 
-function updateOperation(key: string, value: string): QueryOperation {
+function updateOperationFactory(key: string, value: string): QueryOperation {
   return (currentQuery: LocationQuery) => {
     const query = { ...currentQuery, [key]: value }
 
@@ -101,7 +105,7 @@ function updateOperation(key: string, value: string): QueryOperation {
   }
 }
 
-function deleteOperation(key: string): QueryOperation {
+function deleteOperationFactory(key: string): QueryOperation {
   return (currentQuery: LocationQuery) => {
     const query = { ...currentQuery }
 
