@@ -47,20 +47,21 @@ export default class Subscription<T extends Action> {
     return this.channel.isSubscribed(this.id)
   }
 
-  public promise(): Promise<Subscription<T>> {
+  public promise(): Promise<Subscription<T> & { response: Ref<ActionResponse<T>> }> {
     return new Promise((resolve, reject) => {
-      if (this.executed.value) {
+      if (this.isResolved()) {
         if (this.errored.value) {
           reject(this.error.value)
           return
         }
+
 
         resolve(this)
         return
       }
 
       const executedWatcher = watch(this.executed, () => {
-        if (this.executed.value) {
+        if (this.isResolved()) {
           erroredWatcher()
           executedWatcher()
           resolve(this)
@@ -75,5 +76,9 @@ export default class Subscription<T extends Action> {
         }
       })
     })
+  }
+
+  private isResolved(): this is { response: Ref<ActionResponse<T>> } {
+    return this.executed.value
   }
 }
