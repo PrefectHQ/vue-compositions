@@ -1,4 +1,3 @@
-import { Ref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import Subscription from '@/useSubscription/models/subscription'
 import { Action, ActionArguments, ActionParamsRequired, ActionResponse } from '@/useSubscription/types/action'
