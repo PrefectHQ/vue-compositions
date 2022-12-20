@@ -5,6 +5,7 @@ import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
+import { isSame } from '@/utilities/variables'
 
 export type UseValidationState = {
   valid: boolean,
@@ -80,8 +81,12 @@ export function useValidation<T>(
 
   let unregister: ValidationObserverUnregister | undefined
 
-  watch(valueRef, () => {
+  watch(valueRef, (newValue, oldValue) => {
     if (!mounted) {
+      return
+    }
+
+    if (isSame(newValue, oldValue)) {
       return
     }
 
