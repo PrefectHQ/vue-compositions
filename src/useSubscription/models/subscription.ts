@@ -16,7 +16,7 @@ export default class Subscription<T extends Action> {
   public readonly id: number
   public readonly options: SubscriptionOptions
   public loading: Ref<boolean> = ref(false)
-  public response: Ref<ActionResponse<T>| undefined> = ref(undefined)
+  public response: Ref<ActionResponse<T> | undefined> = ref(undefined)
   public errored: Ref<boolean> = ref(false)
   public error: Ref<unknown> = ref(null)
   public executed: Ref<boolean> = ref(false)
