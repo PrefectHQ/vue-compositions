@@ -1,17 +1,23 @@
-import { computed, ComputedRef, onMounted, onUnmounted, ref, Ref, watch } from 'vue'
-import { ValidationAbortedError } from './ValidationAbortedError'
-import { ValidationRuleExecutor } from './ValidationExecutor'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybePromise, MaybeRef } from '@/types/maybe'
+import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
+import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
+import { isSame } from '@/utilities/variables'
 
-export type UseValidation = {
-  valid: ComputedRef<boolean>,
-  invalid: ComputedRef<boolean>,
-  error: Ref<string>,
-  pending: Ref<boolean>,
+export type UseValidationState = {
+  valid: boolean,
+  invalid: boolean,
+  error: string,
+  pending: boolean,
+  validated: boolean,
+}
+
+export type UseValidation = ToRefs<UseValidationState> & {
   validate: () => Promise<boolean>,
+  state: UseValidationState,
 }
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
@@ -29,6 +35,7 @@ export function useValidation<T>(
   const valid = computed(() => error.value === '')
   const invalid = computed(() => !valid.value)
   const pending = ref(false)
+  const validated = ref(false)
 
   const validate = async (): Promise<boolean> => {
     executor.abort()
@@ -45,16 +52,27 @@ export function useValidation<T>(
     }
 
     pending.value = false
+    validated.value = true
 
     return valid.value
   }
 
-  const validation: UseValidation = {
-    error,
+  const state = reactive({
     valid,
     invalid,
+    error,
     pending,
+    validated,
+  })
+
+  const validation: UseValidation = {
+    valid,
+    invalid,
+    error,
+    pending,
+    validated,
     validate,
+    state,
   }
 
   let mounted = false
@@ -63,8 +81,12 @@ export function useValidation<T>(
 
   let unregister: ValidationObserverUnregister | undefined
 
-  watch(valueRef, () => {
+  watch(valueRef, (newValue, oldValue) => {
     if (!mounted) {
+      return
+    }
+
+    if (isSame(newValue, oldValue)) {
       return
     }
 

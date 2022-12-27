@@ -15,6 +15,6 @@ export function mapSubscription<T extends Action>(subscription: Subscription<T>)
     refresh: () => subscription.refresh(),
     unsubscribe: () => subscription.unsubscribe(),
     isSubscribed: () => subscription.isSubscribed(),
-    promise: () => subscription.promise().then(subscription => reactive(mapSubscription(subscription))),
+    promise: () => subscription.promise().then(subscription => reactive(subscription)),
   }
 }

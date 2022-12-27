@@ -1,6 +1,7 @@
 /* eslint-disable no-redeclare */
 import { Ref, ref, watch } from 'vue'
 import { onBeforeRouteLeave, RouteLocationNormalized, useRoute, useRouter } from 'vue-router'
+import { isSame } from '@/utilities/variables'
 
 export function useRouteQueryParam(param: string): Ref<string | string[]>
 export function useRouteQueryParam(param: string, defaultValue: string): Ref<string>
@@ -51,8 +52,4 @@ function matchValueType(previous: string | string[], next: string | string[]): s
   }
 
   return next
-}
-
-function isSame(valueA: string | string[], valueB: string | string[]): boolean {
-  return JSON.stringify(valueA) === JSON.stringify(valueB)
 }

@@ -11,6 +11,8 @@ export type SubscriptionOptions = {
   manager?: Manager,
 }
 
+export type SubscriptionPromise<T extends Action> = Promise<Omit<UseSubscription<T>, 'promise'> & { response: ActionResponse<T> }>
+
 export type MappedSubscription<T extends Action> = {
   loading: Subscription<T>['loading'],
   response: Subscription<T>['response'],
@@ -20,7 +22,7 @@ export type MappedSubscription<T extends Action> = {
   refresh: Subscription<T>['refresh'],
   unsubscribe: Subscription<T>['unsubscribe'],
   isSubscribed: Subscription<T>['isSubscribed'],
-  promise: () => Promise<UseSubscription<T>>,
+  promise: () => SubscriptionPromise<T>,
 }
 
 export type UseSubscription<T extends Action> = {
@@ -32,5 +34,5 @@ export type UseSubscription<T extends Action> = {
   refresh: Subscription<T>['refresh'],
   unsubscribe: Subscription<T>['unsubscribe'],
   isSubscribed: Subscription<T>['isSubscribed'],
-  promise: () => Promise<UseSubscription<T>>,
+  promise: () => SubscriptionPromise<T>,
 }
