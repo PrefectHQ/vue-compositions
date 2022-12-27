@@ -1,4 +1,5 @@
-import { LocationQueryValue, LocationQuery } from 'vue-router'
+import { LocationQueryValue } from 'vue-router'
+import { UseRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
@@ -24,12 +25,12 @@ export abstract class RouteParam<T> {
     this.defaultValue = defaultValue
   }
 
-  public get(currentQuery: LocationQuery): T | T[] {
-    if (!(this.key in currentQuery)) {
+  public get(routeQuery: UseRouteQuery): T | T[] {
+    if (!(this.key in routeQuery.query)) {
       return this.defaultValue
     }
 
-    const strings = asArray(currentQuery[this.key])
+    const strings = asArray(routeQuery.get(this.key))
     const values = strings.map(value => this.safeParseValue(value)).filter(isNotInvalidRouteParamValue)
 
     if (this.multiple) {
@@ -41,7 +42,7 @@ export abstract class RouteParam<T> {
     return first
   }
 
-  public set(currentQuery: LocationQuery, value: T | T[]): LocationQuery {
+  public set(routeQuery: UseRouteQuery, value: T | T[]): void {
     const values = asArray(value)
     const strings = values.map(value => this.safeFormatValue(value)).filter(isNotInvalidRouteParamValue)
 
@@ -50,23 +51,16 @@ export abstract class RouteParam<T> {
     }
 
     if (strings.length === 0) {
-      return this.remove(currentQuery)
+      return routeQuery.remove(this.key)
     }
 
     if (this.multiple) {
-      return { ...currentQuery, [this.key]: strings }
+      return routeQuery.set(this.key, strings)
     }
 
     const [first] = strings
 
-    return { ...currentQuery, [this.key]: first }
-  }
-
-  private remove(currentQuery: LocationQuery): LocationQuery {
-    // eslint-disable-next-line id-length, no-unused-vars
-    const { [this.key]: _, ...queryWithKeyRemoved } = currentQuery
-
-    return queryWithKeyRemoved
+    routeQuery.set(this.key, first)
   }
 
   private safeParseValue(value: LocationQueryValue): T | InvalidRouteParamValue {
