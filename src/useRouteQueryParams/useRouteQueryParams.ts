@@ -1,8 +1,7 @@
-import { computed, reactive, Ref } from 'vue'
-import { LocationQuery, useRoute, useRouter } from 'vue-router'
+import { Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParams/formats'
-import { useRouteQuery } from '@/useRouteQueryParams/useRouteQuery'
+import { useRouteQueryParam } from '@/useRouteQueryParams/useRouteQueryParam'
 
 export type RouteParamsSchema<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown> ? RouteParamsSchema<T[P]> : RouteParamClass<T[P]>
@@ -12,17 +11,8 @@ export type RouteParams<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown> ? RouteParams<T[P]> : Ref<T[P]>
 }
 
-function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteParamsSchema<T>, defaultValue: NoInfer<T>): T {
-  const route = useRoute()
-  const router = useRouter()
-  const { query, get, set } = useRouteQuery()
-
-  // use schema as the "template"
-  // wrap that in reactive
-  // debounce the router push?
-  // profit?
-  const params = getSchemaRouteQueryParams(query, schema, defaultValue)
-
+export function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteParamsSchema<T>, defaultValue: NoInfer<T>): RouteParams<T> {
+  return getSchemaRouteQueryParams(schema, defaultValue)
 }
 
 function isRouteParamSchema<T extends Record<string, unknown>>(value: RouteParamsSchema<T> | unknown): value is RouteParamsSchema<T> {
@@ -30,7 +20,6 @@ function isRouteParamSchema<T extends Record<string, unknown>>(value: RouteParam
 }
 
 function getSchemaRouteQueryParams<T extends Record<string, unknown>>(
-  query: LocationQuery,
   schema: RouteParamsSchema<T>,
   defaultValue: NoInfer<T>,
   prefix?: string,
@@ -48,22 +37,15 @@ function getSchemaRouteQueryParams<T extends Record<string, unknown>>(
     const propertyDefault = defaultValue[key]
 
     if (isRouteParamClass(property)) {
-      const format = new property(prefixed(key), propertyDefault)
-
-      params[key] = computed({
-        get() {
-          return format.get(query)
-        },
-        set(value) {
-          format.set(query, value)
-        },
-      })
+      params[key] = useRouteQueryParam(prefixed(key), property, propertyDefault)
 
       return params
     }
 
     if (isRouteParamSchema(property)) {
-      params[key] = getSchemaRouteQueryParams(property, propertyDefault ?? {}, key)
+      const defaultSchemaValue = (propertyDefault ?? {}) as Record<string, unknown>
+
+      params[key] = getSchemaRouteQueryParams(property, defaultSchemaValue, key)
 
       return params
     }
