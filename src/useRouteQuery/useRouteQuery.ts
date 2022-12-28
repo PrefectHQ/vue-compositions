@@ -80,6 +80,14 @@ function factory(): () => UseRouteQuery {
 
         return true
       },
+      ownKeys() {
+        const query = applyQueryOperations(route.query, operations)
+
+        return Object.keys(query)
+      },
+      has(target, property) {
+        return property in route.query
+      },
     })
 
     return {
