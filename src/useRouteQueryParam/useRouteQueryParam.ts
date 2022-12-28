@@ -1,55 +1,30 @@
 /* eslint-disable no-redeclare */
-import { Ref, ref, watch } from 'vue'
-import { onBeforeRouteLeave, RouteLocationNormalized, useRoute, useRouter } from 'vue-router'
-import { isSame } from '@/utilities/variables'
+import { computed, Ref } from 'vue'
+import { NoInfer } from '@/types/generics'
+import { MaybeArray } from '@/types/maybe'
+import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
+import { StringRouteParam } from '@/useRouteQueryParams/formats'
+import { isNotRouteParamClass, isRouteParamClass, RouteParamClass } from '@/useRouteQueryParams/formats/RouteParam'
 
-export function useRouteQueryParam(param: string): Ref<string | string[]>
-export function useRouteQueryParam(param: string, defaultValue: string): Ref<string>
-export function useRouteQueryParam(param: string, defaultValue: string[]): Ref<string[]>
-export function useRouteQueryParam(param: string, defaultValue: string | string[] = ''): Ref<string | string[]> {
-  const router = useRouter()
-  const route = useRoute()
-  const initialValue = matchValueType(defaultValue, getRouteQueryParam(route, param) ?? defaultValue)
-  const valueRef = ref<string | string[]>(initialValue)
+export function useRouteQueryParam(key: string): Ref<string>
+// eslint-disable-next-line @typescript-eslint/unified-signatures
+export function useRouteQueryParam(key: string, defaultValue: string): Ref<string>
+export function useRouteQueryParam(key: string, defaultValue: string[]): Ref<string[]>
+export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>): Ref<T>
+export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>[]): Ref<T[]>
+export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteParamClass | MaybeArray<string>, maybeDefaultValue: MaybeArray = ''): Ref {
+  const query = useRouteQuery()
+  const formatter = isRouteParamClass(formatterOrDefaultValue) ? formatterOrDefaultValue : StringRouteParam
+  const defaultValue = isNotRouteParamClass(formatterOrDefaultValue) ? formatterOrDefaultValue : maybeDefaultValue
+  const format = new formatter(key, defaultValue)
 
-  const unwatchValue = watch(valueRef, (newValue, oldValue) => {
-    if (isSame(newValue, oldValue)) {
-      return
-    }
-
-    router.push({ query: { ...route.query, [param]: valueRef.value } })
+  return computed({
+    get() {
+      return format.get(query)
+    },
+    set(value) {
+      format.set(query, value)
+    },
   })
 
-  const unwatchRoute = watch(route, (newRoute, oldRoute) => {
-    const newValue = getRouteQueryParam(newRoute, param) ?? defaultValue
-    const oldValue = getRouteQueryParam(oldRoute, param) ?? defaultValue
-    const matched = matchValueType(oldValue, newValue)
-
-    if (matched !== valueRef.value) {
-      valueRef.value = matched
-    }
-  }, { deep: true })
-
-  onBeforeRouteLeave(() => {
-    unwatchValue()
-    unwatchRoute()
-  })
-
-  return valueRef
-}
-
-function getRouteQueryParam({ query }: RouteLocationNormalized, param: string): string | null | string[] {
-  return query[param] as string | null | string[]
-}
-
-function matchValueType(previous: string | string[], next: string | string[]): string | string[] {
-  if (Array.isArray(previous) && !Array.isArray(next)) {
-    return [next]
-  }
-
-  if (typeof previous === 'string' && Array.isArray(next)) {
-    return next[0]
-  }
-
-  return next
 }
