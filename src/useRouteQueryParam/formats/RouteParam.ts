@@ -3,12 +3,14 @@ import { UseRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
+const IS_ROUTE_PARAM_SYMBOL: unique symbol = Symbol()
+
 // adding any here so RouteParamClass can be used without passing a generic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RouteParamClass<T = any> = new (key: string, defaultValue: T | T[]) => RouteParam<T>
 
 export function isRouteParamClass(value: unknown): value is RouteParamClass<unknown> {
-  return value instanceof RouteParam
+  return typeof value === 'function' && 'IS_ROUTE_PARAM' in value && value.IS_ROUTE_PARAM == IS_ROUTE_PARAM_SYMBOL
 }
 
 export function isNotRouteParamClass<T>(value: T | RouteParamClass): value is T {
@@ -16,6 +18,8 @@ export function isNotRouteParamClass<T>(value: T | RouteParamClass): value is T 
 }
 
 export abstract class RouteParam<T> {
+  public static IS_ROUTE_PARAM = IS_ROUTE_PARAM_SYMBOL
+
   protected abstract parse(value: LocationQueryValue): T
   protected abstract format(value: T): LocationQueryValue
 
