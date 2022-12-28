@@ -11,6 +11,10 @@ export function isRouteParamClass(value: unknown): value is RouteParamClass<unkn
   return value instanceof RouteParam
 }
 
+export function isNotRouteParamClass<T>(value: T | RouteParamClass): value is T {
+  return !isRouteParamClass(value)
+}
+
 export abstract class RouteParam<T> {
   protected abstract parse(value: LocationQueryValue): T
   protected abstract format(value: T): LocationQueryValue
