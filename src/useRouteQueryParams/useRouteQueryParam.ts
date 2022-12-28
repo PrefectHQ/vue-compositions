@@ -6,7 +6,7 @@ import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { StringRouteParam } from '@/useRouteQueryParams/formats'
 import { RouteParamClass } from '@/useRouteQueryParams/formats/RouteParam'
 
-export function useRouteQueryParam<T = string>(key: string): Ref<T>
+export function useRouteQueryParam(key: string): Ref<string>
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>): Ref<T>
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>[]): Ref<T[]>
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass = StringRouteParam, defaultValue: MaybeArray = ''): Ref {
