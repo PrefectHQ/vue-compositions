@@ -3,7 +3,9 @@ import { UseRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
-export type RouteParamClass<T> = new (key: string, defaultValue: T | T[]) => RouteParam<T>
+// adding any here so RouteParamClass can be used without passing a generic
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RouteParamClass<T = any> = new (key: string, defaultValue: T | T[]) => RouteParam<T>
 
 export function isRouteParamClass(value: unknown): value is RouteParamClass<unknown> {
   return value instanceof RouteParam
