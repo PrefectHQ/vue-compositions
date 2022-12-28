@@ -3,8 +3,8 @@ import { computed, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray } from '@/types/maybe'
 import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
-import { StringRouteParam } from '@/useRouteQueryParams/formats'
-import { isNotRouteParamClass, isRouteParamClass, RouteParamClass } from '@/useRouteQueryParams/formats/RouteParam'
+import { isNotRouteParamClass, isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats/RouteParam'
+import { StringRouteParam } from '@/useRouteQueryParam/formats/StringRouteParam'
 
 export function useRouteQueryParam(key: string): Ref<string>
 // eslint-disable-next-line @typescript-eslint/unified-signatures

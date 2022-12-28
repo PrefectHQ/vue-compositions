@@ -1,5 +1,5 @@
 import { LocationQueryValue } from 'vue-router'
-import { RouteParam } from '@/useRouteQueryParams/formats/RouteParam'
+import { RouteParam } from '@/useRouteQueryParam/formats/RouteParam'
 
 export class BooleanRouteParam extends RouteParam<boolean> {
 

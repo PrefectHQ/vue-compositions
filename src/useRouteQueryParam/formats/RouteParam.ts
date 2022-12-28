@@ -1,6 +1,6 @@
 import { LocationQueryValue } from 'vue-router'
 import { UseRouteQuery } from '@/useRouteQuery/useRouteQuery'
-import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
+import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
 // adding any here so RouteParamClass can be used without passing a generic

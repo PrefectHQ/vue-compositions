@@ -1,7 +1,7 @@
 import { Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
+import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats'
 import { useRouteQueryParam } from '@/useRouteQueryParam/useRouteQueryParam'
-import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParams/formats'
 
 export type RouteParamsSchema<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown> ? RouteParamsSchema<T[P]> : RouteParamClass<T[P]>

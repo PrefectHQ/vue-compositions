@@ -1,6 +1,6 @@
 import { LocationQueryValue } from 'vue-router'
-import { InvalidRouteParamValue } from '@/useRouteQueryParams/formats/InvalidRouteParamValue'
-import { RouteParam } from '@/useRouteQueryParams/formats/RouteParam'
+import { InvalidRouteParamValue } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
+import { RouteParam } from '@/useRouteQueryParam/formats/RouteParam'
 
 export class NumberRouteParam extends RouteParam<number> {
 

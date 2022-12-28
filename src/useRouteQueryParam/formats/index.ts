@@ -1,6 +1,5 @@
 export * from './BooleanRouteParam'
 export * from './InvalidRouteParamValue'
 export * from './NumberRouteParam'
-export * from './ObjectRouteParam'
 export * from './RouteParam'
 export * from './StringRouteParam'
