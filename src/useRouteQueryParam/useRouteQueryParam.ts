@@ -6,9 +6,7 @@ import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { isNotRouteParamClass, isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats/RouteParam'
 import { StringRouteParam } from '@/useRouteQueryParam/formats/StringRouteParam'
 
-export function useRouteQueryParam(key: string): Ref<string>
-// eslint-disable-next-line @typescript-eslint/unified-signatures
-export function useRouteQueryParam(key: string, defaultValue: string): Ref<string>
+export function useRouteQueryParam(key: string, defaultValue?: string): Ref<string>
 export function useRouteQueryParam(key: string, defaultValue: string[]): Ref<string[]>
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>): Ref<T>
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: NoInfer<T>[]): Ref<T[]>
