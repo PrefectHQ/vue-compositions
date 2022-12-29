@@ -12,21 +12,21 @@ export type RouteParamsSchema<T extends Record<string, unknown>> = {
     : RouteParamClass<T[P]>
 }
 
-export type RouteParamsDefaultValue<T extends AnyRouteParamSchema> = {
-  [P in keyof T]-?: T[P] extends AnyRouteParamSchema
-    ? RouteParamsDefaultValue<T[P]>
-    : T[P] extends RouteParamClass<infer C>
-      ? C
-      : never
-}
+// export type RouteParamsDefaultValue<T extends AnyRouteParamSchema> = {
+//   [P in keyof T]-?: T[P] extends AnyRouteParamSchema
+//     ? RouteParamsDefaultValue<T[P]>
+//     : T[P] extends RouteParamClass<infer C>
+//       ? C
+//       : never
+// }
 
-export type RouteParams<T extends AnyRouteParamSchema> = {
-  [P in keyof T]-?: T[P] extends AnyRouteParamSchema
-    ? RouteParams<T[P]>
-    : T[P] extends RouteParamClass<infer C>
-      ? Ref<C>
-      : never
-}
+// export type RouteParams<T extends AnyRouteParamSchema> = {
+//   [P in keyof T]-?: T[P] extends AnyRouteParamSchema
+//     ? RouteParams<T[P]>
+//     : T[P] extends RouteParamClass<infer C>
+//       ? Ref<C>
+//       : never
+// }
 
 // export type RouteParamsSchema<T extends Record<string, unknown>> = {
 //   [P in keyof T]-?: T[P] extends Record<string, unknown>
@@ -34,13 +34,13 @@ export type RouteParams<T extends AnyRouteParamSchema> = {
 //     : RouteParamClass<T[P]>
 // }
 
-// export type RouteParams<T extends Record<string, unknown>> = {
-//   [P in keyof T]-?: T[P] extends Record<string, unknown>
-//     ? RouteParams<T[P]>
-//     : Ref<T[P]>
-// }
+export type RouteParams<T extends Record<string, unknown>> = {
+  [P in keyof T]-?: T[P] extends Record<string, unknown>
+    ? RouteParams<T[P]>
+    : Ref<T[P]>
+}
 
-export function useRouteQueryParams<T extends AnyRouteParamSchema>(schema: T, defaultValue: RouteParamsDefaultValue<NoInfer<T>>): RouteParams<T> {
+export function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteParamsSchema<T>, defaultValue: Required<NoInfer<T>>): RouteParams<T> {
   return getSchemaRouteQueryParams(schema, defaultValue)
 }
 
@@ -102,8 +102,8 @@ const foo = {
 }
 
 type Schema = RouteParamsSchema<Foo>
-type Default = RouteParamsDefaultValue<typeof foo>
-type Params = RouteParams<typeof foo>
+// type Default = RouteParamsDefaultValue<typeof foo>
+type Params = RouteParams<Foo>
 
 const schema: Schema = {
   nested: {
@@ -129,7 +129,7 @@ const params: Params = {
   },
 }
 
-const object = useRouteQueryParams(foo, {
+const object = useRouteQueryParams<Foo>(foo, {
   nested: {
     string: 'hello',
     boolean: false,
