@@ -20,10 +20,16 @@ function factory(): () => UseRouteQuery {
   const update = (): void => {
     const query = applyQueryOperations(route.query, operations)
 
+    operations.splice(0)
+
     router.push({ query })
   }
 
   watch(operations, () => {
+    if (!operations.length) {
+      return
+    }
+
     clearInterval(interval)
     interval = setTimeout(update)
   })
