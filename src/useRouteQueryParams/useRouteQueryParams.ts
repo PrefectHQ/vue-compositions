@@ -3,31 +3,31 @@ import { NoInfer } from '@/types/generics'
 import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats'
 import { useRouteQueryParam } from '@/useRouteQueryParam/useRouteQueryParam'
 
-export type RouteParamsSchema<T extends Record<string, unknown>> = {
+export type RouteQueryParamsSchema<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown>
-    ? RouteParamsSchema<T[P]>
+    ? RouteQueryParamsSchema<T[P]>
     : RouteParamClass<T[P]>
 }
 
-export type RouteParams<T extends Record<string, unknown>> = {
+export type RouteQueryParams<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown>
-    ? RouteParams<T[P]>
+    ? RouteQueryParams<T[P]>
     : Ref<T[P]>
 }
 
-export function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteParamsSchema<T>, defaultValue: NoInfer<T>): RouteParams<T> {
+export function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteQueryParamsSchema<T>, defaultValue: NoInfer<T>): RouteQueryParams<T> {
   return getSchemaRouteQueryParams(schema, defaultValue)
 }
 
-function isRouteParamSchema<T extends Record<string, unknown>>(value: RouteParamsSchema<T> | unknown): value is RouteParamsSchema<T> {
+function isRouteParamSchema<T extends Record<string, unknown>>(value: RouteQueryParamsSchema<T> | unknown): value is RouteQueryParamsSchema<T> {
   return !isRouteParamClass(value)
 }
 
 function getSchemaRouteQueryParams<T extends Record<string, unknown>>(
-  schema: RouteParamsSchema<T>,
+  schema: RouteQueryParamsSchema<T>,
   defaultValue: NoInfer<T>,
   prefix?: string,
-): RouteParams<T> {
+): RouteQueryParams<T> {
   const prefixed = (key: string): string => {
     if (prefix) {
       return `${prefix}.${key}`
@@ -57,5 +57,5 @@ function getSchemaRouteQueryParams<T extends Record<string, unknown>>(
     return params
   }, {})
 
-  return params as RouteParams<T>
+  return params as RouteQueryParams<T>
 }
