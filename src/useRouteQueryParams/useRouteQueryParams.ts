@@ -1,10 +1,7 @@
-import { ref, Ref } from 'vue'
+import { Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
-import { BooleanRouteParam, isRouteParamClass, NumberRouteParam, RouteParamClass, StringRouteParam } from '@/useRouteQueryParam/formats'
+import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats'
 import { useRouteQueryParam } from '@/useRouteQueryParam/useRouteQueryParam'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRouteParamSchema = RouteParamsSchema<any>
 
 export type RouteParamsSchema<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown>
@@ -12,35 +9,13 @@ export type RouteParamsSchema<T extends Record<string, unknown>> = {
     : RouteParamClass<T[P]>
 }
 
-// export type RouteParamsDefaultValue<T extends AnyRouteParamSchema> = {
-//   [P in keyof T]-?: T[P] extends AnyRouteParamSchema
-//     ? RouteParamsDefaultValue<T[P]>
-//     : T[P] extends RouteParamClass<infer C>
-//       ? C
-//       : never
-// }
-
-// export type RouteParams<T extends AnyRouteParamSchema> = {
-//   [P in keyof T]-?: T[P] extends AnyRouteParamSchema
-//     ? RouteParams<T[P]>
-//     : T[P] extends RouteParamClass<infer C>
-//       ? Ref<C>
-//       : never
-// }
-
-// export type RouteParamsSchema<T extends Record<string, unknown>> = {
-//   [P in keyof T]-?: T[P] extends Record<string, unknown>
-//     ? RouteParamsSchema<T[P]>
-//     : RouteParamClass<T[P]>
-// }
-
 export type RouteParams<T extends Record<string, unknown>> = {
   [P in keyof T]-?: T[P] extends Record<string, unknown>
     ? RouteParams<T[P]>
     : Ref<T[P]>
 }
 
-export function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteParamsSchema<T>, defaultValue: Required<NoInfer<T>>): RouteParams<T> {
+export function useRouteQueryParams<T extends Record<string, unknown>>(schema: RouteParamsSchema<T>, defaultValue: NoInfer<T>): RouteParams<T> {
   return getSchemaRouteQueryParams(schema, defaultValue)
 }
 
@@ -48,9 +23,9 @@ function isRouteParamSchema<T extends Record<string, unknown>>(value: RouteParam
   return !isRouteParamClass(value)
 }
 
-function getSchemaRouteQueryParams<T extends AnyRouteParamSchema>(
-  schema: T,
-  defaultValue: RouteParamsDefaultValue<NoInfer<T>>,
+function getSchemaRouteQueryParams<T extends Record<string, unknown>>(
+  schema: RouteParamsSchema<T>,
+  defaultValue: NoInfer<T>,
   prefix?: string,
 ): RouteParams<T> {
   const prefixed = (key: string): string => {
@@ -74,7 +49,7 @@ function getSchemaRouteQueryParams<T extends AnyRouteParamSchema>(
     if (isRouteParamSchema(property)) {
       const defaultSchemaValue = (propertyDefault ?? {}) as Record<string, unknown>
 
-      params[key] = getSchemaRouteQueryParams(property, defaultSchemaValue, key)
+      params[key] = getSchemaRouteQueryParams(property, defaultSchemaValue, prefixed(key))
 
       return params
     }
@@ -84,57 +59,3 @@ function getSchemaRouteQueryParams<T extends AnyRouteParamSchema>(
 
   return params as RouteParams<T>
 }
-
-type Foo = {
-  nested: {
-    string: string,
-    boolean: boolean,
-    number: number,
-  },
-}
-
-const foo = {
-  nested: {
-    string: StringRouteParam,
-    boolean: BooleanRouteParam,
-    number: NumberRouteParam,
-  },
-}
-
-type Schema = RouteParamsSchema<Foo>
-// type Default = RouteParamsDefaultValue<typeof foo>
-type Params = RouteParams<Foo>
-
-const schema: Schema = {
-  nested: {
-    string: StringRouteParam,
-    boolean: BooleanRouteParam,
-    number: NumberRouteParam,
-  },
-}
-
-const defaults: Default = {
-  nested: {
-    string: '',
-    boolean: false,
-    number: 0,
-  },
-}
-
-const params: Params = {
-  nested: {
-    string: ref(''),
-    boolean: ref(false),
-    number: ref(1),
-  },
-}
-
-const object = useRouteQueryParams<Foo>(foo, {
-  nested: {
-    string: 'hello',
-    boolean: false,
-    number: 0,
-  },
-})
-
-object.nested.boolean.value
