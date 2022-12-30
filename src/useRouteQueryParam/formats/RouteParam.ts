@@ -5,16 +5,17 @@ import { asArray } from '@/utilities/arrays'
 
 const IS_ROUTE_PARAM_SYMBOL: unique symbol = Symbol()
 
+export type RouteParamClassArgs<T> = {
+  key: string,
+  defaultValue: T | T[],
+}
+
 // adding any here so RouteParamClass can be used without passing a generic
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RouteParamClass<T = any> = new (key: string, defaultValue: T | T[]) => RouteParam<T>
+export type RouteParamClass<T = any> = new (args: RouteParamClassArgs<T>) => RouteParam<T>
 
 export function isRouteParamClass(value: unknown): value is RouteParamClass<unknown> {
   return typeof value === 'function' && 'IS_ROUTE_PARAM' in value && value.IS_ROUTE_PARAM == IS_ROUTE_PARAM_SYMBOL
-}
-
-export function isNotRouteParamClass<T>(value: T | RouteParamClass): value is T {
-  return !isRouteParamClass(value)
 }
 
 export abstract class RouteParam<T> {
@@ -30,9 +31,10 @@ export abstract class RouteParam<T> {
     return Array.isArray(this.defaultValue)
   }
 
-  public constructor(key: string, defaultValue: T | T[]) {
+  public constructor({ key, defaultValue }: RouteParamClassArgs<T>) {
     this.key = key
     this.defaultValue = defaultValue
+    console.log({ key, defaultValue })
   }
 
   public get(routeQuery: UseRouteQuery): T | T[] {
