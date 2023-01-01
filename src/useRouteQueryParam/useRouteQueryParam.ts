@@ -39,7 +39,6 @@ export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteP
       return format.get(query)
     },
     set(value) {
-      console.log({ value })
       format.set(query, value)
     },
   })

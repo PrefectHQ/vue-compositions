@@ -34,7 +34,6 @@ export abstract class RouteParam<T> {
   public constructor({ key, defaultValue }: RouteParamClassArgs<T>) {
     this.key = key
     this.defaultValue = defaultValue
-    console.log({ key, defaultValue })
   }
 
   public get(routeQuery: UseRouteQuery): T | T[] {
@@ -54,7 +53,11 @@ export abstract class RouteParam<T> {
     return first
   }
 
-  public set(routeQuery: UseRouteQuery, value: T | T[]): void {
+  public set(routeQuery: UseRouteQuery, value: T | T[] | undefined): void {
+    if (value === undefined) {
+      return routeQuery.remove(this.key)
+    }
+
     const values = asArray(value)
     const strings = values.map(value => this.safeFormatValue(value)).filter(isNotInvalidRouteParamValue)
 
