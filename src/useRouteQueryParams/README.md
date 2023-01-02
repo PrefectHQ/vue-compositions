@@ -41,7 +41,10 @@ const schema: RouteQueryParamSchema<Filter> = {
   search: StringRouteParam,
   page: NumberRouteParam,
   enabled: BooleanRouteParam
-  anOptionalParam: StringRouteParam.
+  range: {
+    min: NumberRouteParam,
+    max: NumberRouteParam,
+  }
 }
 
 const { search, page, enabled, range } = useRouteQueryParams(schema, {
