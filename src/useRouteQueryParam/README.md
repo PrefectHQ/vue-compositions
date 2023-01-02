@@ -18,18 +18,24 @@ console.log(foo.value) // 'bar'
 ```
 
 ## Type Safe Params
-Query params are always strings. But if a different format is desired a formatter can be used. Formatters for `boolean`, `number`, and `string` are provided out. But custom formatters can be created by extending the `RouteParam` class. 
+Query params are always strings. But if a different format is desired a formatter can be used. Formatters for `boolean`, `number`, and `string` are provided. But custom formatters can be created by extending the `RouteParam` class. 
 
 ```typescript
 import { useRouteQueryParam, NumberRouteParam, BooleanRouteParam } from '@prefecthq/vue-compositions'
 
-const number = useRouteQueryParam('value', NumberRouteParam, 0)
+const number = useRouteQueryParam('number', NumberRouteParam, 0)
+const boolean = useRouteQueryParam('boolean', BooleanRouteParam, false)
 console.log(number.value) // 0
+console.log(boolean.value) // false
 
 number.value = 'string' // type error
 number.value = 10
-
 console.log(number.value) // 10
+
+boolean.value = 10 //type error
+boolean.value = true
+
+console.log(boolean.value) // true
 ```
 
 ## Arrays
