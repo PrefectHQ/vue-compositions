@@ -15,11 +15,11 @@ export type RouteParamClassArgs<T> = {
 export type RouteParamClass<T = any> = new (args: RouteParamClassArgs<T>) => RouteParam<T>
 
 export function isRouteParamClass(value: unknown): value is RouteParamClass<unknown> {
-  return typeof value === 'function' && 'IS_ROUTE_PARAM' in value && value.IS_ROUTE_PARAM == IS_ROUTE_PARAM_SYMBOL
+  return typeof value === 'function' && IS_ROUTE_PARAM_SYMBOL in value
 }
 
 export abstract class RouteParam<T> {
-  public static IS_ROUTE_PARAM = IS_ROUTE_PARAM_SYMBOL
+  public static [IS_ROUTE_PARAM_SYMBOL] = true
 
   protected abstract parse(value: LocationQueryValue): T
   protected abstract format(value: T): LocationQueryValue
