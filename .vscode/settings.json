@@ -9,8 +9,7 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
-    "prefecthq",
-    "unflatten"
+    "prefecthq"
   ],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
