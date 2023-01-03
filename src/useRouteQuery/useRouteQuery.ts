@@ -92,7 +92,9 @@ function factory(): () => UseRouteQuery {
         return Object.keys(query)
       },
       has(target, property) {
-        return property in route.query
+        const query = applyQueryOperations(route.query, operations)
+
+        return property in query
       },
     })
 
