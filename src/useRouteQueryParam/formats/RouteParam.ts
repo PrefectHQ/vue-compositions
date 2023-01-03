@@ -61,10 +61,6 @@ export abstract class RouteParam<T> {
     const values = asArray(value)
     const strings = values.map(value => this.safeFormatValue(value)).filter(isNotInvalidRouteParamValue)
 
-    if (this.multiple) {
-      this.defaultValue = []
-    }
-
     if (strings.length === 0) {
       return routeQuery.remove(this.key)
     }
