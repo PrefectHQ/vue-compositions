@@ -41,9 +41,7 @@ export abstract class RouteParam<T> {
       return this.defaultValue
     }
 
-    const value = routeQuery.get(this.key)
-
-    const strings = asArray(value)
+    const strings = asArray(routeQuery.get(this.key))
     const values = strings.map(value => this.safeParseValue(value)).filter(isNotInvalidRouteParamValue)
 
     if (this.multiple) {
