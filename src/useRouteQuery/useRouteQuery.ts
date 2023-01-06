@@ -9,6 +9,12 @@ export type UseRouteQuery = {
   remove: (key: string) => void,
 }
 
+class InvalidRouteQueryProperty extends Error {
+  public constructor() {
+    super('Invalid route query property')
+  }
+}
+
 type QueryOperation = (query: LocationQuery) => LocationQuery
 
 function factory(): () => UseRouteQuery {
@@ -54,10 +60,10 @@ function factory(): () => UseRouteQuery {
       delete query[key]
     }
 
-    const query: LocationQuery = new Proxy({}, {
+    const query = new Proxy<LocationQuery>({}, {
       get(target, property) {
         if (typeof property === 'symbol') {
-          return Reflect.get(target, property)
+          throw new InvalidRouteQueryProperty()
         }
 
         const query = applyQueryOperations(route.query, operations)
@@ -66,7 +72,7 @@ function factory(): () => UseRouteQuery {
       },
       set(target, property, value) {
         if (typeof property === 'symbol') {
-          return Reflect.set(target, property, value)
+          throw new InvalidRouteQueryProperty()
         }
 
         const operation = updateOperationFactory(property, value)
@@ -77,7 +83,7 @@ function factory(): () => UseRouteQuery {
       },
       deleteProperty(target, property) {
         if (typeof property === 'symbol') {
-          return Reflect.deleteProperty(target, property)
+          throw new InvalidRouteQueryProperty()
         }
 
         const operation = deleteOperationFactory(property)
