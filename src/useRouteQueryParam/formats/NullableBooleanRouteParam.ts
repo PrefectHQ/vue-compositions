@@ -13,6 +13,10 @@ export class NullableBooleanRouteParam extends RouteParam<boolean | null> {
       return false
     }
 
+    if (value === null) {
+      return value
+    }
+
     throw new InvalidRouteParamValue()
   }
 
