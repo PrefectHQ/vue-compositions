@@ -25,7 +25,7 @@ export abstract class RouteParam<T> {
   protected abstract format(value: T): LocationQueryValue
 
   protected key: string
-  protected defaultValue: T | T[]
+  protected defaultValue: T | T[] | undefined
 
   private get multiple(): boolean {
     return Array.isArray(this.defaultValue)
@@ -36,7 +36,7 @@ export abstract class RouteParam<T> {
     this.defaultValue = defaultValue
   }
 
-  public get(routeQuery: UseRouteQuery): T | T[] {
+  public get(routeQuery: UseRouteQuery): T | T[] | undefined {
     if (!(this.key in routeQuery.query)) {
       return this.defaultValue
     }

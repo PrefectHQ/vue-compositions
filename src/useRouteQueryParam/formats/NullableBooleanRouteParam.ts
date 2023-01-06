@@ -2,9 +2,9 @@ import { LocationQueryValue } from 'vue-router'
 import { InvalidRouteParamValue } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
 import { RouteParam } from '@/useRouteQueryParam/formats/RouteParam'
 
-export class BooleanRouteParam extends RouteParam<boolean> {
+export class NullableBooleanRouteParam extends RouteParam<boolean | null> {
 
-  protected override parse(value: LocationQueryValue): boolean {
+  protected override parse(value: LocationQueryValue): boolean | null {
     if (value === 'true') {
       return true
     }
@@ -13,10 +13,18 @@ export class BooleanRouteParam extends RouteParam<boolean> {
       return false
     }
 
+    if (value === null) {
+      return value
+    }
+
     throw new InvalidRouteParamValue()
   }
 
-  protected override format(value: boolean): LocationQueryValue {
+  protected override format(value: boolean | null): LocationQueryValue {
+    if (value === null) {
+      return value
+    }
+
     return value ? 'true' : 'false'
   }
 
