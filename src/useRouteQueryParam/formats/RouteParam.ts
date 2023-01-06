@@ -25,18 +25,10 @@ export abstract class RouteParam<T> {
   protected abstract format(value: T): LocationQueryValue
 
   protected key: string
-  protected defaultValue: T | T[] | null | undefined
+  protected defaultValue: T | T[] | undefined
 
   private get multiple(): boolean {
     return Array.isArray(this.defaultValue)
-  }
-
-  private get isNullable(): boolean {
-    return this.defaultValue === null
-  }
-
-  private get isOptional(): boolean {
-    return this.defaultValue === undefined
   }
 
   public constructor({ key, defaultValue }: RouteParamClassArgs<T>) {
@@ -44,16 +36,12 @@ export abstract class RouteParam<T> {
     this.defaultValue = defaultValue
   }
 
-  public get(routeQuery: UseRouteQuery): T | T[] | null | undefined {
+  public get(routeQuery: UseRouteQuery): T | T[] | undefined {
     if (!(this.key in routeQuery.query)) {
       return this.defaultValue
     }
 
     const value = routeQuery.get(this.key)
-
-    if (value === null && this.isNullable) {
-      return null
-    }
 
     const strings = asArray(value)
     const values = strings.map(value => this.safeParseValue(value)).filter(isNotInvalidRouteParamValue)
@@ -67,7 +55,7 @@ export abstract class RouteParam<T> {
     return first
   }
 
-  public set(routeQuery: UseRouteQuery, value: T | T[] | null | undefined): void {
+  public set(routeQuery: UseRouteQuery, value: T | T[] | undefined): void {
     if (value === undefined) {
       return routeQuery.remove(this.key)
     }
