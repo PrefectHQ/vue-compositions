@@ -65,7 +65,7 @@ function factory(): () => UseRouteQuery {
         return query[property]
       },
       set(target, property, value) {
-        if (typeof property === 'symbol' || typeof value !== 'string') {
+        if (typeof property === 'symbol') {
           return Reflect.set(target, property, value)
         }
 
