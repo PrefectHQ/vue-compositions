@@ -23,14 +23,31 @@ export type UseValidation = ToRefs<UseValidationState> & {
 
 export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
 
+type RulesArg<T> = MaybeRef<MaybeArray<ValidationRule<T>>>
+
+function isRules<T>(value: MaybeRef<string> | RulesArg<T>): value is RulesArg<T> {
+  return typeof unref(value) !== 'string'
+}
+
+export function useValidation<T>(value: MaybeRef<T>, rules: RulesArg<NoInfer<T>>): UseValidation
+export function useValidation<T>(value: MaybeRef<T>, name: MaybeRef<string>, rules: RulesArg<NoInfer<T>>): UseValidation
 export function useValidation<T>(
   value: MaybeRef<T>,
-  name: MaybeRef<string>,
-  rules: MaybeRef<MaybeArray<ValidationRule<NoInfer<T>>>>,
+  nameOrRules: MaybeRef<string> | RulesArg<NoInfer<T>>,
+  maybeRules?: RulesArg<NoInfer<T>>,
 ): UseValidation {
+
+  if (isRules(nameOrRules)) {
+    return useValidation(value, 'Value', nameOrRules)
+  }
+
+  if (maybeRules === undefined) {
+    throw new Error('Invalid useValidation arguments')
+  }
+
   const valueRef = ref(value)
-  const nameRef = ref(name)
-  const rulesRef = computed(() => asArray(unref(rules)))
+  const nameRef = ref(nameOrRules)
+  const rulesRef = computed(() => asArray(unref(maybeRules)))
 
   const error = ref<string>('')
   const valid = computed(() => error.value === '')
