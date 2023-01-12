@@ -14,11 +14,25 @@ const isGreaterThanZero: ValidationRule<number> = (value, name) => {
   return `${name} must be greater than 0`
 }
 
+const isLessThanTen: ValidationRule<number> = (value, name) => {
+  if(value < 10) {
+    return true
+  }
+
+  return `${name} must be less than 10`
+}
+
 const value = ref(0)
-const { valid, error } = useValidation(value, 'Number', [isGreaterThanZero])
+const { valid, error } = useValidation(value, 'Number', isGreaterThanZero)
 
 console.log(valid) // Ref<false>
 console.log(error) // Ref<string> 'Number must be greater than 0'
+
+const value2 = ref(11)
+const { valid, error } = useValidation(value2, 'Number', [isGreaterThanZero, isLessThanTen])
+
+console.log(valid) // Ref<false>
+console.log(error) // Ref<string> 'Number must be less than 10'
 ```
 
 ## Arguments
@@ -26,7 +40,7 @@ console.log(error) // Ref<string> 'Number must be greater than 0'
 |----------|-----------------------------------|
 | value    | `MaybeRef<T>`                     |
 | name     | `MaybeRef<string>`                |
-| rules    | `MaybeRef<ValidationRule<T>[]>`   |
+| rules    | `MaybeRef<MaybeArray<ValidationRule<T>>>`   |
 
 
 ## Returns

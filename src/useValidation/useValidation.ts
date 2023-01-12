@@ -1,9 +1,10 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref } from 'vue'
 import { NoInfer } from '@/types/generics'
-import { MaybePromise, MaybeRef } from '@/types/maybe'
+import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
+import { asArray } from '@/utilities/arrays'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
 import { isSame } from '@/utilities/variables'
 
@@ -25,11 +26,11 @@ export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) =>
 export function useValidation<T>(
   value: MaybeRef<T>,
   name: MaybeRef<string>,
-  rules: MaybeRef<ValidationRule<NoInfer<T>>[]>,
+  rules: MaybeRef<MaybeArray<ValidationRule<NoInfer<T>>>>,
 ): UseValidation {
   const valueRef = ref(value)
   const nameRef = ref(name)
-  const rulesRef = ref(rules)
+  const rulesRef = computed(() => asArray(unref(rules)))
 
   const error = ref<string>('')
   const valid = computed(() => error.value === '')
