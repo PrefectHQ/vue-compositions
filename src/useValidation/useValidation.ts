@@ -69,7 +69,7 @@ export function useValidation<T>(
   const validated = ref(false)
   const executor = new ValidationRuleExecutor<T>()
 
-  const validate = async ({ source }: ValidateMethodOptions): Promise<boolean> => {
+  const validate = async ({ source }: ValidateMethodOptions = {}): Promise<boolean> => {
     executor.abort()
 
     pending.value = true
