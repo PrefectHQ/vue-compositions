@@ -39,7 +39,9 @@ export function useValidationObserver(): UseValidationObserver {
 
   const validate = (): Promise<boolean> => {
     const keys = Reflect.ownKeys(validations) as symbol[]
-    const promises = keys.map(key => validations[key].validate())
+    const promises = keys.map(key => validations[key].validate({
+      source: 'observer',
+    }))
 
     return Promise.all(promises).then(results => results.every(valid => valid))
   }

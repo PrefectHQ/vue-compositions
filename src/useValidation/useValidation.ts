@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
@@ -16,12 +16,24 @@ export type UseValidationState = {
   validated: boolean,
 }
 
+type ValidateMethodOptions = {
+  source?: string,
+}
+
+type ValidateMethod = (options: ValidateMethodOptions) => Promise<boolean>
+
 export type UseValidation = ToRefs<UseValidationState> & {
-  validate: () => Promise<boolean>,
+  validate: ValidateMethod,
   state: UseValidationState,
 }
 
-export type ValidationRule<T> = (value: T, name: string, signal: AbortSignal) => MaybePromise<boolean | string>
+export type ValidationRuleContext<T> = {
+  signal: AbortSignal,
+  source: string | undefined,
+  previousValue: T | undefined,
+}
+
+export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleContext<T>) => MaybePromise<boolean | string | void>
 
 type RulesArg<T> = MaybeRef<MaybeArray<ValidationRule<T>>>
 
@@ -45,23 +57,35 @@ export function useValidation<T>(
     throw new Error('Invalid useValidation arguments')
   }
 
-  const valueRef = ref(value)
+  const valueRef = ref(value) as Ref<T>
   const nameRef = ref(nameOrRules)
   const rulesRef = computed(() => asArray(unref(maybeRules)))
+  const previousValueRef = ref() as Ref<T>
 
   const error = ref<string>('')
   const valid = computed(() => error.value === '')
   const invalid = computed(() => !valid.value)
   const pending = ref(false)
   const validated = ref(false)
+  const executor = new ValidationRuleExecutor<T>()
 
-  const validate = async (): Promise<boolean> => {
+  const validate = async ({ source }: ValidateMethodOptions): Promise<boolean> => {
     executor.abort()
 
     pending.value = true
 
     try {
-      error.value = await executor.validate(valueRef.value as T, nameRef.value, rulesRef.value)
+      const result = await executor.validate({
+        source,
+        value: valueRef.value,
+        name: nameRef.value,
+        rules: rulesRef.value,
+        previousValue: previousValueRef.value,
+      })
+
+      if (result !== undefined) {
+        error.value = result
+      }
     } catch (error) {
       if (!(error instanceof ValidationAbortedError)) {
         console.warn('There was an error during validation')
@@ -94,10 +118,6 @@ export function useValidation<T>(
   }
 
   let mounted = false
-  const executor = new ValidationRuleExecutor<T>()
-  const observer = injectFromSelfOrAncestor(VALIDATION_OBSERVER_INJECTION_KEY)
-
-  let unregister: ValidationObserverUnregister | undefined
 
   watch(valueRef, (newValue, oldValue) => {
     if (!mounted) {
@@ -108,8 +128,14 @@ export function useValidation<T>(
       return
     }
 
-    validate()
+    previousValueRef.value = oldValue
+
+    validate({ source: 'validation' })
   }, { deep: true })
+
+  const observer = injectFromSelfOrAncestor(VALIDATION_OBSERVER_INJECTION_KEY)
+
+  let unregister: ValidationObserverUnregister | undefined
 
   onMounted(() => {
     unregister = observer?.register(validation)
