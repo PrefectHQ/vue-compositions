@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, watchEffect } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
@@ -83,9 +83,11 @@ export function useValidation<T>(
         previousValue: previousValueRef.value,
       })
 
-      if (result !== undefined) {
-        error.value = result
+      if (result === undefined) {
+        return valid.value
       }
+
+      error.value = result
     } catch (error) {
       if (!(error instanceof ValidationAbortedError)) {
         console.warn('There was an error during validation')
