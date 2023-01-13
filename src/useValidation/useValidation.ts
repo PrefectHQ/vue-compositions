@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
@@ -132,7 +132,7 @@ export function useValidation<T>(
 
     previousValueRef.value = oldValue
 
-    validate({ source: 'validation' })
+    validate({ source: 'validator' })
   }, { deep: true })
 
   const observer = injectFromSelfOrAncestor(VALIDATION_OBSERVER_INJECTION_KEY)
