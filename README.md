@@ -20,6 +20,7 @@ npm i --save @prefecthq/vue-compositions
 - [useRouteParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteParam)
 - [useRouteQuery](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQuery)
 - [useRouteQueryParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParam)
+- [useRouteQueryParams](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParams)
 - [useStorage](https://github.com/prefecthq/vue-compositions/tree/main/src/useStorage)
 - [useSubscription](https://github.com/prefecthq/vue-compositions/tree/main/src/useSubscription)
 - [useValidation](https://github.com/prefecthq/vue-compositions/tree/main/src/useValidation)
