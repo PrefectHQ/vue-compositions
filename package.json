@@ -1,7 +1,7 @@
 {
   "name": "@prefecthq/vue-compositions",
   "private": false,
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A collection of reusable vue compositions.",
   "main": "./dist/vue-compositions.umd.js",
   "module": "./dist/vue-compositions.mjs",
