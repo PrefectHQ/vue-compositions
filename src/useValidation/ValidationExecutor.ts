@@ -22,16 +22,16 @@ export class ValidationRuleExecutor<T> {
     const { signal } = this.controller
 
     for (const rule of rules) {
-      if (signal.aborted) {
-        throw new ValidationAbortedError()
-      }
-
       // eslint-disable-next-line no-await-in-loop
       const result = await rule(value, name, {
         source,
         signal,
         previousValue,
       })
+
+      if (signal.aborted) {
+        throw new ValidationAbortedError()
+      }
 
       if (result === undefined) {
         return
