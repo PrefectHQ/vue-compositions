@@ -27,15 +27,13 @@ export type UseValidation = ToRefs<UseValidationState> & {
   state: UseValidationState,
 }
 
-export type ValidationRuleSource = 'validation' | 'observer'
-
-export type ValidationRuleMeta<T> = {
+export type ValidationRuleContext<T> = {
   signal: AbortSignal,
   source: string | undefined,
   previousValue: T | undefined,
 }
 
-export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleMeta<T>) => MaybePromise<boolean | string | void>
+export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleContext<T>) => MaybePromise<boolean | string | void>
 
 type RulesArg<T> = MaybeRef<MaybeArray<ValidationRule<T>>>
 
