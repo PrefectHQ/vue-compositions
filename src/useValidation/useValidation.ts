@@ -20,7 +20,7 @@ type ValidateMethodOptions = {
   source?: string,
 }
 
-type ValidateMethod = (options: ValidateMethodOptions) => Promise<boolean>
+type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
 
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
