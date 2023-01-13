@@ -1,5 +1,6 @@
 import { ValidationRule } from '@/useValidation/useValidation'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
+import { ValidationSkippedError } from '@/useValidation/ValidationSkippedError'
 
 type Validate<T> = {
   value: T,
@@ -18,7 +19,7 @@ export class ValidationRuleExecutor<T> {
     this.controller = new AbortController()
   }
 
-  public async validate({ value, name, rules, source, previousValue }: Validate<T>): Promise<string | void> {
+  public async validate({ value, name, rules, source, previousValue }: Validate<T>): Promise<string> {
     const { signal } = this.controller
 
     for (const rule of rules) {
@@ -33,8 +34,9 @@ export class ValidationRuleExecutor<T> {
         throw new ValidationAbortedError()
       }
 
+      // we cannot stop looping when a rule skips...
       if (result === undefined) {
-        return
+        throw new ValidationSkippedError()
       }
 
       if (result === false) {

@@ -1,8 +1,9 @@
 import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
-import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
+import { isValidationAbortedError, ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
+import { isValidationSkippedError } from '@/useValidation/ValidationSkippedError'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { asArray } from '@/utilities/arrays'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
@@ -74,6 +75,10 @@ export function useValidation<T>(
 
     pending.value = true
 
+    function done(): boolean {
+      return valid.value
+    }
+
     try {
       const result = await executor.validate({
         source,
@@ -83,22 +88,23 @@ export function useValidation<T>(
         previousValue: previousValueRef.value,
       })
 
-      if (result === undefined) {
-        return valid.value
+      error.value = result
+      pending.value = false
+      validated.value = true
+      previousValueRef.value = valueRef.value
+
+      return done()
+
+    } catch (error) {
+      if (isValidationAbortedError(error) || isValidationSkippedError(error)) {
+        return done()
       }
 
-      error.value = result
-    } catch (error) {
-      if (!(error instanceof ValidationAbortedError)) {
-        console.warn('There was an error during validation')
-        console.error(error)
-      }
+      console.warn('There was an error during validation')
+      console.error(error)
     }
 
-    pending.value = false
-    validated.value = true
-
-    return valid.value
+    return done()
   }
 
   const state = reactive({
@@ -129,8 +135,6 @@ export function useValidation<T>(
     if (isSame(newValue, oldValue)) {
       return
     }
-
-    previousValueRef.value = oldValue
 
     validate({ source: 'validator' })
   }, { deep: true })
