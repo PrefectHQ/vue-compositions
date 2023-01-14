@@ -1,6 +1,5 @@
 import { ValidationRule } from '@/useValidation/useValidation'
 import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
-import { ValidationSkippedError } from '@/useValidation/ValidationSkippedError'
 
 type Validate<T> = {
   value: T,
@@ -34,9 +33,8 @@ export class ValidationRuleExecutor<T> {
         throw new ValidationAbortedError()
       }
 
-      // we cannot stop looping when a rule skips...
-      if (result === undefined) {
-        throw new ValidationSkippedError()
+      if (skipped(result) || passed(result)) {
+        continue
       }
 
       if (result === false) {
@@ -51,4 +49,12 @@ export class ValidationRuleExecutor<T> {
     return ''
   }
 
+}
+
+function skipped(value: string | boolean | undefined): value is undefined {
+  return value === undefined
+}
+
+function passed(value: string | boolean | undefined): value is true {
+  return value === true
 }

@@ -1,9 +1,8 @@
 import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
-import { isValidationAbortedError, ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
+import { isValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
-import { isValidationSkippedError } from '@/useValidation/ValidationSkippedError'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { asArray } from '@/utilities/arrays'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
@@ -17,11 +16,11 @@ export type UseValidationState = {
   validated: boolean,
 }
 
-type ValidateMethodOptions = {
+export type ValidateMethodOptions = {
   source?: string,
 }
 
-type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
+export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
 
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
@@ -34,7 +33,7 @@ export type ValidationRuleContext<T> = {
   previousValue: T | undefined,
 }
 
-export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleContext<T>) => MaybePromise<boolean | string | void>
+export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleContext<T>) => MaybePromise<boolean | string | undefined>
 
 type RulesArg<T> = MaybeRef<MaybeArray<ValidationRule<T>>>
 
@@ -75,10 +74,6 @@ export function useValidation<T>(
 
     pending.value = true
 
-    function done(): boolean {
-      return valid.value
-    }
-
     try {
       const result = await executor.validate({
         source,
@@ -93,18 +88,14 @@ export function useValidation<T>(
       validated.value = true
       previousValueRef.value = valueRef.value
 
-      return done()
-
     } catch (error) {
-      if (isValidationAbortedError(error) || isValidationSkippedError(error)) {
-        return done()
+      if (!isValidationAbortedError(error)) {
+        console.warn('There was an error during validation')
+        console.error(error)
       }
-
-      console.warn('There was an error during validation')
-      console.error(error)
     }
 
-    return done()
+    return valid.value
   }
 
   const state = reactive({
