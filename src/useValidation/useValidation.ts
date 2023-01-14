@@ -1,7 +1,7 @@
 import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
-import { ValidationAbortedError } from '@/useValidation/ValidationAbortedError'
+import { isValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { asArray } from '@/utilities/arrays'
@@ -16,11 +16,11 @@ export type UseValidationState = {
   validated: boolean,
 }
 
-type ValidateMethodOptions = {
+export type ValidateMethodOptions = {
   source?: string,
 }
 
-type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
+export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
 
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
@@ -33,7 +33,7 @@ export type ValidationRuleContext<T> = {
   previousValue: T | undefined,
 }
 
-export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleContext<T>) => MaybePromise<boolean | string | void>
+export type ValidationRule<T> = (value: T, name: string, meta: ValidationRuleContext<T>) => MaybePromise<boolean | string | undefined>
 
 type RulesArg<T> = MaybeRef<MaybeArray<ValidationRule<T>>>
 
@@ -83,20 +83,17 @@ export function useValidation<T>(
         previousValue: previousValueRef.value,
       })
 
-      if (result === undefined) {
-        return valid.value
-      }
-
       error.value = result
+      pending.value = false
+      validated.value = true
+      previousValueRef.value = valueRef.value
+
     } catch (error) {
-      if (!(error instanceof ValidationAbortedError)) {
+      if (!isValidationAbortedError(error)) {
         console.warn('There was an error during validation')
         console.error(error)
       }
     }
-
-    pending.value = false
-    validated.value = true
 
     return valid.value
   }
@@ -129,8 +126,6 @@ export function useValidation<T>(
     if (isSame(newValue, oldValue)) {
       return
     }
-
-    previousValueRef.value = oldValue
 
     validate({ source: 'validator' })
   }, { deep: true })

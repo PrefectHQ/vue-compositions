@@ -18,14 +18,10 @@ export class ValidationRuleExecutor<T> {
     this.controller = new AbortController()
   }
 
-  public async validate({ value, name, rules, source, previousValue }: Validate<T>): Promise<string | void> {
+  public async validate({ value, name, rules, source, previousValue }: Validate<T>): Promise<string> {
     const { signal } = this.controller
 
     for (const rule of rules) {
-      if (signal.aborted) {
-        throw new ValidationAbortedError()
-      }
-
       // eslint-disable-next-line no-await-in-loop
       const result = await rule(value, name, {
         source,
@@ -33,8 +29,12 @@ export class ValidationRuleExecutor<T> {
         previousValue,
       })
 
-      if (result === undefined) {
-        return
+      if (signal.aborted) {
+        throw new ValidationAbortedError()
+      }
+
+      if (skipped(result) || passed(result)) {
+        continue
       }
 
       if (result === false) {
@@ -49,4 +49,12 @@ export class ValidationRuleExecutor<T> {
     return ''
   }
 
+}
+
+function skipped(value: string | boolean | undefined): value is undefined {
+  return value === undefined
+}
+
+function passed(value: string | boolean | undefined): value is true {
+  return value === true
 }
