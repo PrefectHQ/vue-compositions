@@ -26,7 +26,7 @@ a.value // 'foo'
 Schemas can be built from existing types. Types including nested values, values of different types, and optional values
 
 ```typescript
-import { useRouteQueryParams, RouteQueryParamSchema, StringRouteParam, NumberRouteParam, BooleanRouteParam } from '@prefecthq/vue-compositions'
+import { useRouteQueryParams, RouteQueryParamsSchema, StringRouteParam, NumberRouteParam, BooleanRouteParam } from '@prefecthq/vue-compositions'
 
 type Filter = {
   search: string,
@@ -37,7 +37,7 @@ type Filter = {
     max: number,
 }
 
-const schema: RouteQueryParamSchema<Filter> = {
+const schema: RouteQueryParamsSchema<Filter> = {
   search: StringRouteParam,
   page: NumberRouteParam,
   enabled: BooleanRouteParam
@@ -63,7 +63,7 @@ range.max.value // undefined
 ## Basic Arguments
 | Name         | Type                       | Default |
 |--------------|----------------------------|---------|
-| schema       | `RouteQueryParamSchema<T>` | None    |
+| schema       | `RouteQueryParamsSchema<T>`| None    |
 | defaultValue | `T`                        | None    |
 
 ### Returns
