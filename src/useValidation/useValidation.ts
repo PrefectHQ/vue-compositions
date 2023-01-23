@@ -6,7 +6,7 @@ import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
 import { asArray } from '@/utilities/arrays'
 import { injectFromSelfOrAncestor } from '@/utilities/injection'
-import { isSame } from '@/utilities/variables'
+import { isSame } from '@/utilities/isSame'
 
 export type UseValidationState = {
   valid: boolean,
