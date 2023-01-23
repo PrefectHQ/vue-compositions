@@ -13,6 +13,7 @@ npm i --save @prefecthq/vue-compositions
 - [useElementRect](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementRect)
 - [useElementWidth](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementWidth)
 - [useIntersectionObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useIntersectionObserver)
+- [useIsSame](https://github.com/prefecthq/vue-compositions/tree/main/src/useIsSame)
 - [useMedia](https://github.com/prefecthq/vue-compositions/tree/main/src/useMedia)
 - [useMutationObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useMutationObserver)
 - [usePatchRef](https://github.com/prefecthq/vue-compositions/tree/main/src/usePatchRef)
