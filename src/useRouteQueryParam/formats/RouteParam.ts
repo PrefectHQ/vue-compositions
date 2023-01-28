@@ -8,6 +8,7 @@ const IS_ROUTE_PARAM_SYMBOL: unique symbol = Symbol()
 export type RouteParamClassArgs<T> = {
   key: string,
   defaultValue: T | T[],
+  multiple: boolean,
 }
 
 // adding any here so RouteParamClass can be used without passing a generic
@@ -26,14 +27,13 @@ export abstract class RouteParam<T> {
 
   protected key: string
   protected defaultValue: T | T[] | undefined
+  protected multiple: boolean
 
-  private get multiple(): boolean {
-    return Array.isArray(this.defaultValue)
-  }
-
-  public constructor({ key, defaultValue }: RouteParamClassArgs<T>) {
+  public constructor({ key, defaultValue, multiple }: RouteParamClassArgs<T>) {
     this.key = key
     this.defaultValue = defaultValue
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    this.multiple = multiple ?? Array.isArray(defaultValue)
   }
 
   public get(routeQuery: UseRouteQuery): T | T[] | undefined {

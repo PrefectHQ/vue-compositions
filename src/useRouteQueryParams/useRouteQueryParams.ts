@@ -1,14 +1,18 @@
 import { Ref } from 'vue'
-import { NoInfer, NonArray } from '@/types/generics'
+import { NoInfer } from '@/types/generics'
 import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats'
 import { useRouteQueryParam } from '@/useRouteQueryParam/useRouteQueryParam'
 
 type AnyRecord = Record<string, unknown>
 
 export type RouteQueryParamsSchema<T extends AnyRecord> = {
-  [P in keyof T]-?: NonNullable<T[P]> extends AnyRecord
+  [P in keyof Required<T>]: NonNullable<T[P]> extends AnyRecord
     ? RouteQueryParamsSchema<NonNullable<T[P]>>
-    : RouteParamClass<NonNullable<NonArray<T[P]>>>
+    : T[P] extends infer V | undefined
+      ? V extends (infer V)[]
+        ? [RouteParamClass<V>]
+        : RouteParamClass<V>
+      : never
 }
 
 export type RouteQueryParams<T extends AnyRecord> = {
