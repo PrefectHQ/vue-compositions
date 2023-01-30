@@ -8,11 +8,9 @@ type AnyRecord = Record<string, unknown>
 export type RouteQueryParamsSchema<T extends AnyRecord> = {
   [P in keyof Required<T>]: NonNullable<T[P]> extends AnyRecord
     ? RouteQueryParamsSchema<NonNullable<T[P]>>
-    : T[P] extends infer V | undefined
-      ? V extends (infer V)[]
-        ? [RouteParamClass<V>]
-        : RouteParamClass<V>
-      : never
+    : T[P] extends (infer V)[] | undefined
+      ? [RouteParamClass<V>]
+      : RouteParamClass<Exclude<T[P], undefined>>
 }
 
 export type RouteQueryParams<T extends AnyRecord> = {
