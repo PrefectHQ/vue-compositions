@@ -28,6 +28,7 @@ export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>
 export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T>, defaultValue: MaybeArray<T> | undefined): Ref<MaybeArray<T> | undefined>
 export function useRouteQueryParam<T>(key: string, formatter: [RouteParamClass<T>], defaultValue: T[]): Ref<T[]>
 export function useRouteQueryParam<T>(key: string, formatter: [RouteParamClass<T>], defaultValue: T[] | undefined): Ref<[] | undefined>
+export function useRouteQueryParam<T>(key: string, formatter: RouteParamClass<T> | [RouteParamClass<T>], defaultValue: T | T[] | undefined): Ref<[] | undefined>
 export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteParamClass | [RouteParamClass] | MaybeArray<string> | undefined, maybeDefaultValue?: MaybeArray | undefined): Ref {
 
   const isStringParamWithDefaultValue = isDefaultValue(formatterOrDefaultValue)

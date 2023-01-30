@@ -19,6 +19,12 @@ export function isRouteParamClass(value: unknown): value is RouteParamClass<unkn
   return typeof value === 'function' && IS_ROUTE_PARAM_SYMBOL in value
 }
 
+export function isRouteParamClassTuple(value: unknown): value is [RouteParamClass<unknown>] {
+  const [first] = asArray(value)
+
+  return typeof first === 'function' && IS_ROUTE_PARAM_SYMBOL in first
+}
+
 export abstract class RouteParam<T> {
   public static [IS_ROUTE_PARAM_SYMBOL] = true
 
@@ -32,8 +38,7 @@ export abstract class RouteParam<T> {
   public constructor({ key, defaultValue, multiple }: RouteParamClassArgs<T>) {
     this.key = key
     this.defaultValue = defaultValue
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    this.multiple = multiple ?? Array.isArray(defaultValue)
+    this.multiple = multiple || Array.isArray(defaultValue)
   }
 
   public get(routeQuery: UseRouteQuery): T | T[] | undefined {

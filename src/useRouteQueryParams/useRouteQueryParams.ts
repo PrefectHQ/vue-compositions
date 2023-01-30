@@ -1,6 +1,6 @@
 import { Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
-import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats'
+import { isRouteParamClass, isRouteParamClassTuple, RouteParamClass } from '@/useRouteQueryParam/formats'
 import { useRouteQueryParam } from '@/useRouteQueryParam/useRouteQueryParam'
 
 type AnyRecord = Record<string, unknown>
@@ -46,7 +46,7 @@ function getSchemaRouteQueryParams<T extends AnyRecord>(
     const property = schema[key]
     const propertyDefault = defaultValue[key]
 
-    if (isRouteParamClass(property)) {
+    if (isRouteParamClass(property) || isRouteParamClassTuple(property)) {
       params[key] = useRouteQueryParam(prefixed(key), property, propertyDefault)
 
       return params
