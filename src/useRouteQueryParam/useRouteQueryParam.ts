@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
-import { computed, Ref } from 'vue'
+import { computed, ref, Ref, watch } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray } from '@/types/maybe'
 import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats/RouteParam'
 import { StringRouteParam } from '@/useRouteQueryParam/formats/StringRouteParam'
 import { asArray } from '@/utilities/arrays'
+import { isSame } from '@/utilities/isSame'
 
 function isDefaultValue<T>(value: T | RouteParamClass | [RouteParamClass]): value is T {
   const [first] = asArray(value)
@@ -42,8 +43,7 @@ export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteP
   const [formatter] = asArray(formatterOrDefaultValue)
   const defaultValue = maybeDefaultValue
   const format = new formatter({ key, defaultValue, multiple })
-
-  return computed({
+  const param = computed({
     get() {
       return format.get(query)
     },
@@ -52,4 +52,19 @@ export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteP
     },
   })
 
+  const response = ref(param.value)
+
+  watch(response, value => {
+    if (!isSame(value, param.value)) {
+      param.value = value
+    }
+  })
+
+  watch(param, param => {
+    if (!isSame(param, response.value)) {
+      response.value = param
+    }
+  })
+
+  return response
 }
