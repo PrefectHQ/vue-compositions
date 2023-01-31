@@ -6,6 +6,7 @@ import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
 import { isRouteParamClass, RouteParamClass } from '@/useRouteQueryParam/formats/RouteParam'
 import { StringRouteParam } from '@/useRouteQueryParam/formats/StringRouteParam'
 import { asArray } from '@/utilities/arrays'
+import { isSame } from '@/utilities/isSame'
 
 function isDefaultValue<T>(value: T | RouteParamClass | [RouteParamClass]): value is T {
   const [first] = asArray(value)
@@ -54,13 +55,13 @@ export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteP
   const response = ref(param.value)
 
   watch(response, value => {
-    if (value !== param.value) {
+    if (!isSame(value, param.value)) {
       param.value = value
     }
   })
 
   watch(param, param => {
-    if (param !== response.value) {
+    if (!isSame(param, response.value)) {
       response.value = param
     }
   })
