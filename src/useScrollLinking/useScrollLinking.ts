@@ -2,7 +2,7 @@ import { onMounted, onUnmounted, ref, Ref } from 'vue'
 import { MaybeRef } from '@/types/maybe'
 
 type DisconnectScrollLink = () => void
-type ScrollLinkReturnValue = {
+type UseScrollLinking = {
   disconnect: DisconnectScrollLink,
   source: Ref<HTMLElement | undefined>,
   target: Ref<HTMLElement | undefined>,
@@ -17,14 +17,14 @@ type ScrollLinkReturnValue = {
  * This composition will tear down when the calling component is unmounted but can be disconnected
  * early using the returned disconnect method.
  *
- * @param source Ref<HTMLElement>
- * @param target Ref<HTMLElement>
- * @returns ScrollLinkReturnValue
+ * @param source MaybeRef<HTMLElement>
+ * @param target MaybeRef<HTMLElement>
+ * @returns UseScrollLinking
  */
 export function useScrollLinking(
   source?: MaybeRef<HTMLElement>,
   target?: MaybeRef<HTMLElement>,
-): ScrollLinkReturnValue {
+): UseScrollLinking {
   const sourceRef = ref(source)
   const targetRef = ref(target)
 

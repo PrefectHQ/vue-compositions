@@ -23,4 +23,4 @@ const { target, source } = useScrollLinking()
 | target | `MaybeRef<HTMLElement>` |
 
 ## Returns
-`ScrollLinkReturnValue`
+`UseScrollLinking`
