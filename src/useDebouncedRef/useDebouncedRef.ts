@@ -1,8 +1,8 @@
 import debounce from 'lodash.debounce'
 import { ref, Ref, watch, watchEffect } from 'vue'
 
-export function useDebouncedRef<T>(input: Ref<T>, wait: Ref<number> | number): Ref<T> {
-  const waitRef = ref(wait)
+export function useDebouncedRef<T>(input: Ref<T>, waitMs: Ref<number> | number): Ref<T> {
+  const waitRef = ref(waitMs)
   const copy = ref(input.value) as Ref<T>
   const update = debounce((value: T) => {
     if (value !== copy.value) {
