@@ -26,7 +26,7 @@ describe('useDebouncedRef', () => {
     expect(output.value).toBe(2)
   })
 
-  it('it syncs the debounced value back to the input', async () => {
+  it('it syncs the debounced value back to the input', () => {
     vi.useFakeTimers()
     const input = ref(1)
     const output = useDebouncedRef(input, 100)
