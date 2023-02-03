@@ -21,6 +21,8 @@ describe('useDebouncedRef', () => {
     const output = useDebouncedRef(input, 100)
     input.value = 2
 
+    expect(output.value).toBe(1)
+
     await vi.runAllTimersAsync()
 
     expect(output.value).toBe(2)
