@@ -4,7 +4,11 @@ import { ref, Ref, watch, watchEffect } from 'vue'
 export function useDebouncedRef<T>(input: Ref<T>, wait: Ref<number> | number): Ref<T> {
   const waitRef = ref(wait)
   const copy = ref(input.value) as Ref<T>
-  const update = debounce((value: T) => copy.value = value, waitRef.value)
+  const update = debounce((value: T) => {
+    if (value !== copy.value) {
+      copy.value = value
+    }
+  }, waitRef.value)
 
   watchEffect(() => update(input.value))
 
