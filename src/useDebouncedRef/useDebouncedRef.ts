@@ -9,7 +9,9 @@ export function useDebouncedRef<T>(input: Ref<T>, wait: Ref<number> | number): R
   watchEffect(() => update(input.value))
 
   watch(copy, value => {
-    input.value = value
+    if (value !== input.value) {
+      input.value = value
+    }
   }, { flush: 'sync' })
 
   return copy
