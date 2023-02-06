@@ -1,15 +1,18 @@
 import { onMounted, ref, Ref } from 'vue'
+import { MaybeRef } from '@/types/maybe'
 import { useIntersectionObserver, UseIntersectionObserverOptions } from '@/useIntersectionObserver'
 
 export type UseVisibilityObserverResponse = {
+  elementRef: Ref<HTMLElement | undefined>,
   visible: Ref<boolean>,
   disconnect: () => void,
 }
 
 export type UseVisibilityObserverOptions = UseIntersectionObserverOptions & { disconnectWhenVisible: boolean }
 
-export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, options: UseVisibilityObserverOptions = { disconnectWhenVisible: false }): UseVisibilityObserverResponse {
+export function useVisibilityObserver(element?: MaybeRef<HTMLElement | undefined>, options: UseVisibilityObserverOptions = { disconnectWhenVisible: false }): UseVisibilityObserverResponse {
   const visible = ref(false)
+  const elementRef = ref(element)
   const { disconnectWhenVisible, ...intersectionObserverOptions } = options
 
   function intersect(entries: IntersectionObserverEntry[]): void {
@@ -25,8 +28,8 @@ export function useVisibilityObserver(element: Ref<HTMLElement | undefined>, opt
   const { observe, disconnect } = useIntersectionObserver(intersect, intersectionObserverOptions)
 
   onMounted(() => {
-    observe(element)
+    observe(elementRef)
   })
 
-  return { visible, disconnect }
+  return { elementRef, visible, disconnect }
 }
