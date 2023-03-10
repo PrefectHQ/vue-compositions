@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash'
+import isEqual from 'lodash.isequal'
 import { isRef, unref, watch } from 'vue'
 import { isArray } from '@/utilities/arrays'
 import { isRecord, mapValues } from '@/utilities/objects'
