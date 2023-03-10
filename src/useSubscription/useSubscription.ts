@@ -1,4 +1,4 @@
-import { getCurrentInstance, onUnmounted, reactive, unref, watch } from 'vue'
+import { getCurrentInstance, onUnmounted, reactive, unref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
