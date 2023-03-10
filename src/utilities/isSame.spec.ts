@@ -9,7 +9,7 @@ class Test {
   }
 }
 
-describe('useIsSame', () => {
+describe('isSame', () => {
 
   it('returns correct value', () => {
     expect(isSame(0, 0)).toBe(true)

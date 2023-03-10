@@ -9,6 +9,7 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
+    "isequal",
     "prefecthq"
   ],
   "editor.codeActionsOnSave": {
