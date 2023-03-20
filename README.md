@@ -16,6 +16,7 @@ npm i --save @prefecthq/vue-compositions
 - [useIsSame](https://github.com/prefecthq/vue-compositions/tree/main/src/useIsSame)
 - [useMedia](https://github.com/prefecthq/vue-compositions/tree/main/src/useMedia)
 - [useMutationObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useMutationObserver)
+- [useNow](https://github.com/prefecthq/vue-compositions/tree/main/src/useNow)
 - [usePatchRef](https://github.com/prefecthq/vue-compositions/tree/main/src/usePatchRef)
 - [useResizeObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useResizeObserver)
 - [useRouteParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteParam)
