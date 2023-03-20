@@ -22,6 +22,7 @@ npm i --save @prefecthq/vue-compositions
 - [useRouteQuery](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQuery)
 - [useRouteQueryParam](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParam)
 - [useRouteQueryParams](https://github.com/prefecthq/vue-compositions/tree/main/src/useRouteQueryParams)
+- [useScrollLinking](https://github.com/prefecthq/vue-compositions/tree/main/src/useScrollLinking)
 - [useStorage](https://github.com/prefecthq/vue-compositions/tree/main/src/useStorage)
 - [useSubscription](https://github.com/prefecthq/vue-compositions/tree/main/src/useSubscription)
 - [useValidation](https://github.com/prefecthq/vue-compositions/tree/main/src/useValidation)
