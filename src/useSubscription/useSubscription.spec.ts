@@ -502,4 +502,31 @@ describe('subscribe', () => {
     expect(action).toBeCalledTimes(1)
   })
 
+  it('is retains subscription when reactive options change', async () => {
+    vi.useFakeTimers()
+
+    const action = vi.fn()
+
+    const interval = ref(1000)
+    const options = computed(() => {
+      return {
+        interval: interval.value,
+      }
+    })
+
+    uniqueSubscribe(action, [], options)
+
+    expect(action).toBeCalledTimes(1)
+
+    interval.value = Infinity
+
+    expect(action).toBeCalledTimes(1)
+
+    interval.value = 1000
+
+    vi.advanceTimersByTime(1000)
+
+    expect(action).toBeCalledTimes(2)
+  })
+
 })
