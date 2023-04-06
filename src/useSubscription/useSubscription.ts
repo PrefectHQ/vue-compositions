@@ -9,7 +9,7 @@ import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 const defaultManager = new Manager()
 
 export function useSubscription<T extends Action>(...[action, args, optionsArg = {}]: SubscribeArguments<T>): UseSubscription<T> {
-  const options = unref(optionsArg) ?? {}
+  const options = unref(optionsArg)
   const manager = options.manager ?? defaultManager
   const argsWithDefault = args ?? [] as unknown as ActionArguments<T>
   const originalSubscription = manager.subscribe(action, argsWithDefault, options)
