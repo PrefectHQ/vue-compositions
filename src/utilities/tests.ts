@@ -10,7 +10,7 @@ export function timeout(ms = 0): Promise<void> {
 
 export function uniqueSubscribe<T extends Action>(...[action, args, options = {}]: SubscribeArguments<T>): UseSubscription<T> {
   if (isRef(options)) {
-    options.value.manager = options.value.manager
+    options.value.manager = new Manager()
   } else {
     options.manager = new Manager()
   }
