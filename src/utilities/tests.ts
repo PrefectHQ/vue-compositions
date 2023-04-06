@@ -1,4 +1,4 @@
-import { computed, isRef, unref } from 'vue'
+import { computed, unref } from 'vue'
 import { useSubscription } from '@/useSubscription'
 import Manager from '@/useSubscription/models/manager'
 import { Action } from '@/useSubscription/types/action'
