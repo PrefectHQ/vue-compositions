@@ -1,13 +1,14 @@
 import { reactive, ref, Ref, toRaw, watch } from 'vue'
 import { Action, SubscriptionOptions, UseSubscription, ActionArguments, MappedSubscription } from '@/useSubscription/types'
 import { useSubscription } from '@/useSubscription/useSubscription'
+import { MaybeRef } from '@/types/maybe'
 
 const voidAction = (): undefined => undefined
 
 type UseSubscriptionWithDependencies<T extends Action> = [
   action: T,
   args: Ref<Parameters<T> | null>,
-  options?: SubscriptionOptions
+  options?: MaybeRef<SubscriptionOptions>
 ]
 
 // returns a void subscription with executed overridden to be false
