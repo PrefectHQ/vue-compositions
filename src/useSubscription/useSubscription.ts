@@ -8,8 +8,8 @@ import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 
 const defaultManager = new Manager()
 
-export function useSubscription<T extends Action>(...[action, args, optionArgs = {}]: SubscribeArguments<T>): UseSubscription<T> {
-  const options = optionArgs ? unref(optionArgs) : {}
+export function useSubscription<T extends Action>(...[action, args, optionsArg = {}]: SubscribeArguments<T>): UseSubscription<T> {
+  const options = unref(optionsArg) ?? {}
   const manager = options.manager ?? defaultManager
   const argsWithDefault = args ?? [] as unknown as ActionArguments<T>
   const originalSubscription = manager.subscribe(action, argsWithDefault, options)
@@ -33,15 +33,14 @@ export function useSubscription<T extends Action>(...[action, args, optionArgs =
     Object.assign(subscriptionResponse, mapSubscription(newSubscription))
   }, { deep: true })
 
-  const unwatchOptions = uniqueValueWatcher(getValidWatchSource(optionArgs), () => {
+  const unwatchOptions = uniqueValueWatcher(getValidWatchSource(optionsArg), () => {
 
     if (!subscriptionResponse.isSubscribed()) {
       unwatchOptions!()
       return
     }
 
-    const options = unref(optionArgs)
-
+    const options = unref(optionsArg)
     const newSubscription = manager.subscribe(action, argsWithDefault, options)
 
     newSubscription.response.value ??= subscriptionResponse.response
