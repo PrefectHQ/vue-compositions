@@ -1,4 +1,4 @@
-import { getCurrentInstance, onUnmounted, reactive, unref } from 'vue'
+import { getCurrentInstance, onUnmounted, reactive, ref, unref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
@@ -34,22 +34,17 @@ export function useSubscription<T extends Action>(...[action, args, optionsArg =
   }, { deep: true })
 
   const unwatchOptions = uniqueValueWatcher(getValidWatchSource(optionsArg), () => {
-
     if (!subscriptionResponse.isSubscribed()) {
       unwatchOptions!()
       return
     }
 
     const options = unref(optionsArg)
+    const manager = options.manager ?? defaultManager
     const newSubscription = manager.subscribe(action, argsWithDefault, options)
-
-    newSubscription.response.value ??= subscriptionResponse.response
-    newSubscription.executed.value = newSubscription.executed.value || subscriptionResponse.executed
-
     subscriptionResponse.unsubscribe()
 
     Object.assign(subscriptionResponse, mapSubscription(newSubscription))
-
   }, { deep: true })
 
   if (getCurrentInstance()) {
