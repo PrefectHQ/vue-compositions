@@ -1,8 +1,8 @@
+import { isRef } from 'vue'
 import { useSubscription } from '@/useSubscription'
 import Manager from '@/useSubscription/models/manager'
 import { Action } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
-import { isRef } from 'vue'
 
 export function timeout(ms = 0): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
