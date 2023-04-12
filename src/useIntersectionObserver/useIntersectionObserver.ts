@@ -95,7 +95,6 @@ export function useIntersectionObserver(callback: UseIntersectionObserverCallbac
   })
 
   watch(optionsRef, () => {
-    console.log('here')
     createObserver()
   })
 
