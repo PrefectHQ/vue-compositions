@@ -10,6 +10,7 @@ export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> exten
 export type SubscriptionOptions = {
   interval?: number,
   manager?: Manager,
+  lifecycle?: 'component' | 'app',
 }
 
 export type SubscriptionPromise<T extends Action> = Promise<Omit<UseSubscription<T>, 'promise'> & { response: ActionResponse<T> }>

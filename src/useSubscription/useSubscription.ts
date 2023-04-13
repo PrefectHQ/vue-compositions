@@ -1,4 +1,4 @@
-import { getCurrentInstance, onUnmounted, reactive, ref, unref } from 'vue'
+import { getCurrentInstance, onUnmounted, reactive, unref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
@@ -49,9 +49,13 @@ export function useSubscription<T extends Action>(...[action, args, optionsArg =
 
   if (getCurrentInstance()) {
     onUnmounted(() => {
-      subscriptionResponse.unsubscribe()
-      unwatchOptions()
-      unwatch()
+      const { lifecycle = 'component' } = unref(optionsArg)
+
+      if (lifecycle === 'component') {
+        subscriptionResponse.unsubscribe()
+        unwatchOptions()
+        unwatch()
+      }
     })
   }
 
