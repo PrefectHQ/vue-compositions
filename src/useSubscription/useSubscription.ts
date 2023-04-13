@@ -1,16 +1,15 @@
 import { getCurrentInstance, onUnmounted, reactive, unref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
-import { SubscribeArguments, SubscriptionOptions, UseSubscription } from '@/useSubscription/types/subscription'
+import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
 import { mapSubscription } from '@/useSubscription/utilities/subscriptions'
 import { getValidWatchSource } from '@/utilities/getValidWatchSource'
 import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 
 const defaultManager = new Manager()
-const defaultOptions: SubscriptionOptions = { lifecycle: 'component' }
 
 export function useSubscription<T extends Action>(...[action, args, optionsArg = {}]: SubscribeArguments<T>): UseSubscription<T> {
-  const options = { ...defaultOptions, ...unref(optionsArg) }
+  const options = unref(optionsArg)
   const manager = options.manager ?? defaultManager
   const argsWithDefault = args ?? [] as unknown as ActionArguments<T>
   const originalSubscription = manager.subscribe(action, argsWithDefault, options)
@@ -48,11 +47,15 @@ export function useSubscription<T extends Action>(...[action, args, optionsArg =
     Object.assign(subscriptionResponse, mapSubscription(newSubscription))
   }, { deep: true })
 
-  if (options.lifecycle === 'component' && getCurrentInstance()) {
+  if (getCurrentInstance()) {
     onUnmounted(() => {
-      subscriptionResponse.unsubscribe()
-      unwatchOptions()
-      unwatch()
+      const { lifecycle = 'component' } = unref(optionsArg)
+
+      if (lifecycle === 'component') {
+        subscriptionResponse.unsubscribe()
+        unwatchOptions()
+        unwatch()
+      }
     })
   }
 
