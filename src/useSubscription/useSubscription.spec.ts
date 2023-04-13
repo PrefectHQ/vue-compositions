@@ -315,13 +315,12 @@ describe('subscribe', () => {
     expect(subscription.response).toBe(true)
   })
 
-  const unmountedOptionCases: (SubscriptionOptions | undefined)[] = [
+  test.each<SubscriptionOptions | undefined>([
     undefined,
     {},
     { interval: 3000 },
     { lifecycle: 'component' },
-  ]
-  test.each(unmountedOptionCases)('calls unsubscribe when component is unmounted with default lifecycle', (options?: SubscriptionOptions) => {
+  ])('calls unsubscribe when component is unmounted with default lifecycle', (options?: SubscriptionOptions) => {
     const action = vi.fn()
     let subscription: UseSubscription<typeof action>
 
