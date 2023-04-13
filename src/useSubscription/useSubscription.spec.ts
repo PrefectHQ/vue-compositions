@@ -1,9 +1,9 @@
 import { render } from '@testing-library/vue'
-import { describe, it, expect, afterEach, vi } from 'vitest'
+import { test, describe, it, expect, afterEach, vi } from 'vitest'
 import { computed, h, reactive, ref } from 'vue'
 import { useSubscription } from '@/useSubscription'
 import Manager from '@/useSubscription/models/manager'
-import { UseSubscription } from '@/useSubscription/types/subscription'
+import { SubscriptionOptions, UseSubscription } from '@/useSubscription/types/subscription'
 import { timeout, uniqueSubscribe } from '@/utilities/tests'
 
 function numberEqualsOne(number: number): boolean {
@@ -315,13 +315,19 @@ describe('subscribe', () => {
     expect(subscription.response).toBe(true)
   })
 
-  it('calls unsubscribe when component is unmounted', () => {
+  const unmountedOptionCases: (SubscriptionOptions | undefined)[] = [
+    undefined,
+    {},
+    { interval: 3000 },
+    { lifecycle: 'component' },
+  ]
+  test.each(unmountedOptionCases)('calls unsubscribe when component is unmounted with default lifecycle', (options?: SubscriptionOptions) => {
     const action = vi.fn()
     let subscription: UseSubscription<typeof action>
 
     const { unmount } = render({
       setup() {
-        subscription = uniqueSubscribe(action, [])
+        subscription = uniqueSubscribe(action, [], options)
 
         return () => h('p')
       },
@@ -332,6 +338,27 @@ describe('subscribe', () => {
     unmount()
 
     expect(spy).toBeCalledTimes(1)
+  })
+
+  it('does not call unsubscribe when component is unmounted with app lifecycle', () => {
+    const action = vi.fn()
+    let subscription: UseSubscription<typeof action>
+
+    const { unmount } = render({
+      setup() {
+        subscription = uniqueSubscribe(action, [], {
+          lifecycle: 'app',
+        })
+
+        return () => h('p')
+      },
+    })
+
+    const spy = vi.spyOn(subscription!, 'unsubscribe')
+
+    unmount()
+
+    expect(spy).not.toBeCalled()
   })
 
   it('does not update subscription when unsubscribed', async () => {
