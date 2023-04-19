@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { isEqual } from 'lodash'
 import Manager from '@/useSubscription/models/manager'
 import Subscription from '@/useSubscription/models/subscription'
 import {
@@ -72,6 +73,10 @@ export default class Channel<T extends Action = Action> {
   }
 
   private set response(response: ActionResponse<T> | undefined) {
+    if (isEqual(this._response, response)) {
+      return
+    }
+
     this._response = response
 
     for (const subscription of this.subscriptions.values()) {
