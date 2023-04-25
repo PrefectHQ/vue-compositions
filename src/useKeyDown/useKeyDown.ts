@@ -4,7 +4,6 @@ import { asArray } from '@/utilities/arrays'
 
 export type UseKeyDown = {
   down: ComputedRef<boolean>,
-  up: ComputedRef<boolean>,
 }
 
 export type UseKeyDownCallback = (event: KeyboardEvent) => void
@@ -31,7 +30,6 @@ function useKeyDownFactory(): (...args: UseKeyDownArgs) => UseKeyDown {
   return (...[key, callback]: UseKeyDownArgs): UseKeyDown => {
     const keys = computed(() => asArray(unref(key)))
     const down = computed(() => keys.value.some(key => downKeys.has(key)))
-    const up = computed(() => !down.value)
 
     const filteredCallback: UseKeyDownCallback = (event) => {
       if (keys.value.includes(event.key)) {
@@ -46,7 +44,6 @@ function useKeyDownFactory(): (...args: UseKeyDownArgs) => UseKeyDown {
     })
 
     return {
-      up,
       down,
     }
   }
