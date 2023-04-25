@@ -1,4 +1,4 @@
-import { ComputedRef, computed, onMounted, onUnmounted, ref, unref } from 'vue'
+import { ComputedRef, computed, onUnmounted, reactive, unref } from 'vue'
 import { MaybeArray, MaybeRef } from '@/types/maybe'
 import { asArray } from '@/utilities/arrays'
 
@@ -9,37 +9,47 @@ export type UseKeyDown = {
 
 export type UseKeyDownCallback = (event: KeyboardEvent) => void
 
-export function useKeyDown(key: MaybeRef<MaybeArray<string>>, callback?: UseKeyDownCallback): UseKeyDown {
-  const keys = computed(() => asArray(unref(key)))
-  const isPressed = ref(false)
-  const down = computed(() => isPressed.value)
-  const up = computed(() => !isPressed.value)
+export type UseKeyDownArgs = [key: MaybeRef<MaybeArray<string>>, callback?: UseKeyDownCallback]
+
+function useKeyDownFactory(): (...args: UseKeyDownArgs) => UseKeyDown {
+  const downKeys = reactive<Set<string>>(new Set())
+  const callbacks = new Set<UseKeyDownCallback>()
 
   function keyDownCallback(event: KeyboardEvent): void {
-    if (keys.value.includes(event.key)) {
-      isPressed.value = true
-      callback?.(event)
-    }
+    downKeys.add(event.key)
+
+    callbacks.forEach(callback => callback(event))
   }
 
   function keyUpCallback(event: KeyboardEvent): void {
-    if (keys.value.includes(event.key)) {
-      isPressed.value = false
+    downKeys.delete(event.key)
+  }
+
+  document.addEventListener('keydown', keyDownCallback)
+  document.addEventListener('keyup', keyUpCallback)
+
+  return (...[key, callback]: UseKeyDownArgs): UseKeyDown => {
+    const keys = computed(() => asArray(unref(key)))
+    const down = computed(() => keys.value.some(key => downKeys.has(key)))
+    const up = computed(() => !down.value)
+
+    const filteredCallback: UseKeyDownCallback = (event) => {
+      if (keys.value.includes(event.key)) {
+        callback?.(event)
+      }
+    }
+
+    callbacks.add(filteredCallback)
+
+    onUnmounted(() => {
+      callbacks.delete(filteredCallback)
+    })
+
+    return {
+      up,
+      down,
     }
   }
-
-  onMounted(() => {
-    document.addEventListener('keydown', keyDownCallback)
-    document.addEventListener('keyup', keyUpCallback)
-  })
-
-  onUnmounted(() => {
-    document.removeEventListener('keydown', keyDownCallback)
-    document.removeEventListener('keyup', keyUpCallback)
-  })
-
-  return {
-    down,
-    up,
-  }
 }
+
+export const useKeyDown = useKeyDownFactory()
