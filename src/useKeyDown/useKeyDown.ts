@@ -1,6 +1,7 @@
 import { ComputedRef, computed, onUnmounted, reactive, unref } from 'vue'
 import { MaybeArray, MaybeRef } from '@/types/maybe'
 import { asArray } from '@/utilities/arrays'
+import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 
 export type UseKeyDown = {
   down: ComputedRef<boolean>,
@@ -39,7 +40,7 @@ function useKeyDownFactory(): (...args: UseKeyDownArgs) => UseKeyDown {
 
     callbacks.add(filteredCallback)
 
-    onUnmounted(() => {
+    tryOnScopeDispose(() => {
       callbacks.delete(filteredCallback)
     })
 
