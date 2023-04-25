@@ -5,6 +5,7 @@ import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 
 export type UseKeyDown = {
   down: ComputedRef<boolean>,
+  connect: () => void,
   disconnect: () => void,
 }
 
@@ -39,16 +40,21 @@ function useKeyDownFactory(): (...args: UseKeyDownArgs) => UseKeyDown {
       }
     }
 
+    const connect = (): void => {
+      callbacks.add(filteredCallback)
+    }
+
     const disconnect = (): void => {
       callbacks.delete(filteredCallback)
     }
 
-    callbacks.add(filteredCallback)
+    connect()
 
     tryOnScopeDispose(disconnect)
 
     return {
       down,
+      connect,
       disconnect,
     }
   }
