@@ -68,6 +68,6 @@
     }
   },
   "dependencies": {
-    "jsdom": "^21.0.0"
+    "jsdom": "^22.0.0"
   }
 }
