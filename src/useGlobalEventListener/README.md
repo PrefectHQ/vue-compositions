@@ -1,5 +1,5 @@
 # useGlobalEventListener
-The `useGlobalEventListener` composition can be used to automagically handle setup and teardown of event listeners on the document scope. It takes the same arguments as the global `addEventListener` method
+The `useGlobalEventListener` composition can be used to automatically handle setup and teardown of event listeners on the document scope. It takes the same arguments as the global `addEventListener` method
 
 ## Example
 ```typescript
