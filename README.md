@@ -12,6 +12,7 @@ npm i --save @prefecthq/vue-compositions
 - [useDebouncedRef](https://github.com/prefecthq/vue-compositions/tree/main/src/useDebouncedRef)
 - [useElementRect](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementRect)
 - [useElementWidth](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementWidth)
+- [useGlobalEventListener](https://github.com/prefecthq/vue-compositions/tree/main/src/useGlobalEventListener)
 - [useIntersectionObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useIntersectionObserver)
 - [useIsSame](https://github.com/prefecthq/vue-compositions/tree/main/src/useIsSame)
 - [useKeyDown](https://github.com/prefecthq/vue-compositions/tree/main/src/useKeyDown)
