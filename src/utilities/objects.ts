@@ -1,5 +1,7 @@
+import { isDate } from '@/utilities/dates'
+
 export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
+  return typeof value === 'object' && value !== null && !isDate(value)
 }
 
 export type MapKeysCallback<PreviousKey extends PropertyKey, Value, NewKey extends PropertyKey> = (key: PreviousKey, value: Value) => NewKey
