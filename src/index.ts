@@ -1,3 +1,4 @@
+export * from './useBoolean'
 export * from './useChildrenAreWrapped'
 export * from './useComputedStyle'
 export * from './useDebouncedRef'
