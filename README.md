@@ -7,6 +7,7 @@ npm i --save @prefecthq/vue-compositions
 ```
 
 ## Compositions
+- [useBoolean](https://github.com/prefecthq/vue-compositions/tree/main/src/useBoolean)
 - [useChildrenAreWrapped](https://github.com/prefecthq/vue-compositions/tree/main/src/useChildrenAreWrapped)
 - [useComputedStyle](https://github.com/prefecthq/vue-compositions/tree/main/src/useComputedStyle)
 - [useDebouncedRef](https://github.com/prefecthq/vue-compositions/tree/main/src/useDebouncedRef)
