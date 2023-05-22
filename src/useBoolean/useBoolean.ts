@@ -1,8 +1,8 @@
-import { ref } from 'vue'
+import { ref, Ref } from 'vue'
 import { MaybeRef } from '@/types/maybe'
 
 type UseBoolean = {
-  value: MaybeRef<boolean>,
+  value: Ref<boolean>,
   toggle: () => void,
   setTrue: () => void,
   setFalse: () => void,
