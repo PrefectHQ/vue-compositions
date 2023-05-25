@@ -9,14 +9,22 @@ export type UseNow = {
 
 export type UseNowArgs = {
   immediate?: boolean,
+  interval?: number,
 }
 
-export function useNow({ immediate = true }: UseNowArgs = {}): UseNow {
-  const now = ref(new Date())
+export function useNow({
+  immediate = true,
+  interval = 0,
+}: UseNowArgs = {}): UseNow {
+  const response = ref(new Date())
   let id: null | number = null
 
   function update(): void {
-    now.value = new Date()
+    const now = new Date()
+
+    if (now.getTime() - response.value.getTime() > interval) {
+      response.value = now
+    }
 
     id = window.requestAnimationFrame(update)
   }
@@ -40,7 +48,7 @@ export function useNow({ immediate = true }: UseNowArgs = {}): UseNow {
   tryOnScopeDispose(pause)
 
   return {
-    now,
+    now: response,
     resume,
     pause,
   }
