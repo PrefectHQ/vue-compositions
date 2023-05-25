@@ -1,4 +1,5 @@
 import { ref, Ref } from 'vue'
+import { MaybeRef } from '@/types/maybe'
 import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 
 export type UseNow = {
@@ -9,7 +10,7 @@ export type UseNow = {
 
 export type UseNowArgs = {
   immediate?: boolean,
-  interval?: number,
+  interval?: MaybeRef<number>,
 }
 
 export function useNow({
@@ -17,12 +18,13 @@ export function useNow({
   interval = 0,
 }: UseNowArgs = {}): UseNow {
   const response = ref(new Date())
+  const intervalRef = ref(interval)
   let id: null | number = null
 
   function update(): void {
     const now = new Date()
 
-    if (now.getTime() - response.value.getTime() > interval) {
+    if (now.getTime() - response.value.getTime() > intervalRef.value) {
       response.value = now
     }
 
