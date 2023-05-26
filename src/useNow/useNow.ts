@@ -17,14 +17,25 @@ export function useNow({
   immediate = true,
   interval = 0,
 }: UseNowArgs = {}): UseNow {
-  const response = ref(new Date())
+  const response = ref(getNow())
   const intervalRef = ref(interval)
   let id: null | number = null
 
-  function update(): void {
-    const now = new Date()
+  function getNow(): Date {
+    if (intervalRef.value === 0) {
+      return new Date()
+    }
 
-    if (now.getTime() - response.value.getTime() > intervalRef.value) {
+    const time = new Date().getTime()
+    const nearest = Math.round(time / intervalRef.value) * intervalRef.value
+
+    return new Date(nearest)
+  }
+
+  function update(): void {
+    const now = getNow()
+
+    if (response.value.getTime() !== now.getTime()) {
       response.value = now
     }
 
