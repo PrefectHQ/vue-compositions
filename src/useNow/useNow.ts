@@ -17,8 +17,8 @@ export function useNow({
   immediate = true,
   interval = 0,
 }: UseNowArgs = {}): UseNow {
-  const response = ref(getNow())
   const intervalRef = ref(interval)
+  const response = ref(getNow())
   let id: null | number = null
 
   function getNow(): Date {
