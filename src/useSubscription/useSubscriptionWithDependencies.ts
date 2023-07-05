@@ -1,7 +1,7 @@
 import { reactive, ref, Ref, toRaw, watch } from 'vue'
+import { MaybeRef } from '@/types/maybe'
 import { Action, SubscriptionOptions, UseSubscription, ActionArguments, MappedSubscription } from '@/useSubscription/types'
 import { useSubscription } from '@/useSubscription/useSubscription'
-import { MaybeRef } from '@/types/maybe'
 
 const voidAction = (): undefined => undefined
 
@@ -49,7 +49,7 @@ export function useSubscriptionWithDependencies<T extends Action>(...[action, ar
 
     Object.assign(subscription, newSubscription)
 
-  }, { immediate: true })
+  }, { deep: true, immediate: true })
 
   return subscription
 }
