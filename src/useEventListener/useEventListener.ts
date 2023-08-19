@@ -1,5 +1,6 @@
-import { getCurrentScope, onScopeDispose, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { MaybeRefOrGetter } from '@/types/maybe'
+import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 import { toValue } from '@/utilities/vue'
 
 export type UseEventListener = {
@@ -20,30 +21,32 @@ export function useEventListener<K extends keyof HTMLElementEventMap>(target: Ma
 // eslint-disable-next-line max-params
 export function useEventListener<K extends string>(target: MaybeRefOrGetter<Node | undefined | null>, key: K, callback: (this: Node, event: Event) => unknown, options: UseEventListenerOptions = {}): UseEventListener {
   const { immediate, ...listenerOptions } = { ...defaultOptions, ...options }
+  const manualMode = ref(!immediate)
 
-  function add(): void {
+  function addEventListener(): void {
     toValue(target)?.addEventListener(key, callback, listenerOptions)
   }
 
-  function remove(): void {
+  function removeEventListener(): void {
     toValue(target)?.removeEventListener(key, callback, listenerOptions)
   }
 
-  if (getCurrentScope()) {
-    onScopeDispose(() => remove())
-  }
-
-  if (immediate) {
-    add()
-  }
+  tryOnScopeDispose(removeEventListener)
 
   watch(() => toValue(target), () => {
-    remove()
-    add()
-  })
+    if (!manualMode.value) {
+      removeEventListener()
+      addEventListener()
+    }
+  }, { immediate: true })
 
   return {
-    add,
-    remove,
+    add: () => {
+      addEventListener()
+    },
+    remove: () => {
+      manualMode.value = true
+      removeEventListener()
+    },
   }
 }
