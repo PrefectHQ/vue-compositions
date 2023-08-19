@@ -3,7 +3,6 @@ import { vi, describe, it, test, expect, afterEach } from 'vitest'
 import { ref } from 'vue'
 import { useEventListener } from '@/useEventListener/useEventListener'
 import { timeout } from '@/utilities/tests'
-import * as utils from '@/utilities/vue'
 
 describe('useEventListener', () => {
 
