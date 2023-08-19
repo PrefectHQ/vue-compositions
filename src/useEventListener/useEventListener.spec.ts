@@ -17,22 +17,15 @@ describe('useEventListener', () => {
   ])('given falsy target never adds event listener', (initialValue) => {
     const callback = vi.fn()
     const target = ref<HTMLElement | undefined | null>(initialValue)
-    vi.spyOn(utils, 'toValue').mockReturnValue(initialValue)
 
     useEventListener(target, 'click', callback)
-
-    if (target.value) {
-      const addEventListenerMock = vi.spyOn(target.value, 'addEventListener')
-      expect(addEventListenerMock).not.toBeCalled()
-    }
 
     expect(callback).not.toBeCalled()
   })
 
   it('adds event listener', () => {
-    const target = ref<HTMLParagraphElement>()
     const element = document.createElement('p')
-    vi.spyOn(utils, 'toValue').mockReturnValue(element)
+    const target = ref<HTMLParagraphElement>(element)
     const addEventListenerMock = vi.spyOn(element, 'addEventListener')
 
     useEventListener(target, 'click', vi.fn())
@@ -41,9 +34,8 @@ describe('useEventListener', () => {
   })
 
   it('given immediate false wont automatically add event listener', () => {
-    const target = ref<HTMLParagraphElement>()
     const element = document.createElement('p')
-    vi.spyOn(utils, 'toValue').mockReturnValue(element)
+    const target = ref<HTMLParagraphElement>(element)
     const addEventListenerMock = vi.spyOn(element, 'addEventListener')
 
     useEventListener(target, 'click', vi.fn(), { immediate: false })
@@ -52,9 +44,8 @@ describe('useEventListener', () => {
   })
 
   it('add is called always adds listener', () => {
-    const target = ref<HTMLParagraphElement>()
     const element = document.createElement('p')
-    vi.spyOn(utils, 'toValue').mockReturnValue(element)
+    const target = ref<HTMLParagraphElement>(element)
     const addEventListenerMock = vi.spyOn(element, 'addEventListener')
 
     const { add } = useEventListener(target, 'click', vi.fn(), { immediate: false })
@@ -64,22 +55,20 @@ describe('useEventListener', () => {
   })
 
   it('remove is called always removes listener', () => {
-    const target = ref<HTMLParagraphElement>()
     const element = document.createElement('p')
-    vi.spyOn(utils, 'toValue').mockReturnValue(element)
-    const addEventListenerMock = vi.spyOn(element, 'removeEventListener')
+    const target = ref<HTMLParagraphElement>(element)
+    const removeEventListenerMock = vi.spyOn(element, 'removeEventListener')
 
     const { remove } = useEventListener(target, 'click', vi.fn(), { immediate: false })
     remove()
 
-    expect(addEventListenerMock).toHaveBeenCalledOnce()
+    expect(removeEventListenerMock).toHaveBeenCalledOnce()
   })
 
   it('triggers callback on event', () => {
     const callback = vi.fn()
-    const target = ref<HTMLParagraphElement>()
     const element = document.createElement('p')
-    vi.spyOn(utils, 'toValue').mockReturnValue(element)
+    const target = ref<HTMLParagraphElement>(element)
 
     useEventListener(target, 'click', callback)
 
@@ -89,7 +78,9 @@ describe('useEventListener', () => {
   })
 
   it('on scope dispose removes listener', () => {
-    const target = ref<HTMLElement>()
+    const element = document.createElement('p')
+    const target = ref<HTMLElement>(element)
+    const addEventListenerMock = vi.spyOn(element, 'removeEventListener')
 
     const { unmount } = render({
       setup: () => {
@@ -97,46 +88,34 @@ describe('useEventListener', () => {
       },
     })
 
-    const element = document.createElement('p')
-    vi.spyOn(utils, 'toValue').mockReturnValue(element)
-    const addEventListenerMock = vi.spyOn(element, 'removeEventListener')
-
     unmount()
 
     expect(addEventListenerMock).toHaveBeenCalled()
   })
 
   it('changing target automatically reattaches event listener', async () => {
-    const target = ref<HTMLParagraphElement>()
     const originalElement = document.createElement('p')
-    const updatedElement = document.createElement('div')
+    const target = ref<HTMLParagraphElement>(originalElement)
+    const updatedElement = document.createElement('p')
 
-    const currentElement = ref(originalElement)
-    vi.spyOn(utils, 'toValue').mockImplementation(() => currentElement.value)
-
-    const originalAddEventListenerMock = vi.spyOn(originalElement, 'addEventListener')
     const originalRemoveEventListenerMock = vi.spyOn(originalElement, 'removeEventListener')
     const updatedAddEventListenerMock = vi.spyOn(updatedElement, 'addEventListener')
 
     useEventListener(target, 'click', vi.fn())
 
-    currentElement.value = updatedElement
+    target.value = updatedElement
 
     // because reattaching would happen in watch
     await timeout()
 
-    expect(originalAddEventListenerMock).toHaveBeenCalledOnce()
     expect(originalRemoveEventListenerMock).toHaveBeenCalledOnce()
     expect(updatedAddEventListenerMock).toHaveBeenCalledOnce()
   })
 
   it('changing target wont reattach if remove was called', async () => {
-    const target = ref<HTMLParagraphElement>()
     const originalElement = document.createElement('p')
+    const target = ref<HTMLParagraphElement>(originalElement)
     const updatedElement = document.createElement('div')
-
-    const currentElement = ref(originalElement)
-    vi.spyOn(utils, 'toValue').mockImplementation(() => currentElement.value)
 
     const originalAddEventListenerMock = vi.spyOn(originalElement, 'addEventListener')
     const updatedAddEventListenerMock = vi.spyOn(updatedElement, 'addEventListener')
@@ -145,7 +124,7 @@ describe('useEventListener', () => {
 
     remove()
 
-    currentElement.value = updatedElement
+    target.value = updatedElement
 
     // because reattaching would happen in watch
     await timeout()
