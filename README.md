@@ -1,18 +1,22 @@
 # vue-compositions
+
 A collection of reusable vue compositions
 
 ## Installation
-```
+
+```bash
 npm i --save @prefecthq/vue-compositions
 ```
 
 ## Compositions
+
 - [useBoolean](https://github.com/prefecthq/vue-compositions/tree/main/src/useBoolean)
 - [useChildrenAreWrapped](https://github.com/prefecthq/vue-compositions/tree/main/src/useChildrenAreWrapped)
 - [useComputedStyle](https://github.com/prefecthq/vue-compositions/tree/main/src/useComputedStyle)
 - [useDebouncedRef](https://github.com/prefecthq/vue-compositions/tree/main/src/useDebouncedRef)
 - [useElementRect](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementRect)
 - [useElementWidth](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementWidth)
+- [useEventListener](https://github.com/prefecthq/vue-compositions/tree/main/src/useEventListener)
 - [useGlobalEventListener](https://github.com/prefecthq/vue-compositions/tree/main/src/useGlobalEventListener)
 - [useIntersectionObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useIntersectionObserver)
 - [useIsSame](https://github.com/prefecthq/vue-compositions/tree/main/src/useIsSame)
