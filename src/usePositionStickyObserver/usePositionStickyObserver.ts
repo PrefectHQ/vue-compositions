@@ -1,6 +1,7 @@
-import { Ref, computed, onMounted, ref, toValue } from 'vue'
+import { Ref, computed, onMounted, ref } from 'vue'
 import { MaybeRefOrGetter } from '@/types/maybe'
 import { useIntersectionObserver } from '@/useIntersectionObserver'
+import { toValue } from '@/utilities/vue'
 
 export type UsePositionStickyObserverResponse = {
   stuck: Ref<boolean>,
