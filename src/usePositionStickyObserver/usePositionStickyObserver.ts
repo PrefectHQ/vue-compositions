@@ -9,7 +9,7 @@ export type UsePositionStickyObserverResponse = {
 
 export type UsePositionStickyObserverOptions = {
   rootMargin?: string,
-  boundingElement?: MaybeRefOrGetter<HTMLElement | undefined>,
+  boundingElement?: HTMLElement,
 }
 
 const usePositionStickyObserverDefaultOptions = {
@@ -22,21 +22,19 @@ export function usePositionStickyObserver(
   options?: MaybeRefOrGetter<UsePositionStickyObserverOptions>,
 ): UsePositionStickyObserverResponse {
   const elementRef = computed(() => toValue(element))
-  const optionsRef = computed(() => {
-    if (!options) {
-      return usePositionStickyObserverDefaultOptions
-    }
+  const stuck = ref(false)
 
-    const { rootMargin, boundingElement } = toValue(options)
-    const boundingElementRef = toValue(boundingElement)
+  const observerOptions = computed(() => {
+    const { rootMargin: rootMarginOption, boundingElement: boundingElementOption } = toValue(options ?? {})
+    const rootMargin = rootMarginOption ?? usePositionStickyObserverDefaultOptions.rootMargin
+    const root = boundingElementOption ?? usePositionStickyObserverDefaultOptions.boundingElement
 
     return {
-      rootMargin: rootMargin ?? usePositionStickyObserverDefaultOptions.rootMargin,
-      boundingElement: boundingElementRef ?? usePositionStickyObserverDefaultOptions.boundingElement,
+      threshold: [1],
+      rootMargin,
+      root,
     }
   })
-
-  const stuck = ref(false)
 
   function intersect(entries: IntersectionObserverEntry[]): void {
     entries.forEach(entry => {
@@ -44,11 +42,7 @@ export function usePositionStickyObserver(
     })
   }
 
-  const { observe } = useIntersectionObserver(intersect, computed(() => ({
-    threshold: [1],
-    rootMargin: optionsRef.value.rootMargin,
-    root: optionsRef.value.boundingElement,
-  })))
+  const { observe } = useIntersectionObserver(intersect, observerOptions)
 
   onMounted(() => observe(elementRef))
 
