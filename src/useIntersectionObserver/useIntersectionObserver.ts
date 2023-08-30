@@ -1,11 +1,12 @@
 import { onMounted, onUnmounted, ref, Ref, unref, watch } from 'vue'
-import { MaybeRef } from '@/types/maybe'
+import { MaybeRef, MaybeRefOrGetter } from '@/types/maybe'
+import { toValue } from '@/utilities/vue'
 
 export type UseIntersectionObserverResponse = {
-  observe: (element: Ref<HTMLElement | undefined>) => void,
-  unobserve: (element: Ref<HTMLElement | undefined>) => void,
+  observe: (element: MaybeRefOrGetter<HTMLElement | undefined>) => void,
+  unobserve: (element: MaybeRefOrGetter<HTMLElement | undefined>) => void,
   disconnect: () => void,
-  check: (element: Ref<HTMLElement | undefined>) => void,
+  check: (element: MaybeRefOrGetter<HTMLElement | undefined>) => void,
 }
 
 export type UseIntersectionObserverOptions = {
@@ -22,22 +23,23 @@ export function useIntersectionObserver(callback: UseIntersectionObserverCallbac
 
   let intersectionObserver: IntersectionObserver | null = null
 
-  function observe(element: Ref<HTMLElement | undefined>): void {
+  function observe(element: MaybeRefOrGetter<HTMLElement | undefined>): void {
+    const value = toValue(element)
     const observer = getObserver()
 
-    if (element.value) {
-      observer.observe(element.value)
-      elements.add(element.value)
+    if (value) {
+      observer.observe(value)
+      elements.add(value)
     }
-
   }
 
-  function unobserve(element: Ref<HTMLElement | undefined>): void {
+  function unobserve(element: MaybeRefOrGetter<HTMLElement | undefined>): void {
+    const value = toValue(element)
     const observer = getObserver()
 
-    if (element.value) {
-      observer.unobserve(element.value)
-      elements.delete(element.value)
+    if (value) {
+      observer.unobserve(value)
+      elements.delete(value)
     }
   }
 
@@ -56,14 +58,16 @@ export function useIntersectionObserver(callback: UseIntersectionObserverCallbac
     }
   }
 
-  function check(element: Ref<HTMLElement | undefined>): void {
-    if (!element.value) {
+  function check(element: MaybeRefOrGetter<HTMLElement | undefined>): void {
+    const value = toValue(element)
+
+    if (!value) {
       return
     }
 
     const observer = new IntersectionObserver(callback, getOptions(optionsRef.value))
 
-    observer.observe(element.value)
+    observer.observe(value)
 
     setTimeout(() => observer.disconnect(), 100)
   }

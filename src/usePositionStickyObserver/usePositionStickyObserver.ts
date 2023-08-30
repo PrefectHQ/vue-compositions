@@ -1,4 +1,4 @@
-import { Ref, computed, onMounted, ref } from 'vue'
+import { Ref, computed, ref, watch } from 'vue'
 import { MaybeRefOrGetter } from '@/types/maybe'
 import { useIntersectionObserver } from '@/useIntersectionObserver'
 import { toValue } from '@/utilities/vue'
@@ -42,9 +42,12 @@ export function usePositionStickyObserver(
     })
   }
 
-  const { observe } = useIntersectionObserver(intersect, observerOptions)
+  const { observe, unobserve } = useIntersectionObserver(intersect, observerOptions)
 
-  onMounted(() => observe(elementRef))
+  watch(elementRef, (newVal, oldVal) => {
+    unobserve(oldVal)
+    observe(newVal)
+  }, { immediate: true })
 
   return {
     stuck,
