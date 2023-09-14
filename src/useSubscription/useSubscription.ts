@@ -1,9 +1,10 @@
-import { getCurrentScope, onScopeDispose, reactive, unref } from 'vue'
+import { reactive, unref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
 import { mapSubscription } from '@/useSubscription/utilities/subscriptions'
 import { getValidWatchSource } from '@/utilities/getValidWatchSource'
+import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 
 const defaultManager = new Manager()
@@ -47,17 +48,15 @@ export function useSubscription<T extends Action>(...[action, args, optionsArg =
     Object.assign(subscriptionResponse, mapSubscription(newSubscription))
   }, { deep: true })
 
-  if (getCurrentScope()) {
-    onScopeDispose(() => {
-      const { lifecycle = 'component' } = unref(optionsArg)
+  tryOnScopeDispose(() => {
+    const { lifecycle = 'component' } = unref(optionsArg)
 
-      if (lifecycle === 'component') {
-        subscriptionResponse.unsubscribe()
-        unwatchOptions()
-        unwatch()
-      }
-    })
-  }
+    if (lifecycle === 'component') {
+      subscriptionResponse.unsubscribe()
+      unwatchOptions()
+      unwatch()
+    }
+  })
 
   return subscriptionResponse
 }
