@@ -528,7 +528,7 @@ describe('subscribe', () => {
     expect(action).toBeCalledTimes(1)
   })
 
-  it('is retains subscription when reactive options change', async () => {
+  it('is retains subscription when reactive options change', () => {
     vi.useFakeTimers()
 
     const action = vi.fn()
@@ -553,6 +553,22 @@ describe('subscribe', () => {
     vi.advanceTimersByTime(1000)
 
     expect(action).toBeCalledTimes(2)
+  })
+
+  it('unsubscribes nested subscriptions automatically', () => {
+    const manager = new Manager()
+    const action = vi.fn()
+    let childSubscription: UseSubscription<typeof action>
+
+    const subscription = useSubscription((): void => {
+      childSubscription = useSubscription(action)
+    }, [], { manager })
+
+    const spy = vi.spyOn(childSubscription!, 'unsubscribe')
+
+    subscription.unsubscribe()
+
+    expect(spy).toBeCalledTimes(1)
   })
 
 })
