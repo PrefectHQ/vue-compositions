@@ -1,4 +1,4 @@
-import { getCurrentInstance, onUnmounted, reactive, unref } from 'vue'
+import { getCurrentScope, onScopeDispose, reactive, unref } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
@@ -47,8 +47,8 @@ export function useSubscription<T extends Action>(...[action, args, optionsArg =
     Object.assign(subscriptionResponse, mapSubscription(newSubscription))
   }, { deep: true })
 
-  if (getCurrentInstance()) {
-    onUnmounted(() => {
+  if (getCurrentScope()) {
+    onScopeDispose(() => {
       const { lifecycle = 'component' } = unref(optionsArg)
 
       if (lifecycle === 'component') {
