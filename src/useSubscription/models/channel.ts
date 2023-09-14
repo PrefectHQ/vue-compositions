@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { isEqual } from 'lodash'
+import { effectScope } from 'vue'
 import Manager from '@/useSubscription/models/manager'
 import Subscription from '@/useSubscription/models/subscription'
 import {
@@ -43,6 +44,7 @@ export default class Channel<T extends Action = Action> {
   private readonly action: T
   private readonly args: ActionArguments<T>
   private readonly subscriptions: Map<number, Subscription<T>> = new Map()
+  private readonly scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
   private _loading: boolean = false
@@ -163,6 +165,7 @@ export default class Channel<T extends Action = Action> {
 
     if (this.subscriptions.size == 0) {
       this.manager.deleteChannel(this.signature)
+      this.scope.stop()
     }
   }
 
@@ -175,7 +178,7 @@ export default class Channel<T extends Action = Action> {
     this.setInterval()
 
     try {
-      this.response = await this.action(...args)
+      this.response = await this.scope.run(() => this.action(...args))
       this.errored = false
       this.error = null
     } catch (error) {
