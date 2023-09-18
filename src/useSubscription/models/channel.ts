@@ -194,11 +194,9 @@ export default class Channel<T extends Action = Action> {
   }
 
   public refresh(): Promise<void> {
-    const previousScope = this.scope
+    this.scope.stop()
     this.scope = effectScope()
     const response = this.execute()
-
-    previousScope.stop()
 
     return response
   }
