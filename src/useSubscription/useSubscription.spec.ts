@@ -571,14 +571,14 @@ describe('subscribe', () => {
     expect(spy).toBeCalledTimes(1)
   })
 
-  it('changing args unsubscribes nested subscriptions automatically', async () => {
+  it('unsubscribes nested subscriptions when changing args', async () => {
     const number = ref(0)
     const manager = new Manager()
     const action = vi.fn()
     let childSubscription: UseSubscription<typeof action>
 
     useSubscription((number: number): number => {
-      childSubscription = useSubscription(action)
+      childSubscription = useSubscription(action, [], { manager })
       return number
     }, [number], { manager })
 
@@ -589,6 +589,22 @@ describe('subscribe', () => {
     await timeout()
 
     expect(spy).toBeCalledTimes(1)
+  })
+
+  it('it refreshes nested subscriptions when calling refresh', async () => {
+    const action = vi.fn()
+    const manager = new Manager()
+    const subscription = useSubscription((): void => {
+      useSubscription(action, [], { manager })
+    }, [], { manager })
+
+    await timeout()
+
+    subscription.refresh()
+
+    await timeout()
+
+    expect(action).toBeCalledTimes(2)
   })
 
 })

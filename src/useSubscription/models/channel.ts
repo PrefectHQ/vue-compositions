@@ -44,7 +44,7 @@ export default class Channel<T extends Action = Action> {
   private readonly action: T
   private readonly args: ActionArguments<T>
   private readonly subscriptions: Map<number, Subscription<T>> = new Map()
-  private readonly scope = effectScope()
+  private scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
   private _loading: boolean = false
@@ -193,6 +193,14 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
+  public refresh(): Promise<void> {
+    this.scope.stop()
+    this.scope = effectScope()
+    const response = this.execute()
+
+    return response
+  }
+
   public isSubscribed(id: number): boolean {
     return this.subscriptions.has(id)
   }
@@ -217,6 +225,6 @@ export default class Channel<T extends Action = Action> {
     const sinceLastRun = Date.now() - this.lastExecution
     const timeTillNextExecution = this.interval - sinceLastRun
 
-    this.timer = setTimeout(() => this.execute(), timeTillNextExecution)
+    this.timer = setTimeout(() => this.refresh(), timeTillNextExecution)
   }
 }

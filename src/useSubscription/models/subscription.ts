@@ -36,7 +36,7 @@ export default class Subscription<T extends Action> {
   }
 
   public async refresh(): Promise<void> {
-    await this.channel.execute()
+    await this.channel.refresh()
   }
 
   public unsubscribe(): void {
