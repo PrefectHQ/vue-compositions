@@ -37,7 +37,7 @@ export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteP
     return useRouteQueryParam(key, StringRouteParam, formatterOrDefaultValue)
   }
 
-  const query = useRouteQuery()
+  const { query } = useRouteQuery()
   const multiple = Array.isArray(formatterOrDefaultValue)
   const [formatter] = asArray(formatterOrDefaultValue)
   const defaultValue = maybeDefaultValue
