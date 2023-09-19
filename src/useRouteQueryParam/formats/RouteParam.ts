@@ -1,5 +1,4 @@
-import { LocationQueryValue } from 'vue-router'
-import { UseRouteQuery } from '@/useRouteQuery/useRouteQuery'
+import { LocationQuery, LocationQueryValue } from 'vue-router'
 import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
@@ -41,12 +40,12 @@ export abstract class RouteParam<T> {
     this.multiple = multiple || Array.isArray(defaultValue)
   }
 
-  public get(routeQuery: UseRouteQuery): T | T[] | undefined {
-    if (!(this.key in routeQuery.query)) {
+  public get(query: LocationQuery): T | T[] | undefined {
+    if (!(this.key in query)) {
       return this.defaultValue
     }
 
-    const strings = asArray(routeQuery.get(this.key))
+    const strings = asArray(query[this.key])
     const values = strings.map(value => this.safeParseValue(value)).filter(isNotInvalidRouteParamValue)
 
     if (this.multiple) {
@@ -58,25 +57,28 @@ export abstract class RouteParam<T> {
     return first
   }
 
-  public set(routeQuery: UseRouteQuery, value: T | T[] | undefined): void {
+  public set(query: LocationQuery, value: T | T[] | undefined): void {
     if (value === undefined) {
-      return routeQuery.remove(this.key)
+      delete query[this.key]
+      return
     }
 
     const values = asArray(value)
     const strings = values.map(value => this.safeFormatValue(value)).filter(isNotInvalidRouteParamValue)
 
     if (strings.length === 0) {
-      return routeQuery.remove(this.key)
+      delete query[this.key]
+      return
     }
 
     if (this.multiple) {
-      return routeQuery.set(this.key, strings)
+      query[this.key] = strings
+      return
     }
 
     const [first] = strings
 
-    routeQuery.set(this.key, first)
+    query[this.key] = first
   }
 
   private safeParseValue(value: LocationQueryValue): T | InvalidRouteParamValue {
