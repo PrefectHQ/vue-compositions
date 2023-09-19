@@ -25,7 +25,7 @@ export function useRouteQueryParams<T extends AnyRecord>(schema: RouteQueryParam
   return getSchemaRouteQueryParams(schema, defaultValue, prefix)
 }
 
-function isRouteParamSchema<T extends AnyRecord>(value: RouteQueryParamsSchema<T> | unknown): value is RouteQueryParamsSchema<T> {
+export function isRouteParamSchema<T extends AnyRecord>(value: RouteQueryParamsSchema<T> | unknown): value is RouteQueryParamsSchema<T> {
   return !isRouteParamClass(value)
 }
 
