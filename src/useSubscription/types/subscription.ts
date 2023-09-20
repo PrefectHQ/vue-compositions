@@ -11,6 +11,7 @@ export type SubscriptionOptions = {
   interval?: number,
   manager?: Manager,
   lifecycle?: 'component' | 'app',
+  onError?: (error: unknown) => void,
 }
 
 export type SubscriptionPromise<T extends Action> = Promise<Omit<UseSubscription<T>, 'promise'> & { response: ActionResponse<T> }>

@@ -68,8 +68,6 @@ export default class Channel<T extends Action = Action> {
     return Math.min(...intervals)
   }
 
-  // conflicting rules
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public get response(): ActionResponse<T> | undefined {
     return this._response
   }
@@ -86,8 +84,6 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  // conflicting rules
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public get executed(): boolean {
     return this._executed
   }
@@ -100,8 +96,6 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  // conflicting rules
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public get loading(): boolean {
     return this._loading
   }
@@ -114,8 +108,6 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  // conflicting rules
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public get errored(): boolean {
     return this._errored
   }
@@ -128,8 +120,6 @@ export default class Channel<T extends Action = Action> {
     }
   }
 
-  // conflicting rules
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public get error(): unknown {
     return this._error
   }
@@ -185,6 +175,7 @@ export default class Channel<T extends Action = Action> {
       this.errored = true
       this.error = error
       this.clearTimer()
+      this.onError(error)
 
       console.error(error)
     } finally {
@@ -226,5 +217,11 @@ export default class Channel<T extends Action = Action> {
     const timeTillNextExecution = this.interval - sinceLastRun
 
     this.timer = setTimeout(() => this.refresh(), timeTillNextExecution)
+  }
+
+  private onError(error: unknown): void {
+    for (const subscription of this.subscriptions.values()) {
+      subscription.options.onError?.(error)
+    }
   }
 }
