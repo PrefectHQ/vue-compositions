@@ -607,4 +607,19 @@ describe('subscribe', () => {
     expect(action).toBeCalledTimes(2)
   })
 
+  it('calls the onError callback when the action errors', async () => {
+    const error = new Error()
+    const onError = vi.fn()
+    const action = (): void => {
+      throw error
+    }
+
+    uniqueSubscribe(action, [], { onError })
+
+    await timeout()
+
+    expect(onError).toBeCalledTimes(1)
+    expect(onError).toBeCalledWith(error)
+  })
+
 })
