@@ -36,7 +36,7 @@ export class StorageManager {
     }
 
     try {
-      return JSON.parse(value) as T
+      return JSON.parse(value) as T | null ?? defaultValue
     } catch {
       console.error(`Unable to parse current value for key ${key}, returning default instead`)
       return defaultValue
