@@ -4,6 +4,7 @@ import { UseValidation } from '@/useValidation/useValidation'
 export type UseValidationObserver = {
   register: ValidationObserverRegister,
   validate: () => Promise<boolean>,
+  reset: () => void,
   valid: ComputedRef<boolean>,
   invalid: ComputedRef<boolean>,
   errors: ComputedRef<string[]>,
@@ -46,6 +47,14 @@ export function useValidationObserver(): UseValidationObserver {
     return Promise.all(promises).then(results => results.every(valid => valid))
   }
 
+  const reset = (): void => {
+    const keys = Reflect.ownKeys(validations) as symbol[]
+
+    for (const key of keys) {
+      validations[key].reset()
+    }
+  }
+
   const errors = computed<string[]>(() => {
     const keys = Reflect.ownKeys(validations) as symbol[]
     return keys
@@ -76,6 +85,7 @@ export function useValidationObserver(): UseValidationObserver {
     invalid,
     pending,
     validate,
+    reset,
     register,
   }
 
