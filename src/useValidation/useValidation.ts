@@ -21,9 +21,11 @@ export type ValidateMethodOptions = {
 }
 
 export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
+export type ResetMethod = () => void
 
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
+  reset: ResetMethod,
   state: UseValidationState,
 }
 
@@ -98,6 +100,12 @@ export function useValidation<T>(
     return valid.value
   }
 
+  const reset: ResetMethod = () => {
+    error.value = ''
+    pending.value = false
+    validated.value = false
+  }
+
   const state = reactive({
     valid,
     invalid,
@@ -113,6 +121,7 @@ export function useValidation<T>(
     pending,
     validated,
     validate,
+    reset,
     state,
   }
 

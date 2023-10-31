@@ -38,4 +38,25 @@ describe('useValidation', () => {
       expect(error.value).toBe('Number must be greater than 0')
     })
   })
+
+  describe('reset', () => {
+    it('resets the validation state', async () => {
+      const { state, validate, reset } = useValidation(
+        ref(0),
+        'Number',
+        isGreaterThanZero,
+      )
+
+      await validate()
+
+      expect(state.valid).toBe(false)
+      expect(state.error).toBe('Number must be greater than 0')
+
+      reset()
+
+      expect(state.valid).toBe(true)
+      expect(state.error).toBe('')
+      expect(state.validated).toBe(false)
+    })
+  })
 })
