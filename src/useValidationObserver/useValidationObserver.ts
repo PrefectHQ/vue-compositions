@@ -1,10 +1,10 @@
 import { computed, ComputedRef, inject, InjectionKey, onUnmounted, provide, reactive, UnwrapNestedRefs } from 'vue'
-import { UseValidation } from '@/useValidation/useValidation'
+import { ResetMethod, UseValidation } from '@/useValidation/useValidation'
 
 export type UseValidationObserver = {
   register: ValidationObserverRegister,
   validate: () => Promise<boolean>,
-  reset: () => void,
+  reset: ResetMethod,
   valid: ComputedRef<boolean>,
   invalid: ComputedRef<boolean>,
   errors: ComputedRef<string[]>,
@@ -47,11 +47,11 @@ export function useValidationObserver(): UseValidationObserver {
     return Promise.all(promises).then(results => results.every(valid => valid))
   }
 
-  const reset = (): void => {
+  const reset: ResetMethod = (options) => {
     const keys = Reflect.ownKeys(validations) as symbol[]
 
     for (const key of keys) {
-      validations[key].reset()
+      validations[key].reset(options)
     }
   }
 

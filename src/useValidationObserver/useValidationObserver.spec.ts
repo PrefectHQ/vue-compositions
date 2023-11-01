@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { useValidation } from '@/useValidation'
 import { useValidationObserver } from '@/useValidationObserver'
 
@@ -61,28 +61,73 @@ describe('useValidationObserver', () => {
     expect(validationRule2Spy).toHaveBeenCalled()
   })
 
-  it('should reset all observed validation states when reset is called', async () => {
-    const validationRule1Spy = vi.fn().mockResolvedValue(true)
-    const validationRule2Spy = vi.fn().mockResolvedValue('Number must be greater than 0')
-    const wrapper = mount({
-      setup() {
-        const { validate, reset, valid, errors } = useValidationObserver()
-        useValidation(ref(0), validationRule1Spy)
-        useValidation(ref(0), validationRule2Spy)
+  describe('reset', () => {
+    it('should reset all observed validation states when reset is called', async () => {
+      const validationRule1Spy = vi.fn().mockResolvedValue(true)
+      const validationRule2Spy = vi.fn().mockResolvedValue('Number must be greater than 0')
+      const wrapper = mount({
+        setup() {
+          const { validate, reset, valid, errors } = useValidationObserver()
+          useValidation(ref(0), validationRule1Spy)
+          useValidation(ref(0), validationRule2Spy)
 
-        return { validate, reset, valid, errors }
-      },
+          return { validate, reset, valid, errors }
+        },
+      })
+
+      // initial, pre-validated state should be true
+      expect(wrapper.vm.valid).toBe(true)
+
+      await wrapper.vm.validate()
+      expect(wrapper.vm.valid).toBe(false)
+      expect(wrapper.vm.errors).toHaveLength(1)
+
+      wrapper.vm.reset()
+      expect(wrapper.vm.valid).toBe(true)
+      expect(wrapper.vm.errors).toHaveLength(0)
     })
 
-    // initial, pre-validated state should be true
-    expect(wrapper.vm.valid).toBe(true)
+    it('should reset and allow the value to be reset without rerunning validations', async () => {
+      const value = ref<number | undefined>(0)
+      // this validator will always fail. testing that calling reset allows the value to be reset without revalidating
+      const validationRuleSpy = vi.fn().mockResolvedValue('Number must be greater than 0')
+      const wrapper = mount({
+        setup() {
+          const { validate, reset, valid, errors } = useValidationObserver()
+          useValidation(value, validationRuleSpy)
 
-    await wrapper.vm.validate()
-    expect(wrapper.vm.valid).toBe(false)
-    expect(wrapper.vm.errors).toHaveLength(1)
+          return { validate, reset, valid, errors }
+        },
+      })
 
-    wrapper.vm.reset()
-    expect(wrapper.vm.valid).toBe(true)
-    expect(wrapper.vm.errors).toHaveLength(0)
+      // initial, pre-validated state should be true
+      expect(wrapper.vm.valid).toBe(true)
+
+      await wrapper.vm.validate()
+      expect(wrapper.vm.valid).toBe(false)
+      expect(wrapper.vm.errors).toHaveLength(1)
+
+      wrapper.vm.reset({ skipNextValidateOnChange: true })
+      expect(wrapper.vm.valid).toBe(true)
+      expect(wrapper.vm.errors).toHaveLength(0)
+
+      validationRuleSpy.mockClear()
+
+      value.value = undefined
+      await nextTick()
+
+      expect(validationRuleSpy).not.toHaveBeenCalled()
+      expect(wrapper.vm.valid).toBe(true)
+      expect(wrapper.vm.errors).toHaveLength(0)
+
+      validationRuleSpy.mockClear()
+      // the next value change should trigger validation
+      value.value = 1
+      await nextTick()
+      await new Promise(setImmediate)
+
+      expect(validationRuleSpy).toHaveBeenCalled()
+      expect(wrapper.vm.valid).toBe(false)
+    })
   })
 })

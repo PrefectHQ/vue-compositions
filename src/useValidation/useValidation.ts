@@ -21,7 +21,16 @@ export type ValidateMethodOptions = {
 }
 
 export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
-export type ResetMethod = () => void
+
+export type ResetMethodOptions = {
+  /**
+   * If true, the next call to validate will not be called.
+   * This allows you to reset validation state and then reset the value
+   * without triggering another validation.
+   */
+  skipNextValidateOnChange?: boolean,
+}
+export type ResetMethod = (options?: ResetMethodOptions) => void
 
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
@@ -100,10 +109,15 @@ export function useValidation<T>(
     return valid.value
   }
 
-  const reset: ResetMethod = () => {
+  let skipNextValidateOnChange = false
+  const reset: ResetMethod = (options) => {
     error.value = ''
     pending.value = false
     validated.value = false
+
+    if (options?.skipNextValidateOnChange) {
+      skipNextValidateOnChange = true
+    }
   }
 
   const state = reactive({
@@ -129,6 +143,11 @@ export function useValidation<T>(
 
   watch(valueRef, (newValue, oldValue) => {
     if (!mounted) {
+      return
+    }
+
+    if (skipNextValidateOnChange) {
+      skipNextValidateOnChange = false
       return
     }
 
