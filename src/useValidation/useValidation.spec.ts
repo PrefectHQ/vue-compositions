@@ -45,12 +45,12 @@ describe('useValidation', () => {
 
     it('triggers automatically when the value changes', async () => {
       const theValue = ref(0)
-      const validationSpy = vi.fn().mockResolvedValue('Validation did not pass')
+      const validationRule = vi.fn().mockResolvedValue('Validation did not pass')
       const wrapper = mount({
         setup() {
           const { valid, error } = useValidation(
             theValue,
-            validationSpy,
+            validationRule,
           )
 
           return { valid, error }
@@ -59,13 +59,13 @@ describe('useValidation', () => {
 
       expect(wrapper.vm.valid).toBe(true)
       expect(wrapper.vm.error).toBe('')
-      expect(validationSpy).not.toHaveBeenCalled()
+      expect(validationRule).not.toHaveBeenCalled()
 
       theValue.value = 1
       await nextTick()
       await flushPromises()
 
-      expect(validationSpy).toHaveBeenCalled()
+      expect(validationRule).toHaveBeenCalled()
       expect(wrapper.vm.error).toBe('Validation did not pass')
       expect(wrapper.vm.valid).toBe(false)
     })

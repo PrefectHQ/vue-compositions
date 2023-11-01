@@ -6,11 +6,11 @@ import { useValidationObserver } from '@/useValidationObserver'
 
 describe('useValidationObserver', () => {
   it('should observe a single useValidation', async () => {
-    const validationSpy = vi.fn().mockResolvedValue(true)
+    const validationRule = vi.fn().mockResolvedValue(true)
     const wrapper = mount({
       setup() {
         const { validate } = useValidationObserver()
-        useValidation(ref(0), validationSpy)
+        useValidation(ref(0), validationRule)
         return { validate }
       },
     })
@@ -18,17 +18,17 @@ describe('useValidationObserver', () => {
     const result = await wrapper.vm.validate()
 
     expect(result).toBe(true)
-    expect(validationSpy).toHaveBeenCalled()
+    expect(validationRule).toHaveBeenCalled()
   })
 
   it('should observe multiple useValidations', async () => {
-    const validationSpy1 = vi.fn().mockResolvedValue(true)
-    const validationSpy2 = vi.fn().mockResolvedValue(true)
+    const validationRule1 = vi.fn().mockResolvedValue(true)
+    const validationRule2 = vi.fn().mockResolvedValue(true)
     const wrapper = mount({
       setup() {
         const { validate } = useValidationObserver()
-        useValidation(ref(0), validationSpy1)
-        useValidation(ref(0), validationSpy2)
+        useValidation(ref(0), validationRule1)
+        useValidation(ref(0), validationRule2)
 
         return { validate }
       },
@@ -37,8 +37,8 @@ describe('useValidationObserver', () => {
     const result = await wrapper.vm.validate()
 
     expect(result).toBe(true)
-    expect(validationSpy1).toHaveBeenCalled()
-    expect(validationSpy2).toHaveBeenCalled()
+    expect(validationRule1).toHaveBeenCalled()
+    expect(validationRule2).toHaveBeenCalled()
   })
 
   it('should observe multiple useValidations and be invalid if any does not pass', async () => {
@@ -63,13 +63,13 @@ describe('useValidationObserver', () => {
 
   describe('reset', () => {
     it('should reset all observed validation states when reset is called', async () => {
-      const validationRule1Spy = vi.fn().mockResolvedValue(true)
-      const validationRule2Spy = vi.fn().mockResolvedValue('Number must be greater than 0')
+      const validationRule1 = vi.fn().mockResolvedValue(true)
+      const validationRule2 = vi.fn().mockResolvedValue('Number must be greater than 0')
       const wrapper = mount({
         setup() {
           const { validate, reset, valid, errors } = useValidationObserver()
-          useValidation(ref(0), validationRule1Spy)
-          useValidation(ref(0), validationRule2Spy)
+          useValidation(ref(0), validationRule1)
+          useValidation(ref(0), validationRule2)
 
           return { validate, reset, valid, errors }
         },
@@ -90,11 +90,11 @@ describe('useValidationObserver', () => {
     it('should reset and allow the value to be reset without rerunning validations', async () => {
       const value = ref<number | undefined>(0)
       // this validator will always fail. testing that calling reset allows the value to be reset without revalidating
-      const validationRuleSpy = vi.fn().mockResolvedValue('Number must be greater than 0')
+      const validationRule = vi.fn().mockResolvedValue('Number must be greater than 0')
       const wrapper = mount({
         setup() {
           const { validate, reset, valid, errors } = useValidationObserver()
-          useValidation(value, validationRuleSpy)
+          useValidation(value, validationRule)
 
           return { validate, reset, valid, errors }
         },
@@ -111,22 +111,22 @@ describe('useValidationObserver', () => {
       expect(wrapper.vm.valid).toBe(true)
       expect(wrapper.vm.errors).toHaveLength(0)
 
-      validationRuleSpy.mockClear()
+      validationRule.mockClear()
 
       value.value = undefined
       await nextTick()
 
-      expect(validationRuleSpy).not.toHaveBeenCalled()
+      expect(validationRule).not.toHaveBeenCalled()
       expect(wrapper.vm.valid).toBe(true)
       expect(wrapper.vm.errors).toHaveLength(0)
 
-      validationRuleSpy.mockClear()
+      validationRule.mockClear()
       // the next value change should trigger validation
       value.value = 1
       await nextTick()
       await new Promise(setImmediate)
 
-      expect(validationRuleSpy).toHaveBeenCalled()
+      expect(validationRule).toHaveBeenCalled()
       expect(wrapper.vm.valid).toBe(false)
     })
   })
