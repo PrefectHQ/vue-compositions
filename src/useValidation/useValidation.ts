@@ -35,6 +35,8 @@ export type ResetMethod = (options?: ResetMethodOptions) => void
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
   reset: ResetMethod,
+  pause: () => void,
+  resume: () => void,
   state: UseValidationState,
 }
 
@@ -120,6 +122,15 @@ export function useValidation<T>(
     }
   }
 
+  let paused = false
+  const pause = (): void => {
+    paused = true
+  }
+
+  const resume = (): void => {
+    paused = false
+  }
+
   const state = reactive({
     valid,
     invalid,
@@ -136,6 +147,8 @@ export function useValidation<T>(
     validated,
     validate,
     reset,
+    pause,
+    resume,
     state,
   }
 
@@ -148,6 +161,10 @@ export function useValidation<T>(
 
     if (skipNextValidateOnChange) {
       skipNextValidateOnChange = false
+      return
+    }
+
+    if (paused) {
       return
     }
 

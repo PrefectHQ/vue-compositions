@@ -71,6 +71,45 @@ describe('useValidation', () => {
     })
   })
 
+  describe('pause and resume', () => {
+    it('prevents validation from running when paused', async () => {
+      const theValue = ref(0)
+      const validationRule = vi.fn().mockResolvedValue('Validation did not pass')
+      const wrapper = mount({
+        setup() {
+          const { valid, error, pause, resume } = useValidation(
+            theValue,
+            validationRule,
+          )
+
+          return { valid, error, pause, resume }
+        },
+      })
+
+      expect(wrapper.vm.valid).toBe(true)
+      expect(wrapper.vm.error).toBe('')
+      expect(validationRule).not.toHaveBeenCalled()
+
+      wrapper.vm.pause()
+      theValue.value = 1
+      await nextTick()
+      await flushPromises()
+
+      expect(validationRule).not.toHaveBeenCalled()
+      expect(wrapper.vm.error).toBe('')
+      expect(wrapper.vm.valid).toBe(true)
+
+      wrapper.vm.resume()
+      theValue.value = 2
+      await nextTick()
+      await flushPromises()
+
+      expect(validationRule).toHaveBeenCalled()
+      expect(wrapper.vm.error).toBe('Validation did not pass')
+      expect(wrapper.vm.valid).toBe(false)
+    })
+  })
+
   describe('reset', () => {
     it('resets the validation state', async () => {
       const { state, validate, reset } = useValidation(
@@ -91,7 +130,7 @@ describe('useValidation', () => {
       expect(state.validated).toBe(false)
     })
 
-    it('resets the validation state and optionally skips the next onChange validate', async () => {
+    it('resets the validation state and optionally allows the value to be reset without revalidating', async () => {
       const theValue = ref(0)
       async function updateTheValueAndWaitForEffects(value: number): Promise<void> {
         theValue.value = value
@@ -100,12 +139,12 @@ describe('useValidation', () => {
       }
       const wrapper = mount({
         setup() {
-          const { state, reset } = useValidation(
+          const { state, reset, pause, resume } = useValidation(
             theValue,
             isGreaterThanZero,
           )
 
-          return { state, reset }
+          return { state, reset, pause, resume }
         },
       })
       expect(wrapper.vm.state.valid).toBe(true)
@@ -125,6 +164,7 @@ describe('useValidation', () => {
       expect(wrapper.vm.state.valid).toBe(true)
 
       wrapper.vm.reset({ skipNextValidateOnChange: true })
+      wrapper.vm.reset()
       expect(wrapper.vm.state.valid).toBe(true)
 
       await updateTheValueAndWaitForEffects(0)
