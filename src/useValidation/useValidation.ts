@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, WatchStopHandle } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
 import { isValidationAbortedError } from '@/useValidation/ValidationAbortedError'
@@ -111,27 +111,25 @@ export function useValidation<T>(
     return valid.value
   }
 
-  let resetting = false
   const reset: ResetMethod = (resetCallback) => {
     error.value = ''
     pending.value = false
     validated.value = false
 
     if (resetCallback) {
-      // pause()
-      resetting = true
+      pause()
       resetCallback()
-      // resume()
+      resume()
     }
   }
 
-  let paused = false
   const pause = (): void => {
-    paused = true
+    stopWatch?.()
+    stopWatch = undefined
   }
 
   const resume = (): void => {
-    paused = false
+    startWatcher()
   }
 
   const state = reactive({
@@ -157,26 +155,21 @@ export function useValidation<T>(
 
   let mounted = false
 
-  watch(valueRef, (newValue, oldValue) => {
-    if (!mounted) {
-      return
-    }
+  let stopWatch: WatchStopHandle | undefined
+  function startWatcher(): void {
+    stopWatch = watch(valueRef, (newValue, oldValue) => {
+      if (!mounted) {
+        return
+      }
 
-    if (paused) {
-      return
-    }
+      if (isSame(newValue, oldValue)) {
+        return
+      }
 
-    if (resetting) {
-      resetting = false
-      return
-    }
-
-    if (isSame(newValue, oldValue)) {
-      return
-    }
-
-    validate({ source: 'validator' })
-  }, { deep: true })
+      validate({ source: 'validator' })
+    }, { deep: true })
+  }
+  startWatcher()
 
   const observer = injectFromSelfOrAncestor(VALIDATION_OBSERVER_INJECTION_KEY)
 
@@ -189,6 +182,7 @@ export function useValidation<T>(
   })
 
   onUnmounted(() => {
+    stopWatch?.()
     unregister?.()
   })
 
