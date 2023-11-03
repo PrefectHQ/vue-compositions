@@ -118,8 +118,11 @@ export function useValidation<T>(
 
     if (resetCallback) {
       pause()
-      resetCallback()
-      resume()
+      try {
+        resetCallback()
+      } finally {
+        resume()
+      }
     }
   }
 

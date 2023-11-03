@@ -170,5 +170,42 @@ describe('useValidation', () => {
       await updateTheValueAndWaitForEffects(-1)
       expect(wrapper.vm.state.valid).toBe(false)
     })
+
+    it('resumes validation if an error occurs in the reset callback', async () => {
+      const theValue = ref(0)
+      const validationRule = vi.fn().mockResolvedValue('Validation did not pass')
+      const wrapper = mount({
+        setup() {
+          const { state, reset } = useValidation(
+            theValue,
+            validationRule,
+          )
+
+          return { state, reset }
+        },
+      })
+
+      expect(wrapper.vm.state.valid).toBe(true)
+      expect(wrapper.vm.state.error).toBe('')
+      expect(validationRule).not.toHaveBeenCalled()
+
+      try {
+        wrapper.vm.reset(() => {
+          theValue.value = 1
+          throw new Error('Something went wrong')
+        })
+      } catch (error) {
+        // ignore
+      }
+      await flushPromises()
+
+      expect(validationRule).not.toHaveBeenCalled()
+      expect(wrapper.vm.state.valid).toBe(true)
+
+      // watcher resumed
+      theValue.value = 2
+      await flushPromises()
+      expect(validationRule).toHaveBeenCalled()
+    })
   })
 })
