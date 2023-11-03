@@ -8,6 +8,10 @@ export function timeout(ms = 0): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+export function flushPromises(): Promise<void> {
+  return new Promise(setImmediate)
+}
+
 export function uniqueSubscribe<T extends Action>(...[action, args, optionsArg = {}]: SubscribeArguments<T>): UseSubscription<T> {
   const options = computed(() => {
     const options = unref(optionsArg)

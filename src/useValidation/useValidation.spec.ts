@@ -2,10 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
 import { ValidationRule, useValidation } from '@/useValidation/useValidation'
-
-function flushPromises(): Promise<void> {
-  return new Promise(setImmediate)
-}
+import { flushPromises } from '@/utilities/tests'
 
 const isGreaterThanZero: ValidationRule<number> = (value, name) => {
   if (value > 0) {
@@ -152,23 +149,26 @@ describe('useValidation', () => {
       await updateTheValueAndWaitForEffects(-1)
       expect(wrapper.vm.state.valid).toBe(false)
 
-      // when skipNextValidateOnChange is not true, changing the value triggers validations again
+      // without the reset callback managing pause/resume, changing the value triggers validations again
       wrapper.vm.reset()
       expect(wrapper.vm.state.valid).toBe(true)
 
       await updateTheValueAndWaitForEffects(0)
       expect(wrapper.vm.state.valid).toBe(false)
 
-      // now try with skipNextValidateOnChange: true
+      // now try with a reset callback
       await updateTheValueAndWaitForEffects(1)
       expect(wrapper.vm.state.valid).toBe(true)
 
-      wrapper.vm.reset({ skipNextValidateOnChange: true })
-      wrapper.vm.reset()
+      wrapper.vm.reset(() => theValue.value = 0)
+      await nextTick()
+      await flushPromises()
+      expect(theValue.value).toBe(0)
       expect(wrapper.vm.state.valid).toBe(true)
 
-      await updateTheValueAndWaitForEffects(0)
-      expect(wrapper.vm.state.valid).toBe(true)
+      // make sure it resumes normal behavior
+      await updateTheValueAndWaitForEffects(-1)
+      expect(wrapper.vm.state.valid).toBe(false)
     })
   })
 })

@@ -47,11 +47,11 @@ export function useValidationObserver(): UseValidationObserver {
     return Promise.all(promises).then(results => results.every(valid => valid))
   }
 
-  const reset: ResetMethod = (options) => {
+  const reset: ResetMethod = (resetCallback) => {
     const keys = Reflect.ownKeys(validations) as symbol[]
 
     for (const key of keys) {
-      validations[key].reset(options)
+      validations[key].reset(resetCallback)
     }
   }
 

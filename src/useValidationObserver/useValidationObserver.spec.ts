@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
 import { useValidation } from '@/useValidation'
 import { useValidationObserver } from '@/useValidationObserver'
+import { flushPromises } from '@/utilities/tests'
 
 describe('useValidationObserver', () => {
   it('should observe a single useValidation', async () => {
@@ -107,14 +108,12 @@ describe('useValidationObserver', () => {
       expect(wrapper.vm.valid).toBe(false)
       expect(wrapper.vm.errors).toHaveLength(1)
 
-      wrapper.vm.reset({ skipNextValidateOnChange: true })
+      validationRule.mockClear()
+      wrapper.vm.reset(() => value.value = undefined)
       expect(wrapper.vm.valid).toBe(true)
       expect(wrapper.vm.errors).toHaveLength(0)
 
-      validationRule.mockClear()
-
-      value.value = undefined
-      await nextTick()
+      await flushPromises()
 
       expect(validationRule).not.toHaveBeenCalled()
       expect(wrapper.vm.valid).toBe(true)
@@ -123,8 +122,7 @@ describe('useValidationObserver', () => {
       validationRule.mockClear()
       // the next value change should trigger validation
       value.value = 1
-      await nextTick()
-      await new Promise(setImmediate)
+      await flushPromises()
 
       expect(validationRule).toHaveBeenCalled()
       expect(wrapper.vm.valid).toBe(false)

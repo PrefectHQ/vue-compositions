@@ -22,15 +22,15 @@ export type ValidateMethodOptions = {
 
 export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
 
-export type ResetMethodOptions = {
+export type ResetMethodParams = [
   /**
    * If true, the next call to validate will not be called.
    * This allows you to reset validation state and then reset the value
    * without triggering another validation.
    */
-  skipNextValidateOnChange?: boolean,
-}
-export type ResetMethod = (options?: ResetMethodOptions) => void
+  resetCallback?: () => void
+]
+export type ResetMethod = (...params: ResetMethodParams) => void
 
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
@@ -111,14 +111,17 @@ export function useValidation<T>(
     return valid.value
   }
 
-  let skipNextValidateOnChange = false
-  const reset: ResetMethod = (options) => {
+  let resetting = false
+  const reset: ResetMethod = (resetCallback) => {
     error.value = ''
     pending.value = false
     validated.value = false
 
-    if (options?.skipNextValidateOnChange) {
-      skipNextValidateOnChange = true
+    if (resetCallback) {
+      // pause()
+      resetting = true
+      resetCallback()
+      // resume()
     }
   }
 
@@ -159,12 +162,12 @@ export function useValidation<T>(
       return
     }
 
-    if (skipNextValidateOnChange) {
-      skipNextValidateOnChange = false
+    if (paused) {
       return
     }
 
-    if (paused) {
+    if (resetting) {
+      resetting = false
       return
     }
 
