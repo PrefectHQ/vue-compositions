@@ -132,6 +132,9 @@ export function useValidation<T>(
   }
 
   const resume = (): void => {
+    if (stopWatch) {
+      return
+    }
     startWatcher()
   }
 
