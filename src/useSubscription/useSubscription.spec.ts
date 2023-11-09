@@ -628,7 +628,21 @@ describe('subscribe', () => {
 
     subscription.refresh()
 
-    expect(true)
+    expect(action).toBeCalledTimes(2)
+  })
+
+  it('response is reactive when using .promise()', async () => {
+    let value = 0
+    const action = (): number => ++value
+    const subscription = await uniqueSubscribe(action).promise()
+
+    expect(subscription.response).toBe(1)
+
+    subscription.refresh()
+
+    await timeout()
+
+    expect(subscription.response).toBe(2)
   })
 
 })
