@@ -17,7 +17,6 @@ describe('useValidation', () => {
     it('sets valid to true when the rules pass', async () => {
       const { valid, error, validate } = useValidation(
         ref(1),
-        'Number',
         isGreaterThanZero,
       )
 
@@ -28,16 +27,17 @@ describe('useValidation', () => {
     })
 
     it('sets valid to false with an error message when the rules do not pass', async () => {
+      const errorMessage = 'Validation did not pass'
+      const validationRule: ValidationRule<number> = () => errorMessage
       const { valid, error, validate } = useValidation(
         ref(0),
-        'Number',
-        isGreaterThanZero,
+        validationRule,
       )
 
       await validate()
 
       expect(valid.value).toBe(false)
-      expect(error.value).toBe('Number must be greater than 0')
+      expect(error.value).toBe(errorMessage)
     })
 
     it('triggers automatically when the value changes', async () => {
@@ -111,14 +111,13 @@ describe('useValidation', () => {
     it('resets the validation state', async () => {
       const { state, validate, reset } = useValidation(
         ref(0),
-        'Number',
-        isGreaterThanZero,
+        () => 'Validation did not pass',
       )
 
       await validate()
 
       expect(state.valid).toBe(false)
-      expect(state.error).toBe('Number must be greater than 0')
+      expect(state.error).toBe('Validation did not pass')
 
       reset()
 
