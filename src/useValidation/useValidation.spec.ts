@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { nextTick, ref } from 'vue'
+import { ref } from 'vue'
 import { ValidationRule, useValidation } from '@/useValidation/useValidation'
 import { flushPromises } from '@/utilities/tests'
 
@@ -59,7 +59,6 @@ describe('useValidation', () => {
       expect(validationRule).not.toHaveBeenCalled()
 
       theValue.value = 1
-      await nextTick()
       await flushPromises()
 
       expect(validationRule).toHaveBeenCalled()
@@ -89,7 +88,6 @@ describe('useValidation', () => {
 
       wrapper.vm.pause()
       theValue.value = 1
-      await nextTick()
       await flushPromises()
 
       expect(validationRule).not.toHaveBeenCalled()
@@ -98,7 +96,6 @@ describe('useValidation', () => {
 
       wrapper.vm.resume()
       theValue.value = 2
-      await nextTick()
       await flushPromises()
 
       expect(validationRule).toHaveBeenCalled()
@@ -130,7 +127,6 @@ describe('useValidation', () => {
       const theValue = ref(0)
       async function updateTheValueAndWaitForEffects(value: number): Promise<void> {
         theValue.value = value
-        await nextTick()
         await flushPromises()
       }
       const wrapper = mount({
@@ -160,7 +156,6 @@ describe('useValidation', () => {
       expect(wrapper.vm.state.valid).toBe(true)
 
       wrapper.vm.reset(() => theValue.value = 0)
-      await nextTick()
       await flushPromises()
       expect(theValue.value).toBe(0)
       expect(wrapper.vm.state.valid).toBe(true)

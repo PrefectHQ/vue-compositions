@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { nextTick, ref } from 'vue'
+import { ref } from 'vue'
 import { useValidation } from '@/useValidation'
 import { useValidationObserver } from '@/useValidationObserver'
 import { flushPromises } from '@/utilities/tests'
