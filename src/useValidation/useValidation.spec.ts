@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { ValidationRule, useValidation } from '@/useValidation/useValidation'
-import { flushPromises } from '@/utilities/tests'
+import { timeout } from '@/utilities/tests'
 
 const isGreaterThanZero: ValidationRule<number> = (value, name) => {
   if (value > 0) {
@@ -59,7 +59,7 @@ describe('useValidation', () => {
       expect(validationRule).not.toHaveBeenCalled()
 
       theValue.value = 1
-      await flushPromises()
+      await timeout()
 
       expect(validationRule).toHaveBeenCalled()
       expect(wrapper.vm.error).toBe('Validation did not pass')
@@ -88,7 +88,7 @@ describe('useValidation', () => {
 
       wrapper.vm.pause()
       theValue.value = 1
-      await flushPromises()
+      await timeout()
 
       expect(validationRule).not.toHaveBeenCalled()
       expect(wrapper.vm.error).toBe('')
@@ -96,7 +96,7 @@ describe('useValidation', () => {
 
       wrapper.vm.resume()
       theValue.value = 2
-      await flushPromises()
+      await timeout()
 
       expect(validationRule).toHaveBeenCalled()
       expect(wrapper.vm.error).toBe('Validation did not pass')
@@ -127,7 +127,7 @@ describe('useValidation', () => {
       const theValue = ref(0)
       async function updateTheValueAndWaitForEffects(value: number): Promise<void> {
         theValue.value = value
-        await flushPromises()
+        await timeout()
       }
       const wrapper = mount({
         setup() {
@@ -156,7 +156,7 @@ describe('useValidation', () => {
       expect(wrapper.vm.state.valid).toBe(true)
 
       wrapper.vm.reset(() => theValue.value = 0)
-      await flushPromises()
+      await timeout()
       expect(theValue.value).toBe(0)
       expect(wrapper.vm.state.valid).toBe(true)
 
@@ -191,14 +191,14 @@ describe('useValidation', () => {
       } catch (error) {
         // ignore
       }
-      await flushPromises()
+      await timeout()
 
       expect(validationRule).not.toHaveBeenCalled()
       expect(wrapper.vm.state.valid).toBe(true)
 
       // watcher resumed
       theValue.value = 2
-      await flushPromises()
+      await timeout()
       expect(validationRule).toHaveBeenCalled()
     })
   })
