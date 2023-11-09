@@ -44,7 +44,7 @@ describe('useValidationObserver', () => {
 
   it('should observe multiple useValidations and be invalid if any does not pass', async () => {
     const validationRule1Spy = vi.fn().mockResolvedValue(true)
-    const validationRule2Spy = vi.fn().mockResolvedValue('Number must be greater than 0')
+    const validationRule2Spy = vi.fn().mockResolvedValue(false)
     const wrapper = mount({
       setup() {
         const { validate } = useValidationObserver()
@@ -65,7 +65,7 @@ describe('useValidationObserver', () => {
   describe('reset', () => {
     it('should reset all observed validation states when reset is called', async () => {
       const validationRule1 = vi.fn().mockResolvedValue(true)
-      const validationRule2 = vi.fn().mockResolvedValue('Number must be greater than 0')
+      const validationRule2 = vi.fn().mockResolvedValue(false)
       const wrapper = mount({
         setup() {
           const { validate, reset, valid, errors } = useValidationObserver()
@@ -91,7 +91,7 @@ describe('useValidationObserver', () => {
     it('should reset and allow the value to be reset without rerunning validations', async () => {
       const value = ref<number | undefined>(0)
       // this validator will always fail. testing that calling reset allows the value to be reset without revalidating
-      const validationRule = vi.fn().mockResolvedValue('Number must be greater than 0')
+      const validationRule = vi.fn().mockResolvedValue(false)
       const wrapper = mount({
         setup() {
           const { validate, reset, valid, errors } = useValidationObserver()
