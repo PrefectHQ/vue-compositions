@@ -622,4 +622,27 @@ describe('subscribe', () => {
     expect(onError).toBeCalledWith(error)
   })
 
+  it('allows refresh to be called when the a subscription is created with .promise()', async () => {
+    const action = vi.fn()
+    const subscription = await uniqueSubscribe(action).promise()
+
+    subscription.refresh()
+
+    expect(action).toBeCalledTimes(2)
+  })
+
+  it('response is reactive when using .promise()', async () => {
+    let value = 0
+    const action = (): number => ++value
+    const subscription = await uniqueSubscribe(action).promise()
+
+    expect(subscription.response).toBe(1)
+
+    subscription.refresh()
+
+    await timeout()
+
+    expect(subscription.response).toBe(2)
+  })
+
 })
