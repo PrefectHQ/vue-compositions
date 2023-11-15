@@ -24,8 +24,7 @@ function factory(): () => UseRouteQuery {
   let interval: ReturnType<typeof setTimeout>
 
   const update = async (): Promise<void> => {
-    const operationsToApply = operations.slice(0)
-    const query = applyQueryOperations(route.query, operationsToApply)
+    const query = applyQueryOperations(route.query, operations)
 
     await router.push({ query })
 
