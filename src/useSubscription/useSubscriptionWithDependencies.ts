@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal'
 import { reactive, ref, Ref, toRaw, watch } from 'vue'
 import { MaybeRef } from '@/types/maybe'
 import { Action, SubscriptionOptions, UseSubscription, ActionArguments, MappedSubscription } from '@/useSubscription/types'
@@ -30,6 +31,10 @@ export function useSubscriptionWithDependencies<T extends Action>(...[action, ar
 
   watch(args, (value: Parameters<T> | null, previousValue: Parameters<T> | null | undefined) => {
     if (value === null && previousValue === undefined) {
+      return
+    }
+
+    if (isEqual(value, previousValue)) {
       return
     }
 
