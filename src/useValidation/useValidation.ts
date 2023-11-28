@@ -24,9 +24,10 @@ export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolea
 
 export type ResetMethodParams = [
   /**
-   * If true, the next call to validate will not be called.
+   * An optional callback that will be called within a pause/resume block.
    * This allows you to reset validation state and then reset the value
-   * without triggering another validation.
+   * without triggering another validation on change.
+   * For example if a value is required, use `reset(() => valueRef.value = undefined)`.
    */
   resetCallback?: () => void
 ]
