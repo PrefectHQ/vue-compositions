@@ -14,9 +14,12 @@ const isGreaterThanZero: ValidationRule<number> = (value, name) => {
 
 describe('useValidation', () => {
   describe('validate', () => {
-    it('sets valid to true when the rules pass', async () => {
+    it.each([
+      { value: 1, valueType: 'plain value' },
+      { value: ref(1), valueType: 'ref' },
+    ])('sets valid to true when the rules pass (with $valueType)', async ({ value }) => {
       const { valid, error, validate } = useValidation(
-        ref(1),
+        value,
         isGreaterThanZero,
       )
 
@@ -26,11 +29,14 @@ describe('useValidation', () => {
       expect(error.value).toBe('')
     })
 
-    it('sets valid to false with an error message when the rules do not pass', async () => {
+    it.each([
+      { value: 0, valueType: 'plain value' },
+      { value: ref(0), valueType: 'ref' },
+    ])('sets valid to false with an error message when the rules do not pass (with $valueType)', async ({ value }) => {
       const errorMessage = 'Validation did not pass'
       const validationRule: ValidationRule<number> = () => errorMessage
       const { valid, error, validate } = useValidation(
-        ref(0),
+        value,
         validationRule,
       )
 

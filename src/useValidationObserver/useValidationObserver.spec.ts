@@ -11,7 +11,7 @@ describe('useValidationObserver', () => {
     const wrapper = mount({
       setup() {
         const { validate } = useValidationObserver()
-        useValidation(ref(0), validationRule)
+        useValidation(0, validationRule)
         return { validate }
       },
     })
@@ -28,8 +28,8 @@ describe('useValidationObserver', () => {
     const wrapper = mount({
       setup() {
         const { validate } = useValidationObserver()
-        useValidation(ref(0), validationRule1)
-        useValidation(ref(0), validationRule2)
+        useValidation(0, validationRule1)
+        useValidation(0, validationRule2)
 
         return { validate }
       },
@@ -48,8 +48,8 @@ describe('useValidationObserver', () => {
     const wrapper = mount({
       setup() {
         const { validate } = useValidationObserver()
-        useValidation(ref(0), validationRule1Spy)
-        useValidation(ref(0), validationRule2Spy)
+        useValidation(0, validationRule1Spy)
+        useValidation(0, validationRule2Spy)
 
         return { validate }
       },
