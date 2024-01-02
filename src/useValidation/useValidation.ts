@@ -1,4 +1,4 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, WatchStopHandle } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
 import { isValidationAbortedError } from '@/useValidation/ValidationAbortedError'
@@ -22,8 +22,22 @@ export type ValidateMethodOptions = {
 
 export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
 
+export type ResetMethodParams = [
+  /**
+   * An optional callback that will be called within a pause/resume block.
+   * This allows you to reset validation state and then reset the value
+   * without triggering another validation on change.
+   * For example if a value is required, use `reset(() => valueRef.value = undefined)`.
+   */
+  resetCallback?: () => void
+]
+export type ResetMethod = (...params: ResetMethodParams) => void
+
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
+  reset: ResetMethod,
+  pause: () => void,
+  resume: () => void,
   state: UseValidationState,
 }
 
@@ -98,6 +112,33 @@ export function useValidation<T>(
     return valid.value
   }
 
+  const reset: ResetMethod = (resetCallback) => {
+    error.value = ''
+    pending.value = false
+    validated.value = false
+
+    if (resetCallback) {
+      pause()
+      try {
+        resetCallback()
+      } finally {
+        resume()
+      }
+    }
+  }
+
+  const pause = (): void => {
+    stopWatch?.()
+    stopWatch = undefined
+  }
+
+  const resume = (): void => {
+    if (stopWatch) {
+      return
+    }
+    startWatcher()
+  }
+
   const state = reactive({
     valid,
     invalid,
@@ -113,22 +154,29 @@ export function useValidation<T>(
     pending,
     validated,
     validate,
+    reset,
+    pause,
+    resume,
     state,
   }
 
   let mounted = false
 
-  watch(valueRef, (newValue, oldValue) => {
-    if (!mounted) {
-      return
-    }
+  let stopWatch: WatchStopHandle | undefined
+  function startWatcher(): void {
+    stopWatch = watch(valueRef, (newValue, oldValue) => {
+      if (!mounted) {
+        return
+      }
 
-    if (isSame(newValue, oldValue)) {
-      return
-    }
+      if (isSame(newValue, oldValue)) {
+        return
+      }
 
-    validate({ source: 'validator' })
-  }, { deep: true })
+      validate({ source: 'validator' })
+    }, { deep: true })
+  }
+  startWatcher()
 
   const observer = injectFromSelfOrAncestor(VALIDATION_OBSERVER_INJECTION_KEY)
 
@@ -141,6 +189,7 @@ export function useValidation<T>(
   })
 
   onUnmounted(() => {
+    stopWatch?.()
     unregister?.()
   })
 
