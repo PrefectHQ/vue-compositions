@@ -198,14 +198,11 @@ describe('useValidation', () => {
       expect(wrapper.vm.state.error).toBe('')
       expect(validationRule).not.toHaveBeenCalled()
 
-      try {
-        wrapper.vm.reset(() => {
-          theValue.value = 1
-          throw new Error('Something went wrong')
-        })
-      } catch (error) {
-        // ignore
-      }
+      expect(() => wrapper.vm.reset(() => {
+        theValue.value = 1
+        throw new Error('Something went wrong')
+      }),
+      ).toThrowError('Something went wrong')
       await timeout()
 
       expect(validationRule).not.toHaveBeenCalled()
