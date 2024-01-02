@@ -1,6 +1,7 @@
+/* eslint-disable vue/one-component-per-file */
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { ValidationRule, useValidation } from '@/useValidation/useValidation'
 import { timeout } from '@/utilities/tests'
 
@@ -49,7 +50,9 @@ describe('useValidation', () => {
     it('triggers automatically when the value changes', async () => {
       const theValue = ref(0)
       const validationRule = vi.fn().mockResolvedValue('Validation did not pass')
-      const wrapper = mount({
+      const wrapper = mount(defineComponent({
+        name: 'TestComponent',
+        expose: ['valid', 'error'],
         setup() {
           const { valid, error } = useValidation(
             theValue,
@@ -58,7 +61,7 @@ describe('useValidation', () => {
 
           return { valid, error }
         },
-      })
+      }))
 
       expect(wrapper.vm.valid).toBe(true)
       expect(wrapper.vm.error).toBe('')
@@ -77,7 +80,9 @@ describe('useValidation', () => {
     it('prevents validation from running when paused', async () => {
       const theValue = ref(0)
       const validationRule = vi.fn().mockResolvedValue('Validation did not pass')
-      const wrapper = mount({
+      const wrapper = mount(defineComponent({
+        name: 'TestComponent',
+        expose: ['valid', 'error', 'pause', 'resume'],
         setup() {
           const { valid, error, pause, resume } = useValidation(
             theValue,
@@ -86,7 +91,7 @@ describe('useValidation', () => {
 
           return { valid, error, pause, resume }
         },
-      })
+      }))
 
       expect(wrapper.vm.valid).toBe(true)
       expect(wrapper.vm.error).toBe('')
@@ -135,7 +140,9 @@ describe('useValidation', () => {
         theValue.value = value
         await timeout()
       }
-      const wrapper = mount({
+      const wrapper = mount(defineComponent({
+        name: 'TestComponent',
+        expose: ['state', 'reset', 'pause', 'resume'],
         setup() {
           const { state, reset, pause, resume } = useValidation(
             theValue,
@@ -144,7 +151,7 @@ describe('useValidation', () => {
 
           return { state, reset, pause, resume }
         },
-      })
+      }))
       expect(wrapper.vm.state.valid).toBe(true)
 
       await updateTheValueAndWaitForEffects(-1)
@@ -174,7 +181,9 @@ describe('useValidation', () => {
     it('resumes validation if an error occurs in the reset callback', async () => {
       const theValue = ref(0)
       const validationRule = vi.fn().mockResolvedValue('Validation did not pass')
-      const wrapper = mount({
+      const wrapper = mount(defineComponent({
+        name: 'TestComponent',
+        expose: ['state', 'reset'],
         setup() {
           const { state, reset } = useValidation(
             theValue,
@@ -183,7 +192,7 @@ describe('useValidation', () => {
 
           return { state, reset }
         },
-      })
+      }))
 
       expect(wrapper.vm.state.valid).toBe(true)
       expect(wrapper.vm.state.error).toBe('')

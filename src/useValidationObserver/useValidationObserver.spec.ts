@@ -1,6 +1,7 @@
+/* eslint-disable vue/one-component-per-file */
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useValidation } from '@/useValidation'
 import { useValidationObserver } from '@/useValidationObserver'
 import { timeout } from '@/utilities/tests'
@@ -8,13 +9,15 @@ import { timeout } from '@/utilities/tests'
 describe('useValidationObserver', () => {
   it('should observe a single useValidation', async () => {
     const validationRule = vi.fn().mockResolvedValue(true)
-    const wrapper = mount({
+    const wrapper = mount(defineComponent({
+      name: 'TestComponent',
+      expose: ['validate'],
       setup() {
         const { validate } = useValidationObserver()
         useValidation(0, validationRule)
         return { validate }
       },
-    })
+    }))
 
     const result = await wrapper.vm.validate()
 
@@ -25,7 +28,9 @@ describe('useValidationObserver', () => {
   it('should observe multiple useValidations', async () => {
     const validationRule1 = vi.fn().mockResolvedValue(true)
     const validationRule2 = vi.fn().mockResolvedValue(true)
-    const wrapper = mount({
+    const wrapper = mount(defineComponent({
+      name: 'TestComponent',
+      expose: ['validate'],
       setup() {
         const { validate } = useValidationObserver()
         useValidation(0, validationRule1)
@@ -33,7 +38,7 @@ describe('useValidationObserver', () => {
 
         return { validate }
       },
-    })
+    }))
 
     const result = await wrapper.vm.validate()
 
@@ -45,7 +50,9 @@ describe('useValidationObserver', () => {
   it('should observe multiple useValidations and be invalid if any does not pass', async () => {
     const validationRule1Spy = vi.fn().mockResolvedValue(true)
     const validationRule2Spy = vi.fn().mockResolvedValue(false)
-    const wrapper = mount({
+    const wrapper = mount(defineComponent({
+      name: 'TestComponent',
+      expose: ['validate'],
       setup() {
         const { validate } = useValidationObserver()
         useValidation(0, validationRule1Spy)
@@ -53,7 +60,7 @@ describe('useValidationObserver', () => {
 
         return { validate }
       },
-    })
+    }))
 
     const result = await wrapper.vm.validate()
 
@@ -66,7 +73,9 @@ describe('useValidationObserver', () => {
     it('should reset all observed validation states when reset is called', async () => {
       const validationRule1 = vi.fn().mockResolvedValue(true)
       const validationRule2 = vi.fn().mockResolvedValue(false)
-      const wrapper = mount({
+      const wrapper = mount(defineComponent({
+        name: 'TestComponent',
+        expose: ['validate'],
         setup() {
           const { validate, reset, valid, errors } = useValidationObserver()
           useValidation(ref(0), validationRule1)
@@ -74,7 +83,7 @@ describe('useValidationObserver', () => {
 
           return { validate, reset, valid, errors }
         },
-      })
+      }))
 
       // initial, pre-validated state should be true
       expect(wrapper.vm.valid).toBe(true)
@@ -92,14 +101,16 @@ describe('useValidationObserver', () => {
       const value = ref<number | undefined>(0)
       // this validator will always fail. testing that calling reset allows the value to be reset without revalidating
       const validationRule = vi.fn().mockResolvedValue(false)
-      const wrapper = mount({
+      const wrapper = mount(defineComponent({
+        name: 'TestComponent',
+        expose: ['validate'],
         setup() {
           const { validate, reset, valid, errors } = useValidationObserver()
           useValidation(value, validationRule)
 
           return { validate, reset, valid, errors }
         },
-      })
+      }))
 
       // initial, pre-validated state should be true
       expect(wrapper.vm.valid).toBe(true)
