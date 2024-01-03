@@ -8,6 +8,7 @@ export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> exten
   : [action: T, args: ActionArguments<T>, options?: MaybeRef<SubscriptionOptions>]
 
 export type SubscriptionOptions = {
+  /** The maximum time in milliseconds before the subscription is considered stale and refreshes. Defaults to `Infinity` */
   interval?: number,
   manager?: Manager,
   lifecycle?: 'component' | 'app',
@@ -29,13 +30,20 @@ export type MappedSubscription<T extends Action> = {
 }
 
 export type UseSubscription<T extends Action> = {
+  /** Set to `true` while the action is being executed. Initially `false`. */
   loading: boolean,
+  /** Return value from the `action` after execution. Initially `undefined`. */
   response: ActionResponse<T> | undefined,
+  /** Set to `true` if there is an error when executing the action. Initially `false`. */
   errored: boolean,
+  /** Stores any error thrown while executing the action. Initially `null`. */
   error: unknown,
   executed: boolean,
+  /** Executes the `action` again. */
   refresh: Subscription<T>['refresh'],
+  /** Remove the subscription from the channel. */
   unsubscribe: Subscription<T>['unsubscribe'],
   isSubscribed: Subscription<T>['isSubscribed'],
+  /** Returns a promise that resolves when the `response` is returned. */
   promise: () => SubscriptionPromise<T>,
 }

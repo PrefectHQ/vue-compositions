@@ -32,19 +32,6 @@ const defaultManager = new Manager()
  *
  * @param action - The function to be executed.
  * @param args - Parameters of the action being executed.
- * @param options - An object containing optional parameters.
- * @param options.interval - A max poll interval in milliseconds.
- * @param options.manager - A channel manager to use for the subscription.
- *
- * @returns An object containing the following properties:
- * - `loading`: Set to `true` while the action is being executed.
- * - `errored`: Set to `true` if there is an error when executing the action.
- * - `error`: Stores any error thrown while executing the action.
- * - `response`: Return value from the `action` after execution.
- * - `refresh`: Executes the `action` again.
- * - `promise`: Returns a promise that resolves when the `response` is returned.
- * - `unsubscribe`: Remove the subscription from the channel.
- * - `subscribe`: Resubscribes to the channel using the same arguments.
  */
 export function useSubscription<T extends Action>(
   ...[action, args, optionsArg = {}]: SubscribeArguments<T>
