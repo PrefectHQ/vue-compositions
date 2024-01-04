@@ -22,24 +22,30 @@ export type ValidateMethodOptions = {
 
 export type ValidateMethod = (options?: ValidateMethodOptions) => Promise<boolean>
 
-export type ResetMethodParams = [
-  /**
-   * An optional callback that will be called within a pause/resume block.
-   * This allows you to reset validation state and then reset the value
-   * without triggering another validation on change.
-   * For example if a value is required, use `reset(() => valueRef.value = undefined)`.
-   */
-  resetCallback?: () => void
-]
-export type ResetMethod = (...params: ResetMethodParams) => void
-
 export type UseValidation = ToRefs<UseValidationState> & {
   validate: ValidateMethod,
-  reset: ResetMethod,
+  /**
+   * Reset the validation state.
+  *
+  * @param resetCallback An optional callback that will be called within a pause/resume block.
+  *   This allows you to reset validation state and then reset the value without triggering
+  *   another validation on change.
+  *
+  * @example
+  * ```ts
+  * const value = ref(0)
+  * const { reset } = useValidation(value, isGreaterThanZero)
+  * reset(() => value.value = 0)
+  * ```
+  */
+  // eslint-disable-next-line @typescript-eslint/method-signature-style -- JSDoc in IDE doesn't work nearly as well with a property
+  reset(resetCallback?: () => void): void,
   pause: () => void,
   resume: () => void,
   state: UseValidationState,
 }
+
+export type ResetMethod = UseValidation['reset']
 
 export type ValidationRuleContext<T> = {
   signal: AbortSignal,

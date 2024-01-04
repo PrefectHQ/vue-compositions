@@ -6,6 +6,11 @@ export type UseValidationObserver = {
   validate: () => Promise<boolean>,
   pause: () => void,
   resume: () => void,
+  /**
+   * Reset all observed validations' states.
+   *
+   * @see UseValidation['reset']
+   */
   reset: ResetMethod,
   valid: ComputedRef<boolean>,
   invalid: ComputedRef<boolean>,

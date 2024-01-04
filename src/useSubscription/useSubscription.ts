@@ -9,7 +9,17 @@ import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 
 const defaultManager = new Manager()
 
-export function useSubscription<T extends Action>(...[action, args, optionsArg = {}]: SubscribeArguments<T>): UseSubscription<T> {
+/**
+ * The `useSubscription` composition manages data sharing across components. Multiple components can subscribe to an `action` (any method or function) and share the response value.
+ *
+ * @see [docs](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useSubscription#readme)
+ *
+ * @param action - The function to be executed.
+ * @param args - Parameters of the action being executed.
+ */
+export function useSubscription<T extends Action>(
+  ...[action, args, optionsArg = {}]: SubscribeArguments<T>
+): UseSubscription<T> {
   const options = unref(optionsArg)
   const manager = options.manager ?? defaultManager
   const argsWithDefault = args ?? [] as unknown as ActionArguments<T>

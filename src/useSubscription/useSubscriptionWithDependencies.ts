@@ -26,6 +26,14 @@ function toRawSubscription<T extends Action>(subscription: UseSubscription<T>): 
   return toRaw(subscription) as unknown as MappedSubscription<T>
 }
 
+/**
+ * Similar to `useSubscription` but delays executing the action if args is null.
+ *
+ * This is useful for when you want to use a subscription but the arguments are not available yet (e.g. the result of a promise).
+ * A common use case is for chaining subscriptions so that the second subscription is only executed after the first one is done.
+ *
+ * @see [`useSubscription`](https://github.com/PrefectHQ/vue-compositions/tree/main/src/useSubscription#readme) for more details.
+ */
 export function useSubscriptionWithDependencies<T extends Action>(...[action, args, options = {}]: UseSubscriptionWithDependencies<T>): UseSubscription<T | typeof voidAction> {
   const subscription = reactive(rawVoidSubscription())
 
