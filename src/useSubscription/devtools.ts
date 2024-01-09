@@ -29,13 +29,16 @@ class UseSubscriptionDevtoolsInspector {
   public readonly channelNodes: Map<Channel['signature'], { node: CustomInspectorNode, channel: Channel }> = new Map()
   public readonly subscribedComponents: Map<Channel['signature'], Map<number, any>> = new Map()
 
+  public refresh: () => void = () => {}
 
   public addChannel(channel: Channel): void {
     this.channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
+    this.refresh()
   }
 
   public removeChannel(channel: Channel): void {
     this.channelNodes.delete(channel.signature)
+    this.refresh()
   }
 
   public registerChannelSubscription(channel: Channel, subscriptionId: number): void {
@@ -44,6 +47,8 @@ class UseSubscriptionDevtoolsInspector {
     const componentName = vm ?? 'Unknown'
     channelSubscriptions.set(subscriptionId, componentName)
     this.subscribedComponents.set(channel.signature, channelSubscriptions)
+
+    this.refresh()
   }
 
   public getCustomInspectorState(nodeId: string): CustomInspectorState {

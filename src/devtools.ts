@@ -7,6 +7,7 @@ import {
   type InspectorNodeTag
 } from '@vue/devtools-api'
 import { useSubscriptionDevtoolsInspector } from './useSubscription/devtools'
+import { nextTick } from 'vue'
 
 export function setupDevtools(app: App): void {
   setupDevtoolsPlugin({
@@ -29,9 +30,11 @@ export function setupDevtools(app: App): void {
   })
 }
 
+let API: DevtoolsPluginApi<Record<string, unknown>> | null = null
 const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
 
 function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unknown>>): void {
+  API = api
   api.addInspector({
     id: SUBSCRIPTIONS_INSPECTOR_ID,
     label: 'Subscriptions',
@@ -48,17 +51,33 @@ function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unkno
     }
   })
 
-  api.on.getInspectorState((payload, context) => {
+  api.on.getInspectorState(async (payload, context) => {
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
       payload.state = useSubscriptionDevtoolsInspector.getCustomInspectorState(payload.nodeId)
+
+      await Promise.all(payload.state["Subscriptions"].map(async (subscription) => {
+        const name = await api.getComponentName(subscription.value)
+        subscription.value = name
+      }))
     }
   })
 }
 
-// export const refreshInspector = throttle(() => {
-//   setTimeout(async () => {
-//     await nextTick();
-//     API?.sendInspectorState(INSPECTOR_ID);
-//     API?.sendInspectorTree(INSPECTOR_ID);
-//   }, 100);
-// }, 100);
+function throttle(fn: Function, wait: number) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function (...args) {
+    const next = () => fn.apply(this, args);
+    clearTimeout(timeout);
+    timeout = setTimeout(next, wait);
+  };
+}
+
+export const refreshInspector = throttle(() => {
+  setTimeout(async () => {
+    await nextTick();
+    API?.sendInspectorState(SUBSCRIPTIONS_INSPECTOR_ID);
+    API?.sendInspectorTree(SUBSCRIPTIONS_INSPECTOR_ID);
+  }, 100);
+}, 100);
+
+useSubscriptionDevtoolsInspector.refresh = refreshInspector
