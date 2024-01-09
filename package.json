@@ -68,6 +68,7 @@
     }
   },
   "dependencies": {
+    "@vue/devtools-api": "^6.1.4",
     "jsdom": "^23.0.0"
   }
 }
