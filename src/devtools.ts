@@ -45,7 +45,9 @@ function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unkno
   api.on.getInspectorTree((payload, context) => {
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
       payload.rootNodes = []
+      const regex = new RegExp(payload.filter, 'i') // 'i' flag for case-insensitive search
       for (const { node } of useSubscriptionDevtoolsInspector.channelNodes.values()) {
+        if (payload.filter && !regex.test(node.label)) { continue }
         payload.rootNodes.push(node)
       }
     }
