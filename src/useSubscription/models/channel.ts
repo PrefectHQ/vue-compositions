@@ -60,6 +60,10 @@ export default class Channel<T extends Action = Action> {
     this.args = args
   }
 
+  public get actionName(): string {
+    return this.action.name
+  }
+
   private get interval(): number {
     const intervals = Array
       .from(this.subscriptions.values())

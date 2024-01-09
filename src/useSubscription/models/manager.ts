@@ -6,6 +6,7 @@ import {
   ChannelSignature
 } from '@/useSubscription/types/action'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
+import { useSubscriptionDevtoolsInspector } from '../devtools'
 
 export default class Manager {
   private readonly channels: Map<ChannelSignature, Channel> = new Map()
@@ -22,6 +23,11 @@ export default class Manager {
   }
 
   public deleteChannel(signature: ChannelSignature): void {
+    const channel = this.channels.get(signature)
+    if (channel) {
+      useSubscriptionDevtoolsInspector.removeChannel(channel)
+    }
+    
     this.channels.delete(signature)
   }
 
@@ -35,8 +41,14 @@ export default class Manager {
       return this.channels.get(channel.signature)! as Channel<T>
     }
 
-    this.channels.set(channel.signature, channel)
+    this.addChannel(channel)
 
     return channel
+  }
+
+  private addChannel(channel: Channel): void {
+    this.channels.set(channel.signature, channel)
+
+    useSubscriptionDevtoolsInspector.addChannel(channel)
   }
 }

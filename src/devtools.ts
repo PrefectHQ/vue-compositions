@@ -1,6 +1,14 @@
-import { setupDevtoolsPlugin, DevtoolsPluginApi } from '@vue/devtools-api'
+import {
+  type App,
+  setupDevtoolsPlugin,
+  type DevtoolsPluginApi,
+  type CustomInspectorNode,
+  type CustomInspectorState,
+  type InspectorNodeTag
+} from '@vue/devtools-api'
+import { useSubscriptionDevtoolsInspector } from './useSubscription/devtools'
 
-export function setupDevtools(app: any): void {
+export function setupDevtools(app: App): void {
   setupDevtoolsPlugin({
     id: 'prefect-vue-compositions-devtools',
     label: 'Prefect Devtools',
@@ -33,33 +41,58 @@ function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unkno
   api.on.getInspectorTree((payload, context) => {
     console.log('hi')
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
-      payload.rootNodes = [
-        {
-          id: 'root',
-          label: 'Awesome root',
-          children: [
+      payload.rootNodes = useSubscriptionDevtoolsInspector.channelNodes
+      // payload.rootNodes = [
+      //   {
+      //     id: 'root',
+      //     label: 'Awesome root',
+      //     children: [
+      //       {
+      //         id: 'child-1',
+      //         label: 'Child 1',
+      //         tags: [
+      //           {
+      //             label: 'awesome',
+      //             textColor: 0xffffff,
+      //             backgroundColor: 0x000000,
+      //           },
+      //         ],
+      //       },
+      //       {
+      //         id: 'child-2',
+      //         label: 'Child 2',
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     id: 'root2',
+      //     label: 'Amazing root',
+      //   },
+      // ]
+    }
+  })
+
+  api.on.getInspectorState((payload, context) => {
+    if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
+      if (payload.nodeId === 'child-1') {
+        payload.state = {
+          'my section': [
             {
-              id: 'child-1',
-              label: 'Child 1',
-              tags: [
-                {
-                  label: 'awesome',
-                  textColor: 0xffffff,
-                  backgroundColor: 0x000000,
-                },
-              ],
-            },
+              key: 'cat',
+              value: 'meow',
+            }
+          ]
+        }
+      } else if (payload.nodeId === 'child-2') {
+        payload.state = {
+          'my section': [
             {
-              id: 'child-2',
-              label: 'Child 2',
-            },
-          ],
-        },
-        {
-          id: 'root2',
-          label: 'Amazing root',
-        },
-      ]
+              key: 'dog',
+              value: 'waf',
+            }
+          ]
+        }
+      }
     }
   })
 }
