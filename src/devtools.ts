@@ -25,6 +25,7 @@ export function setupDevtools(app: App): void {
     //   })
     //   })
     setupSubscriptionsInspector(api)
+    api.getComponentName
   })
 }
 
@@ -39,60 +40,17 @@ function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unkno
   })
 
   api.on.getInspectorTree((payload, context) => {
-    console.log('hi')
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
-      payload.rootNodes = useSubscriptionDevtoolsInspector.channelNodes
-      // payload.rootNodes = [
-      //   {
-      //     id: 'root',
-      //     label: 'Awesome root',
-      //     children: [
-      //       {
-      //         id: 'child-1',
-      //         label: 'Child 1',
-      //         tags: [
-      //           {
-      //             label: 'awesome',
-      //             textColor: 0xffffff,
-      //             backgroundColor: 0x000000,
-      //           },
-      //         ],
-      //       },
-      //       {
-      //         id: 'child-2',
-      //         label: 'Child 2',
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     id: 'root2',
-      //     label: 'Amazing root',
-      //   },
-      // ]
+      payload.rootNodes = []
+      for (const { node } of useSubscriptionDevtoolsInspector.channelNodes.values()) {
+        payload.rootNodes.push(node)
+      }
     }
   })
 
   api.on.getInspectorState((payload, context) => {
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
-      if (payload.nodeId === 'child-1') {
-        payload.state = {
-          'my section': [
-            {
-              key: 'cat',
-              value: 'meow',
-            }
-          ]
-        }
-      } else if (payload.nodeId === 'child-2') {
-        payload.state = {
-          'my section': [
-            {
-              key: 'dog',
-              value: 'waf',
-            }
-          ]
-        }
-      }
+      payload.state = useSubscriptionDevtoolsInspector.getCustomInspectorState(payload.nodeId)
     }
   })
 }

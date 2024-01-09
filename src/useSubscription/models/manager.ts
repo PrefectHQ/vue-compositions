@@ -19,6 +19,8 @@ export default class Manager {
     const channel = this.getChannel(action, args)
     const subscription = channel.subscribe(options)
 
+    useSubscriptionDevtoolsInspector.registerChannelSubscription(channel, subscription.id)
+
     return subscription
   }
 
