@@ -55,7 +55,8 @@ function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unkno
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
       payload.state = useSubscriptionDevtoolsInspector.getCustomInspectorState(payload.nodeId)
 
-      await Promise.all(payload.state["Subscriptions"].map(async (subscription) => {
+      await Promise.all(payload.state["Subscribed Components"].map(async (subscription) => {
+        if (!subscription.value) { return }
         const name = await api.getComponentName(subscription.value)
         subscription.value = name
       }))

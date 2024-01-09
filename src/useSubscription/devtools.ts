@@ -6,7 +6,7 @@ import type {
 } from '@vue/devtools-api'
 import Channel from './models/channel'
 import Manager from './models/manager'
-import { getCurrentInstance } from 'vue'
+import { ComponentInternalInstance, getCurrentInstance } from 'vue'
 
 export function withDevtoolIntercepts(map: Map<unknown, unknown>) {
   return new Proxy(map, {
@@ -27,7 +27,7 @@ export function withDevtoolIntercepts(map: Map<unknown, unknown>) {
 
 class UseSubscriptionDevtoolsInspector {
   public readonly channelNodes: Map<Channel['signature'], { node: CustomInspectorNode, channel: Channel }> = new Map()
-  public readonly subscribedComponents: Map<Channel['signature'], Map<number, any>> = new Map()
+  public readonly subscribedComponents: Map<Channel['signature'], Map<number, ComponentInternalInstance | null>> = new Map()
 
   public refresh: () => void = () => {}
 
@@ -44,8 +44,7 @@ class UseSubscriptionDevtoolsInspector {
   public registerChannelSubscription(channel: Channel, subscriptionId: number): void {
     const channelSubscriptions = this.subscribedComponents.get(channel.signature) ?? new Map()
     const vm = getCurrentInstance()
-    const componentName = vm ?? 'Unknown'
-    channelSubscriptions.set(subscriptionId, componentName)
+    channelSubscriptions.set(subscriptionId, vm)
     this.subscribedComponents.set(channel.signature, channelSubscriptions)
 
     this.refresh()
@@ -65,7 +64,7 @@ class UseSubscriptionDevtoolsInspector {
           value: channel,
         }
       ],
-      "Subscriptions": [...subscriptions.entries()].map(([id, name]) => (
+      "Subscribed Components": [...subscriptions.entries()].map(([id, name]) => (
         {
           key: id,
           value: name,
