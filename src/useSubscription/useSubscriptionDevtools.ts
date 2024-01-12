@@ -2,7 +2,9 @@ import type {
   DevtoolsPluginApi,
   CustomInspectorNode,
   CustomInspectorState,
-  TimelineEvent} from '@vue/devtools-api'
+  TimelineEvent,
+  PluginSettingsItem,
+  ExtractSettingsTypes} from '@vue/devtools-api'
 import Channel from './models/channel'
 import { ComponentInternalInstance, getCurrentInstance, nextTick } from 'vue'
 
@@ -18,11 +20,27 @@ function throttle(fn: Function, wait: number) {
 const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
 const SUBSCRIPTIONS_TIMELINE_LAYER_ID = 'prefect-vue-compositions-subscriptions'
 
+export const SUBSCRIPTION_DEVTOOLS_SETTINGS = {
+  // timelineColor: {
+  //   label: 'Timeline Color',
+  //   type: 'choice',
+  //   defaultValue: 0xFF69B4,
+  //   options: [
+  //     { value: 0x4fc08d, label: 'Vue Green' },
+  //     { value: 0x175cd3, label: 'Prefect Blue' },
+  //     { value: 0xFF69B4, label: 'Hot' }
+  //   ],
+  //   component: 'button-group'
+  // }
+} satisfies Record<string, PluginSettingsItem>
+
+export type SubscriptionDevtoolsSettings = ExtractSettingsTypes<typeof SUBSCRIPTION_DEVTOOLS_SETTINGS>
+
 const channelNodes: Map<Channel['signature'], { node: CustomInspectorNode, channel: Channel }> = new Map()
 const subscribedComponents: Map<Channel['signature'], Map<number, ComponentInternalInstance | null>> = new Map()
 let API: DevtoolsPluginApi<Record<string, unknown>> | null = null
 
-export function init(api: DevtoolsPluginApi<Record<string, unknown>>): void {
+export function init(api: DevtoolsPluginApi<SubscriptionDevtoolsSettings>): void {
   API = api
   api.addInspector({
     id: SUBSCRIPTIONS_INSPECTOR_ID,
@@ -58,9 +76,12 @@ export function init(api: DevtoolsPluginApi<Record<string, unknown>>): void {
   api.addTimelineLayer({
     id: SUBSCRIPTIONS_TIMELINE_LAYER_ID,
     label: 'Subscriptions',
-    color: 0x4fc08d,
-    // color: 0x175cd3
+    color: 0x175cd3,
   })
+
+  // api.on.setPluginSettings((payload, context) => {
+
+  // })
 }
 
 const refresh: () => void = throttle(() => {
@@ -151,7 +172,7 @@ function mapChannelToInspectorNode(channel: Channel): CustomInspectorNode {
       {
         label: 'channel',
         textColor: 0xffffff,
-        backgroundColor: 0x000000,
+        backgroundColor: 0x175cd3,
       },
     ],
   }

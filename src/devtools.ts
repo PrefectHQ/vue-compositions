@@ -10,6 +10,9 @@ export function setupDevtools(app: App): void {
     label: 'Prefect Devtools',
     packageName: '@prefecthq/vue-compositions',
     homepage: 'https://www.prefect.io/',
+    settings: {
+      ...useSubscriptionDevtools.SUBSCRIPTION_DEVTOOLS_SETTINGS,
+    },
     app,
   }, (api) => {
     useSubscriptionDevtools.init(api)
