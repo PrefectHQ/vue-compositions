@@ -1,8 +1,8 @@
 import {
   type App,
-  setupDevtoolsPlugin,
-  type DevtoolsPluginApi} from '@vue/devtools-api'
-import { useSubscriptionDevtoolsInspector } from './useSubscription/devtools'
+  setupDevtoolsPlugin
+} from '@vue/devtools-api'
+import * as useSubscriptionDevtools from './useSubscription/useSubscriptionDevtools'
 
 export function setupDevtools(app: App): void {
   setupDevtoolsPlugin({
@@ -12,10 +12,6 @@ export function setupDevtools(app: App): void {
     homepage: 'https://www.prefect.io/',
     app,
   }, (api) => {
-    setupSubscriptionsInspector(api)
+    useSubscriptionDevtools.init(api)
   })
-}
-
-function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unknown>>): void {
-  useSubscriptionDevtoolsInspector.setupDevtools(api)
 }
