@@ -30,57 +30,6 @@ export function setupDevtools(app: App): void {
   })
 }
 
-let API: DevtoolsPluginApi<Record<string, unknown>> | null = null
-const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
-
 function setupSubscriptionsInspector(api: DevtoolsPluginApi<Record<string, unknown>>): void {
-  API = api
-  api.addInspector({
-    id: SUBSCRIPTIONS_INSPECTOR_ID,
-    label: 'Subscriptions',
-    icon: 'storage',
-    treeFilterPlaceholder: 'Search subscriptions',
-  })
-
-  api.on.getInspectorTree((payload, context) => {
-    if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
-      payload.rootNodes = []
-      const regex = new RegExp(payload.filter, 'i') // 'i' flag for case-insensitive search
-      for (const { node } of useSubscriptionDevtoolsInspector.channelNodes.values()) {
-        if (payload.filter && !regex.test(node.label)) { continue }
-        payload.rootNodes.push(node)
-      }
-    }
-  })
-
-  api.on.getInspectorState(async (payload, context) => {
-    if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
-      payload.state = useSubscriptionDevtoolsInspector.getCustomInspectorState(payload.nodeId)
-
-      await Promise.all(payload.state["Subscribed Components"].map(async (subscription) => {
-        if (!subscription.value) { return }
-        const name = await api.getComponentName(subscription.value)
-        subscription.value = name
-      }))
-    }
-  })
+  useSubscriptionDevtoolsInspector.setupDevtools(api)
 }
-
-function throttle(fn: Function, wait: number) {
-  let timeout: ReturnType<typeof setTimeout>;
-  return function (...args) {
-    const next = () => fn.apply(this, args);
-    clearTimeout(timeout);
-    timeout = setTimeout(next, wait);
-  };
-}
-
-export const refreshInspector = throttle(() => {
-  setTimeout(async () => {
-    await nextTick();
-    API?.sendInspectorState(SUBSCRIPTIONS_INSPECTOR_ID);
-    API?.sendInspectorTree(SUBSCRIPTIONS_INSPECTOR_ID);
-  }, 100);
-}, 100);
-
-useSubscriptionDevtoolsInspector.refresh = refreshInspector

@@ -1,12 +1,9 @@
 import type {
   DevtoolsPluginApi,
   CustomInspectorNode,
-  CustomInspectorState,
-  InspectorNodeTag
-} from '@vue/devtools-api'
+  CustomInspectorState} from '@vue/devtools-api'
 import Channel from './models/channel'
-import Manager from './models/manager'
-import { ComponentInternalInstance, getCurrentInstance } from 'vue'
+import { ComponentInternalInstance, getCurrentInstance, nextTick } from 'vue'
 
 export function withDevtoolIntercepts(map: Map<unknown, unknown>) {
   return new Proxy(map, {
@@ -25,11 +22,68 @@ export function withDevtoolIntercepts(map: Map<unknown, unknown>) {
   })
 }
 
+function throttle(fn: Function, wait: number) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return function (...args) {
+    const next = () => fn.apply(this, args);
+    clearTimeout(timeout);
+    timeout = setTimeout(next, wait);
+  };
+}
+
+const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
+
 class UseSubscriptionDevtoolsInspector {
   public readonly channelNodes: Map<Channel['signature'], { node: CustomInspectorNode, channel: Channel }> = new Map()
   public readonly subscribedComponents: Map<Channel['signature'], Map<number, ComponentInternalInstance | null>> = new Map()
 
-  public refresh: () => void = () => {}
+  private API: DevtoolsPluginApi<Record<string, unknown>> | null = null
+
+  constructor() {
+    this.refresh = throttle(this.refresh, 100)
+  }
+
+  public setupDevtools(api: DevtoolsPluginApi<Record<string, unknown>>): void {
+    this.API = api
+    api.addInspector({
+      id: SUBSCRIPTIONS_INSPECTOR_ID,
+      label: 'Subscriptions',
+      icon: 'storage',
+      treeFilterPlaceholder: 'Search subscriptions',
+    })
+  
+    api.on.getInspectorTree((payload, context) => {
+      if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
+        payload.rootNodes = []
+        const regex = new RegExp(payload.filter, 'i') // 'i' flag for case-insensitive search
+        console.log('getInspectoTree', useSubscriptionDevtoolsInspector.channelNodes.size)
+        for (const { node } of useSubscriptionDevtoolsInspector.channelNodes.values()) {
+          if (payload.filter && !regex.test(node.label)) { continue }
+          payload.rootNodes.push(node)
+        }
+      }
+    })
+  
+    api.on.getInspectorState(async (payload, context) => {
+      if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
+        payload.state = useSubscriptionDevtoolsInspector.getCustomInspectorState(payload.nodeId)
+  
+        await Promise.all(payload.state["Subscribed Components"].map(async (subscription) => {
+          if (!subscription.value) { return }
+          const name = await api.getComponentName(subscription.value)
+          subscription.value = name
+        }))
+      }
+    })
+  }
+
+  public refresh(): void {
+    setTimeout(async () => {
+      await nextTick();
+      this.API?.sendInspectorState(SUBSCRIPTIONS_INSPECTOR_ID);
+      this.API?.sendInspectorTree(SUBSCRIPTIONS_INSPECTOR_ID);
+    }, 100);
+  }
 
   public addChannel(channel: Channel): void {
     this.channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
@@ -53,7 +107,7 @@ class UseSubscriptionDevtoolsInspector {
   public getCustomInspectorState(nodeId: string): CustomInspectorState {
     const {channel} = this.channelNodes.get(nodeId as Channel['signature']) ?? {}
     if (!channel) {
-      return {"Error": [{ key: 'message', value: 'Channel not found.'}], "State": [], "Subscriptions": []}
+      return {"Error": [{ key: 'message', value: 'Channel not found.'}], "State": [], "Subscribed Components": []}
     }
     const subscriptions = this.subscribedComponents.get(channel.signature) ?? new Map()
     
