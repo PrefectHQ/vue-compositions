@@ -72,21 +72,21 @@ const refresh: () => void = throttle(() => {
 }, 100)
 
 export function addChannel(channel: Channel): void {
-    addTimelineEvent({title: `Channel Created: ${channel.actionName}`, data: {channel, action: channel.actionName}, groupId: channel.signature})
+    addTimelineEvent({title: `${channel.actionName} · Channel Created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
 
     channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
     refresh()
   }
 
 export function removeChannel(channel: Channel): void {
-  addTimelineEvent({title: `Channel removed ${channel.actionName}`, data: {channel, action: channel.actionName}, groupId: channel.signature})
+  addTimelineEvent({title: `${channel.actionName} · Channel removed`, data: {channel, action: channel.actionName}, groupId: channel.signature})
 
   channelNodes.delete(channel.signature)
   refresh()
 }
 
 export function registerChannelSubscription(channel: Channel, subscriptionId: number): void {
-  addTimelineEvent({title: 'Subscription Created', data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
+  addTimelineEvent({title: `${channel.actionName} · Subscription Created`, data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
 
   const channelSubscriptions = subscribedComponents.get(channel.signature) ?? new Map()
   const vm = getCurrentInstance()
@@ -97,7 +97,7 @@ export function registerChannelSubscription(channel: Channel, subscriptionId: nu
 }
 
 export function removeChannelSubscription(channel: Channel, subscriptionId: number): void {
-  addTimelineEvent({title: 'Subscription removed', data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
+  addTimelineEvent({title: `${channel.actionName} · Subscription removed`, data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
 
   const channelSubscriptions = subscribedComponents.get(channel.signature)
   if (!channelSubscriptions) { return }
