@@ -3,6 +3,7 @@ import { ref, Ref, watch } from 'vue'
 import Channel from '@/useSubscription/models/channel'
 import { Action, ActionResponse } from '@/useSubscription/types/action'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
+import { useSubscriptionDevtoolsInspector } from '../devtools'
 
 class SubscriptionIdManager {
   private static id: number = 0
@@ -41,6 +42,7 @@ export default class Subscription<T extends Action> {
 
   public unsubscribe(): void {
     this.channel.unsubscribe(this.id)
+    useSubscriptionDevtoolsInspector.removeChannelSubscription(this.channel, this.id)
   }
 
   public isSubscribed(): boolean {

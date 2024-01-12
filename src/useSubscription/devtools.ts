@@ -104,6 +104,13 @@ class UseSubscriptionDevtoolsInspector {
     this.refresh()
   }
 
+  public removeChannelSubscription(channel: Channel, subscriptionId: number): void {
+    const channelSubscriptions = this.subscribedComponents.get(channel.signature)
+    if (!channelSubscriptions) { return }
+    channelSubscriptions.delete(subscriptionId)
+    this.refresh()
+  }
+
   public getCustomInspectorState(nodeId: string): CustomInspectorState {
     const {channel} = this.channelNodes.get(nodeId as Channel['signature']) ?? {}
     if (!channel) {
