@@ -61,7 +61,9 @@ export default class Channel<T extends Action = Action> {
   }
 
   public get actionName(): string {
-    return this.action.name
+    const prefix = "bound "
+    const sanitizedChannelActionName = this.action.name.startsWith(prefix) ? this.action.name.slice(prefix.length) : this.action.name
+    return sanitizedChannelActionName
   }
 
   private get interval(): number {

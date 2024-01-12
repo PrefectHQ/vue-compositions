@@ -1,7 +1,8 @@
 import type {
   DevtoolsPluginApi,
   CustomInspectorNode,
-  CustomInspectorState} from '@vue/devtools-api'
+  CustomInspectorState,
+  TimelineEvent} from '@vue/devtools-api'
 import Channel from './models/channel'
 import { ComponentInternalInstance, getCurrentInstance, nextTick } from 'vue'
 
@@ -32,6 +33,7 @@ function throttle(fn: Function, wait: number) {
 }
 
 const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
+const SUBSCRIPTIONS_TIMELINE_LAYER_ID = 'prefect-vue-compositions-subscriptions'
 
 class UseSubscriptionDevtoolsInspector {
   public readonly channelNodes: Map<Channel['signature'], { node: CustomInspectorNode, channel: Channel }> = new Map()
@@ -75,6 +77,13 @@ class UseSubscriptionDevtoolsInspector {
         }))
       }
     })
+
+    // Timeline Layer
+    api.addTimelineLayer({
+      id: SUBSCRIPTIONS_TIMELINE_LAYER_ID,
+      label: 'Subscriptions',
+      color: 0x4fc08d,
+    })
   }
 
   public refresh(): void {
@@ -86,16 +95,22 @@ class UseSubscriptionDevtoolsInspector {
   }
 
   public addChannel(channel: Channel): void {
+    this.addTimelineEvent({title: `Channel Created: ${channel.actionName}`, data: {channel}})
+
     this.channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
     this.refresh()
   }
 
   public removeChannel(channel: Channel): void {
+    this.addTimelineEvent({title: `Channel removed ${channel.actionName}`, data: {channel}})
+
     this.channelNodes.delete(channel.signature)
     this.refresh()
   }
 
   public registerChannelSubscription(channel: Channel, subscriptionId: number): void {
+    this.addTimelineEvent({title: 'Subscription Created', data: {channel, subscriptionId}})
+
     const channelSubscriptions = this.subscribedComponents.get(channel.signature) ?? new Map()
     const vm = getCurrentInstance()
     channelSubscriptions.set(subscriptionId, vm)
@@ -105,6 +120,8 @@ class UseSubscriptionDevtoolsInspector {
   }
 
   public removeChannelSubscription(channel: Channel, subscriptionId: number): void {
+    this.addTimelineEvent({title: 'Subscription removed', data: {channel, subscriptionId}})
+
     const channelSubscriptions = this.subscribedComponents.get(channel.signature)
     if (!channelSubscriptions) { return }
     channelSubscriptions.delete(subscriptionId)
@@ -133,17 +150,25 @@ class UseSubscriptionDevtoolsInspector {
       ),
     }
   }
+
+  public addTimelineEvent<T extends Omit<TimelineEvent, 'time'>>(event: T): void {
+    this.API?.addTimelineEvent({
+      layerId: SUBSCRIPTIONS_TIMELINE_LAYER_ID,
+      event: {
+        ...event,
+        time: this.API.now(),
+      },
+    })
+  }
 }
 
 export const useSubscriptionDevtoolsInspector = new UseSubscriptionDevtoolsInspector()
 
 
 function mapChannelToInspectorNode(channel: Channel): CustomInspectorNode {
-  const prefix = "bound "
-  const sanitizedChannelActionName = channel.actionName.startsWith(prefix) ? channel.actionName.slice(prefix.length) : channel.actionName
   return {
     id: channel.signature,
-    label: `${sanitizedChannelActionName} ${channel.signature}`,
+    label: `${channel.actionName} ${channel.signature}`,
     tags: [
       {
         label: 'channel',

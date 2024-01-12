@@ -1,13 +1,8 @@
 import {
   type App,
   setupDevtoolsPlugin,
-  type DevtoolsPluginApi,
-  type CustomInspectorNode,
-  type CustomInspectorState,
-  type InspectorNodeTag
-} from '@vue/devtools-api'
+  type DevtoolsPluginApi} from '@vue/devtools-api'
 import { useSubscriptionDevtoolsInspector } from './useSubscription/devtools'
-import { nextTick } from 'vue'
 
 export function setupDevtools(app: App): void {
   setupDevtoolsPlugin({
@@ -17,16 +12,7 @@ export function setupDevtools(app: App): void {
     homepage: 'https://www.prefect.io/',
     app,
   }, (api) => {
-    // api.on.inspectComponent((payload, ctx) => {
-    //   payload.instanceData.state.push({
-    //     type: 'text',
-    //     key: 'subscriptions',
-    //     editable: false,
-    //     value: ,
-    //   })
-    //   })
     setupSubscriptionsInspector(api)
-    api.getComponentName
   })
 }
 
