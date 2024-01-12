@@ -72,11 +72,11 @@ const refresh: () => void = throttle(() => {
 }, 100)
 
 export function addChannel(channel: Channel): void {
-    addTimelineEvent({title: `${channel.actionName} · Channel Created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
+  addTimelineEvent({title: `${channel.actionName} · Channel Created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
 
-    channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
-    refresh()
-  }
+  channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
+  refresh()
+}
 
 export function removeChannel(channel: Channel): void {
   addTimelineEvent({title: `${channel.actionName} · Channel removed`, data: {channel, action: channel.actionName}, groupId: channel.signature})
@@ -105,7 +105,12 @@ export function removeChannelSubscription(channel: Channel, subscriptionId: numb
   refresh()
 }
 
-function getCustomInspectorState(nodeId: string): CustomInspectorState {
+type SubscriptionsInspectorState = CustomInspectorState & {
+  State: CustomInspectorState[keyof CustomInspectorState],
+  "Subscribed Components": CustomInspectorState[keyof CustomInspectorState],
+}
+
+function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
   const {channel} = channelNodes.get(nodeId as Channel['signature']) ?? {}
   if (!channel) {
     return {"Error": [{ key: 'message', value: 'Channel not found.'}], "State": [], "Subscribed Components": []}
