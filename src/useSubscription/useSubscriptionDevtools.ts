@@ -45,7 +45,7 @@ export function init(api: DevtoolsPluginApi<SubscriptionDevtoolsSettings>): void
   api.addInspector({
     id: SUBSCRIPTIONS_INSPECTOR_ID,
     label: 'Subscriptions',
-    icon: 'storage',
+    icon: 'subscriptions',
     treeFilterPlaceholder: 'Search subscriptions',
   })
 
