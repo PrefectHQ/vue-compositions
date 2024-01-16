@@ -157,9 +157,7 @@ function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
 
 function getComponentName(vm: ComponentInternalInstance | null): string {
   // @ts-ignore __name is not in the types but works.
-  const name = vm?.type.__name as string ?? vm.type.name
-  if (name) { return name }
-  return '🤷🏻‍♂️ Unknown component'
+  return vm?.type.__name as string ?? vm?.type?.name ?? '🤷🏻‍♂️ Unknown component'
 }
 
 export function addTimelineEvent<T extends Omit<TimelineEvent, 'time'>>(event: T): void {
