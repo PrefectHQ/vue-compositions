@@ -64,11 +64,12 @@ export function init(api: DevtoolsPluginApi<SubscriptionDevtoolsSettings>): void
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
       payload.state = getCustomInspectorState(payload.nodeId)
 
-      await Promise.all(payload.state["Subscribed Components"].map(async (subscription) => {
-        if (!subscription.value) { return }
-        const name = await api.getComponentName(subscription.value)
-        subscription.value = name
-      }))
+      // Experimenting with getting the component name from the devtools api. doesn't seem to get all names either but gets some
+      // await Promise.all(payload.state["Subscribed Components"].map(async (subscription) => {
+      //   if (!subscription.value) { return }
+      //   const name = await api.getComponentName(subscription.value)
+      //   subscription.value = name
+      // }))
     }
   })
 
@@ -136,7 +137,7 @@ function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
   if (!channel) {
     return {"Error": [{ key: 'message', value: 'Channel not found.'}], "State": [], "Subscribed Components": []}
   }
-  const subscriptions = subscribedComponents.get(channel.signature) ?? new Map()
+  const subscriptions = subscribedComponents.get(channel.signature) ?? new Map<number, ComponentInternalInstance | null>()
   
   return {
     "State": [
@@ -145,13 +146,20 @@ function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
         value: channel,
       }
     ],
-    "Subscribed Components": [...subscriptions.entries()].map(([id, name]) => (
+    "Subscribed Components": [...subscriptions.entries()].map(([id, vm]) => (
       {
-        key: id,
-        value: name,
+        key: String(id),
+        value: getComponentName(vm),
       })
     ),
   }
+}
+
+function getComponentName(vm: ComponentInternalInstance | null): string {
+  // @ts-ignore __name is not in the types but works.
+  const name = vm?.type.__name as string ?? vm.type.name
+  if (name) { return name }
+  return '🤷🏻‍♂️ Unknown component'
 }
 
 export function addTimelineEvent<T extends Omit<TimelineEvent, 'time'>>(event: T): void {
