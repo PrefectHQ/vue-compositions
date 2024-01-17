@@ -219,7 +219,7 @@ type EventTypeToDataMap = {
   'Loading': { channel: Channel, action: string, loading: boolean },
   'Error': { channel: Channel, action: string, error: unknown },
   'Executed': { channel: Channel, action: string, executed: boolean },
-  'Response': { channel: Channel, action: string, response: any },
+  'Response': { channel: Channel, action: string, response: unknown },
   'Refresh': { channel: Channel, action: string },
 }
 
