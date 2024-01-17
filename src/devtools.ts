@@ -15,6 +15,7 @@ export const plugin: Plugin = {
       settings: {
         ...useSubscriptionDevtools.SUBSCRIPTION_DEVTOOLS_SETTINGS,
       },
+      enableEarlyProxy: true,
       app,
     }, (api) => {
       useSubscriptionDevtools.init(api)
