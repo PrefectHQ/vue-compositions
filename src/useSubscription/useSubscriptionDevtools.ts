@@ -100,6 +100,16 @@ export function addChannel(channel: Channel): void {
   refresh()
 }
 
+type UpdateChannelEventTypes = 'Loading' | 'Error' | 'Executed' | 'Response' | 'Refresh'
+type UpdateChannelEvent = {
+  [K in UpdateChannelEventTypes]: CreateSubscriptionDevtoolsTimelineEvent<K, EventTypeToDataMap[K]>
+}[UpdateChannelEventTypes]
+export function updateChannel(channel: Channel, event: UpdateChannelEvent): void {
+  channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
+  addTimelineEvent(event)
+  refresh()
+}
+
 export function removeChannel(channel: Channel): void {
   addTimelineEvent({title: `${channel.actionName} · Channel removed`, data: {channel, action: channel.actionName}, groupId: channel.signature})
 
@@ -181,7 +191,7 @@ type SubscriptionDevtoolsTimelineEvent = {
   [K in keyof EventTypeToDataMap]: CreateSubscriptionDevtoolsTimelineEvent<K, EventTypeToDataMap[K]>
 }[keyof EventTypeToDataMap]
 
-export function addTimelineEvent(event: SubscriptionDevtoolsTimelineEvent): void {
+function addTimelineEvent(event: SubscriptionDevtoolsTimelineEvent): void {
   API?.addTimelineEvent({
     layerId: SUBSCRIPTIONS_TIMELINE_LAYER_ID,
     event: {

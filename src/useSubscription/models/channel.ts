@@ -11,6 +11,7 @@ import {
 } from '@/useSubscription/types/action'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
 import { unrefArgs } from '@/useSubscription/utilities/reactivity'
+import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
 
 class ChannelSignatureManager {
   private static actionId: number = 0
@@ -88,6 +89,12 @@ export default class Channel<T extends Action = Action> {
     for (const subscription of this.subscriptions.values()) {
       subscription.response.value = response
     }
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Response`,
+      data: { channel: this, action: this.actionName, response },
+      groupId: this.signature,
+    })
   }
 
   public get executed(): boolean {
@@ -100,6 +107,12 @@ export default class Channel<T extends Action = Action> {
     for (const subscription of this.subscriptions.values()) {
       subscription.executed.value = executed
     }
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Executed`,
+      data: { channel: this, action: this.actionName, executed },
+      groupId: this.signature,
+    })
   }
 
   public get loading(): boolean {
@@ -111,6 +124,14 @@ export default class Channel<T extends Action = Action> {
 
     for (const subscription of this.subscriptions.values()) {
       subscription.loading.value = loading
+    }
+
+    if (loading) {
+      useSubscriptionDevtools.updateChannel(this, {
+        title: `${this.actionName} · Loading`,
+        data: { channel: this, action: this.actionName, loading },
+        groupId: this.signature,
+      })
     }
   }
 
@@ -135,6 +156,14 @@ export default class Channel<T extends Action = Action> {
 
     for (const subscription of this.subscriptions.values()) {
       subscription.error.value = error
+    }
+
+    if (error) {
+      useSubscriptionDevtools.updateChannel(this, {
+        title: `${this.actionName} · Error`,
+        data: { channel: this, action: this.actionName, error },
+        groupId: this.signature,
+      })
     }
   }
 
@@ -194,6 +223,12 @@ export default class Channel<T extends Action = Action> {
     this.scope.stop()
     this.scope = effectScope()
     const response = this.execute()
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Refresh`,
+      data: { channel: this, action: this.actionName },
+      groupId: this.signature,
+    })
 
     return response
   }
