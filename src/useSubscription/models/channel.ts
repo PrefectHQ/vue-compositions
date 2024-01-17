@@ -10,8 +10,8 @@ import {
   ChannelSignature
 } from '@/useSubscription/types/action'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
-import { unrefArgs } from '@/useSubscription/utilities/reactivity'
 import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
+import { unrefArgs } from '@/useSubscription/utilities/reactivity'
 
 class ChannelSignatureManager {
   private static actionId: number = 0
@@ -62,7 +62,7 @@ export default class Channel<T extends Action = Action> {
   }
 
   public get actionName(): string {
-    const prefix = "bound "
+    const prefix = 'bound '
     const sanitizedChannelActionName = this.action.name.startsWith(prefix) ? this.action.name.slice(prefix.length) : this.action.name
     return sanitizedChannelActionName
   }

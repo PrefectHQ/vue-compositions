@@ -29,7 +29,7 @@ export default class Manager {
     if (channel) {
       useSubscriptionDevtools.removeChannel(channel)
     }
-    
+
     this.channels.delete(signature)
   }
 

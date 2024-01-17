@@ -3,7 +3,7 @@ import {
   setupDevtoolsPlugin
 } from '@vue/devtools-api'
 import { type Plugin } from 'vue'
-import * as useSubscriptionDevtools from './useSubscription/useSubscriptionDevtools'
+import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
 
 export const plugin: Plugin = {
   install(app: App): void {
@@ -20,5 +20,5 @@ export const plugin: Plugin = {
     }, (api) => {
       useSubscriptionDevtools.init(api)
     })
-  }
+  },
 }

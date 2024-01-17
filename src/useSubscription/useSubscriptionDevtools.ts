@@ -4,34 +4,34 @@ import type {
   CustomInspectorState,
   TimelineEvent,
   PluginSettingsItem,
-  ExtractSettingsTypes} from '@vue/devtools-api'
-import Channel from './models/channel'
+  ExtractSettingsTypes
+} from '@vue/devtools-api'
 import { ComponentInternalInstance, getCurrentInstance, nextTick } from 'vue'
+import Channel from '@/useSubscription/models/channel'
 
-function throttle(fn: Function, wait: number) {
+function throttle(fn: () => void, wait: number): () => void {
   let isThrottled = false
   let invokedDuringThrottle = false
 
-  function wrapper(this: unknown) {
-    const context = this
+  function wrapper(this: unknown): void {
     if (isThrottled) {
       invokedDuringThrottle = true
-      return;
+      return
     }
-    isThrottled = true;
+    isThrottled = true
 
-    fn.apply(context, arguments)
+    fn.apply(this)
 
-    setTimeout(function() {
-      isThrottled = false; // (3)
+    setTimeout(() => {
+      isThrottled = false
       if (invokedDuringThrottle) {
-        wrapper.apply(context);
+        wrapper.apply(this)
         invokedDuringThrottle = false
       }
-    }, wait);
+    }, wait)
   }
 
-  return wrapper;
+  return wrapper
 }
 
 const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
@@ -66,18 +66,21 @@ export function init(api: DevtoolsPluginApi<SubscriptionDevtoolsSettings>): void
     treeFilterPlaceholder: 'Search subscriptions',
   })
 
-  api.on.getInspectorTree((payload, context) => {
+  api.on.getInspectorTree((payload) => {
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
       payload.rootNodes = []
-      const regex = new RegExp(payload.filter, 'i') // 'i' flag for case-insensitive search
+      // 'i' flag for case-insensitive search
+      const regex = new RegExp(payload.filter, 'i')
       for (const { node } of channelNodes.values()) {
-        if (payload.filter && !regex.test(node.label)) { continue }
+        if (payload.filter && !regex.test(node.label)) {
+          continue
+        }
         payload.rootNodes.push(node)
       }
     }
   })
 
-  api.on.getInspectorState(async (payload, context) => {
+  api.on.getInspectorState((payload) => {
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
       payload.state = getCustomInspectorState(payload.nodeId)
 
@@ -108,15 +111,17 @@ function initialized(): boolean {
 
 const refresh: () => void = throttle(() => {
   setTimeout(async () => {
-    await nextTick();
-    API?.sendInspectorState(SUBSCRIPTIONS_INSPECTOR_ID);
-    API?.sendInspectorTree(SUBSCRIPTIONS_INSPECTOR_ID);
-  }, 100);
+    await nextTick()
+    API?.sendInspectorState(SUBSCRIPTIONS_INSPECTOR_ID)
+    API?.sendInspectorTree(SUBSCRIPTIONS_INSPECTOR_ID)
+  }, 100)
 }, 200)
 
 export function addChannel(channel: Channel): void {
-  if (!initialized()) { return }
-  addTimelineEvent({title: `${channel.actionName} · Channel created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
+  if (!initialized()) {
+    return
+  }
+  addTimelineEvent({ title: `${channel.actionName} · Channel created`, data: { channel, action: channel.actionName }, groupId: channel.signature })
 
   channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
   refresh()
@@ -127,7 +132,9 @@ type UpdateChannelEvent = {
   [K in UpdateChannelEventTypes]: CreateSubscriptionDevtoolsTimelineEvent<K, EventTypeToDataMap[K]>
 }[UpdateChannelEventTypes]
 export function updateChannel(channel: Channel, event: UpdateChannelEvent): void {
-  if (!initialized()) { return }
+  if (!initialized()) {
+    return
+  }
 
   channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
   addTimelineEvent(event)
@@ -135,16 +142,20 @@ export function updateChannel(channel: Channel, event: UpdateChannelEvent): void
 }
 
 export function removeChannel(channel: Channel): void {
-  if (!initialized()) { return }
-  addTimelineEvent({title: `${channel.actionName} · Channel removed`, data: {channel, action: channel.actionName}, groupId: channel.signature})
+  if (!initialized()) {
+    return
+  }
+  addTimelineEvent({ title: `${channel.actionName} · Channel removed`, data: { channel, action: channel.actionName }, groupId: channel.signature })
 
   channelNodes.delete(channel.signature)
   refresh()
 }
 
 export function registerChannelSubscription(channel: Channel, subscriptionId: number): void {
-  if (!initialized()) { return }
-  addTimelineEvent({title: `${channel.actionName} · Subscription created`, data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
+  if (!initialized()) {
+    return
+  }
+  addTimelineEvent({ title: `${channel.actionName} · Subscription created`, data: { channel, action: channel.actionName, subscriptionId }, groupId: channel.signature })
 
   const channelSubscriptions = subscribedComponents.get(channel.signature) ?? new Map()
   const vm = getCurrentInstance()
@@ -155,63 +166,67 @@ export function registerChannelSubscription(channel: Channel, subscriptionId: nu
 }
 
 export function removeChannelSubscription(channel: Channel, subscriptionId: number): void {
-  if (!initialized()) { return }
-  addTimelineEvent({title: `${channel.actionName} · Subscription removed`, data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
+  if (!initialized()) {
+    return
+  }
+  addTimelineEvent({ title: `${channel.actionName} · Subscription removed`, data: { channel, action: channel.actionName, subscriptionId }, groupId: channel.signature })
 
   const channelSubscriptions = subscribedComponents.get(channel.signature)
-  if (!channelSubscriptions) { return }
+  if (!channelSubscriptions) {
+    return
+  }
   channelSubscriptions.delete(subscriptionId)
   refresh()
 }
 
 type SubscriptionsInspectorState = CustomInspectorState & {
   State: CustomInspectorState[keyof CustomInspectorState],
-  "Subscribed Components": CustomInspectorState[keyof CustomInspectorState],
+  'Subscribed Components': CustomInspectorState[keyof CustomInspectorState],
 }
 
 function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
-  const {channel} = channelNodes.get(nodeId as Channel['signature']) ?? {}
+  const { channel } = channelNodes.get(nodeId as Channel['signature']) ?? {}
   if (!channel) {
-    return {"Error": [{ key: 'message', value: 'Channel not found.'}], "State": [], "Subscribed Components": []}
+    return { 'Error': [{ key: 'message', value: 'Channel not found.' }], 'State': [], 'Subscribed Components': [] }
   }
   const subscriptions = subscribedComponents.get(channel.signature) ?? new Map<number, ComponentInternalInstance | null>()
-  
+
   return {
-    "State": [
+    'State': [
       {
         key: 'channel',
         value: channel,
-      }
+      },
     ],
-    "Subscribed Components": [...subscriptions.entries()].map(([id, vm]) => (
+    'Subscribed Components': [...subscriptions.entries()].map(([id, vm]) => (
       {
         key: String(id),
         value: getComponentName(vm),
-      })
+      }),
     ),
   }
 }
 
 function getComponentName(vm: ComponentInternalInstance | null): string {
-  // @ts-ignore __name is not in the types but works.
-  return vm?.type.__name as string ?? vm?.type?.name ?? '🤷🏻‍♂️ Unknown component'
+  // @ts-expect-error __name is not in the types but works.
+  return vm?.type.__name as string ?? vm?.type.name ?? '🤷🏻‍♂️ Unknown component'
 }
 
 type CreateSubscriptionDevtoolsTimelineEvent<TEvent extends string, TData> = Omit<TimelineEvent<TData>, 'time'> & {
   title: `${string} · ${TEvent}`,
-  groupId: string
+  groupId: string,
 }
 
 type EventTypeToDataMap = {
-  "Channel created": {channel: Channel, action: string},
-  "Channel removed": {channel: Channel, action: string},
-  "Subscription created": {channel: Channel, action: string, subscriptionId: number},
-  "Subscription removed": {channel: Channel, action: string, subscriptionId: number},
-  "Loading": {channel: Channel, action: string, loading: boolean},
-  "Error": {channel: Channel, action: string, error: unknown},
-  "Executed": {channel: Channel, action: string, executed: boolean},
-  "Response": {channel: Channel, action: string, response: any},
-  "Refresh": {channel: Channel, action: string },
+  'Channel created': { channel: Channel, action: string },
+  'Channel removed': { channel: Channel, action: string },
+  'Subscription created': { channel: Channel, action: string, subscriptionId: number },
+  'Subscription removed': { channel: Channel, action: string, subscriptionId: number },
+  'Loading': { channel: Channel, action: string, loading: boolean },
+  'Error': { channel: Channel, action: string, error: unknown },
+  'Executed': { channel: Channel, action: string, executed: boolean },
+  'Response': { channel: Channel, action: string, response: any },
+  'Refresh': { channel: Channel, action: string },
 }
 
 type SubscriptionDevtoolsTimelineEvent = {
