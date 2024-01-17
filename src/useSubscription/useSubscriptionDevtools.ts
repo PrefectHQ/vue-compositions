@@ -94,7 +94,7 @@ const refresh: () => void = throttle(() => {
 }, 100)
 
 export function addChannel(channel: Channel): void {
-  addTimelineEvent({title: `${channel.actionName} · Channel Created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
+  addTimelineEvent({title: `${channel.actionName} · Channel created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
 
   channelNodes.set(channel.signature, { node: mapChannelToInspectorNode(channel), channel })
   refresh()
@@ -108,7 +108,7 @@ export function removeChannel(channel: Channel): void {
 }
 
 export function registerChannelSubscription(channel: Channel, subscriptionId: number): void {
-  addTimelineEvent({title: `${channel.actionName} · Subscription Created`, data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
+  addTimelineEvent({title: `${channel.actionName} · Subscription created`, data: {channel, action: channel.actionName, subscriptionId}, groupId: channel.signature})
 
   const channelSubscriptions = subscribedComponents.get(channel.signature) ?? new Map()
   const vm = getCurrentInstance()
@@ -160,7 +160,28 @@ function getComponentName(vm: ComponentInternalInstance | null): string {
   return vm?.type.__name as string ?? vm?.type?.name ?? '🤷🏻‍♂️ Unknown component'
 }
 
-export function addTimelineEvent<T extends Omit<TimelineEvent, 'time'>>(event: T): void {
+type CreateSubscriptionDevtoolsTimelineEvent<TEvent extends string, TData> = Omit<TimelineEvent<TData>, 'time'> & {
+  title: `${string} · ${TEvent}`,
+  groupId: string
+}
+
+type EventTypeToDataMap = {
+  "Channel created": {channel: Channel, action: string},
+  "Channel removed": {channel: Channel, action: string},
+  "Subscription created": {channel: Channel, action: string, subscriptionId: number},
+  "Subscription removed": {channel: Channel, action: string, subscriptionId: number},
+  "Loading": {channel: Channel, action: string, loading: boolean},
+  "Error": {channel: Channel, action: string, error: unknown},
+  "Executed": {channel: Channel, action: string, executed: boolean},
+  "Response": {channel: Channel, action: string, response: any},
+  "Refresh": {channel: Channel, action: string },
+}
+
+type SubscriptionDevtoolsTimelineEvent = {
+  [K in keyof EventTypeToDataMap]: CreateSubscriptionDevtoolsTimelineEvent<K, EventTypeToDataMap[K]>
+}[keyof EventTypeToDataMap]
+
+export function addTimelineEvent(event: SubscriptionDevtoolsTimelineEvent): void {
   API?.addTimelineEvent({
     layerId: SUBSCRIPTIONS_TIMELINE_LAYER_ID,
     event: {
