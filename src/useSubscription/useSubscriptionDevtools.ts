@@ -80,16 +80,9 @@ export function init(api: DevtoolsPluginApi<SubscriptionDevtoolsSettings>): void
     }
   })
 
-  api.on.getInspectorState((payload) => {
+  api.on.getInspectorState(async (payload) => {
     if (payload.inspectorId === SUBSCRIPTIONS_INSPECTOR_ID) {
-      payload.state = getCustomInspectorState(payload.nodeId)
-
-      // Experimenting with getting the component name from the devtools api. doesn't seem to get all names either but gets some
-      // await Promise.all(payload.state["Subscribed Components"].map(async (subscription) => {
-      //   if (!subscription.value) { return }
-      //   const name = await api.getComponentName(subscription.value)
-      //   subscription.value = name
-      // }))
+      payload.state = await getCustomInspectorState(payload.nodeId)
     }
   })
 
@@ -184,7 +177,7 @@ type SubscriptionsInspectorState = CustomInspectorState & {
   'Subscribed Components': CustomInspectorState[keyof CustomInspectorState],
 }
 
-function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
+async function getCustomInspectorState(nodeId: string): Promise<SubscriptionsInspectorState> {
   const { channel } = channelNodes.get(nodeId as Channel['signature']) ?? {}
   if (!channel) {
     return { 'Error': [{ key: 'message', value: 'Channel not found.' }], 'State': [], 'Subscribed Components': [] }
@@ -198,18 +191,19 @@ function getCustomInspectorState(nodeId: string): SubscriptionsInspectorState {
         value: channel,
       },
     ],
-    'Subscribed Components': [...subscriptions.entries()].map(([id, vm]) => (
-      {
-        key: String(id),
-        value: getComponentName(vm),
-      }),
-    ),
-  }
-}
+    'Subscribed Components': await Promise.all([...subscriptions.entries()].map(async ([id, vm]) => {
+      let componentName = vm ? await API?.getComponentName(vm) : null
 
-function getComponentName(vm: ComponentInternalInstance | null): string {
-  // @ts-expect-error __name is not in the types but works.
-  return vm?.type.__name as string ?? vm?.type.name ?? '🤷🏻‍♂️ Unknown component'
+      if (!componentName) {
+        componentName = vm === null ? '﹖ Unknown component' : "🔎 Couldn't resolve component name"
+      }
+
+      return {
+        key: String(id),
+        value: componentName,
+      }
+    })),
+  }
 }
 
 type CreateSubscriptionDevtoolsTimelineEvent<TEvent extends string, TData> = Omit<TimelineEvent<TData>, 'time'> & {
