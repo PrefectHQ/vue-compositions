@@ -37,3 +37,20 @@ When a subscription is removed the channel interval is recalculated. A subscript
 | unsubscribe | `() => void`                        |             | Remove the subscription from the channel                        |
 | subscribe   | `() => subscription<action>`        |             | Resubscribes to the channel using the same arguments            |
 
+## Debugging
+`useSubscription` comes with its own Vue devtools plugin for debugging purposes.
+
+To use, just install the Vue plugin onto your app:
+```typescript
+import { plugin as VueCompositionsDevtools } from '@prefecthq/vue-compositions'
+
+const app = createApp(App)
+if (/*not in production*/) {
+  app.use(VueCompositionsDevtools)
+}
+```
+
+> Note: to limit runtime overhead, only install the plugin if in development
+
+Once installed, open the Vue devtools and you should see a new tab and timeline layer
+for `Subscriptions`. The devtool plugin tracks all active subscriptions and their underlying channels.
