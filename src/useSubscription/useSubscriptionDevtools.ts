@@ -9,12 +9,29 @@ import Channel from './models/channel'
 import { ComponentInternalInstance, getCurrentInstance, nextTick } from 'vue'
 
 function throttle(fn: Function, wait: number) {
-  let timeout: ReturnType<typeof setTimeout>;
-  return function (...args) {
-    const next = () => fn.call(this, args);
-    clearTimeout(timeout);
-    timeout = setTimeout(next, wait);
-  };
+  let isThrottled = false
+  let invokedDuringThrottle = false
+
+  function wrapper(this: unknown) {
+    const context = this
+    if (isThrottled) {
+      invokedDuringThrottle = true
+      return;
+    }
+    isThrottled = true;
+
+    fn.apply(context, arguments)
+
+    setTimeout(function() {
+      isThrottled = false; // (3)
+      if (invokedDuringThrottle) {
+        wrapper.apply(context);
+        invokedDuringThrottle = false
+      }
+    }, wait);
+  }
+
+  return wrapper;
 }
 
 const SUBSCRIPTIONS_INSPECTOR_ID = 'prefect-vue-compositions-subscriptions'
@@ -91,7 +108,7 @@ const refresh: () => void = throttle(() => {
     API?.sendInspectorState(SUBSCRIPTIONS_INSPECTOR_ID);
     API?.sendInspectorTree(SUBSCRIPTIONS_INSPECTOR_ID);
   }, 100);
-}, 100)
+}, 200)
 
 export function addChannel(channel: Channel): void {
   addTimelineEvent({title: `${channel.actionName} · Channel created`, data: {channel, action: channel.actionName}, groupId: channel.signature})
