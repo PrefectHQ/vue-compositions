@@ -89,7 +89,7 @@ export default class Channel<T extends Action = Action> {
     }
 
     if (this.late) {
-      this.execute()
+      this.refresh()
     }
   }
 
