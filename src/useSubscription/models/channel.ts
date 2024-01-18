@@ -88,7 +88,7 @@ export default class Channel<T extends Action = Action> {
       subscription.paused.value = paused
     }
 
-    if (this.late) {
+    if (!paused && this.late) {
       this.refresh()
     }
 
