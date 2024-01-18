@@ -23,6 +23,8 @@ export type MappedSubscription<T extends Action> = {
   errored: Subscription<T>['errored'],
   error: Subscription<T>['error'],
   executed: Subscription<T>['executed'],
+  paused: Subscription<T>['paused'],
+  late: Subscription<T>['late'],
   refresh: Subscription<T>['refresh'],
   unsubscribe: Subscription<T>['unsubscribe'],
   isSubscribed: Subscription<T>['isSubscribed'],
@@ -39,6 +41,10 @@ export type UseSubscription<T extends Action> = {
   /** Stores any error thrown while executing the action. Initially `null`. */
   error: unknown,
   executed: boolean,
+  /** Set to `true` if the channel is paused an is not executing */
+  paused: boolean,
+  /** Set to `true` if an execution was requested while the channel was paused */
+  late: boolean,
   /** Executes the `action` again. */
   refresh: Subscription<T>['refresh'],
   /** Remove the subscription from the channel. */

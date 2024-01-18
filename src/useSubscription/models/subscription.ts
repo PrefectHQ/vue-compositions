@@ -21,6 +21,8 @@ export default class Subscription<T extends Action> {
   public errored: Ref<boolean> = ref(false)
   public error: Ref<unknown> = ref(null)
   public executed: Ref<boolean> = ref(false)
+  public paused: Ref<boolean> = ref(false)
+  public late: Ref<boolean> = ref(false)
 
   private readonly channel: Channel<T>
 

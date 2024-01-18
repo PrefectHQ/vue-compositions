@@ -120,7 +120,7 @@ export function addChannel(channel: Channel): void {
   refresh()
 }
 
-type UpdateChannelEventTypes = 'Loading' | 'Error' | 'Executed' | 'Response' | 'Refresh'
+export type UpdateChannelEventTypes = 'Loading' | 'Error' | 'Executed' | 'Response' | 'Refresh' | 'Paused' | 'Late'
 type UpdateChannelEvent = {
   [K in UpdateChannelEventTypes]: CreateSubscriptionDevtoolsTimelineEvent<K, EventTypeToDataMap[K]>
 }[UpdateChannelEventTypes]
@@ -221,6 +221,8 @@ type EventTypeToDataMap = {
   'Executed': { channel: Channel, action: string, executed: boolean },
   'Response': { channel: Channel, action: string, response: unknown },
   'Refresh': { channel: Channel, action: string },
+  'Paused': { channel: Channel, action: string, paused: boolean },
+  'Late': { channel: Channel, action: string, late: boolean },
 }
 
 type SubscriptionDevtoolsTimelineEvent = {

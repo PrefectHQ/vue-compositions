@@ -48,6 +48,8 @@ export default class Channel<T extends Action = Action> {
   private scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
+  private _late: boolean = false
+  private _paused: boolean = false
   private _loading: boolean = false
   private _executed: boolean = false
   private _errored: boolean = false
@@ -73,6 +75,46 @@ export default class Channel<T extends Action = Action> {
       .map(subscription => subscription.options.interval ?? Infinity)
 
     return Math.min(...intervals)
+  }
+
+  public get paused(): boolean {
+    return this._paused
+  }
+
+  public set paused(paused: boolean) {
+    this._paused = paused
+
+    for (const subscription of this.subscriptions.values()) {
+      subscription.paused.value = paused
+    }
+
+    if (!paused && this.late) {
+      this.refresh()
+    }
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Paused`,
+      data: { channel: this, action: this.actionName, paused },
+      groupId: this.signature,
+    })
+  }
+
+  private get late(): boolean {
+    return this._late
+  }
+
+  private set late(late: boolean) {
+    this._late = late
+
+    for (const subscription of this.subscriptions.values()) {
+      subscription.late.value = late
+    }
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Late`,
+      data: { channel: this, action: this.actionName, late },
+      groupId: this.signature,
+    })
   }
 
   public get response(): ActionResponse<T> | undefined {
@@ -195,6 +237,11 @@ export default class Channel<T extends Action = Action> {
   }
 
   public async execute(): Promise<void> {
+    if (this.paused) {
+      this.late = true
+      return
+    }
+
     const args = unrefArgs(this.args)
 
     this.loading = true
@@ -216,6 +263,7 @@ export default class Channel<T extends Action = Action> {
     } finally {
       this.executed = true
       this.loading = false
+      this.late = false
     }
   }
 
