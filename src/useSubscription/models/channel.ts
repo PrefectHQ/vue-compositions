@@ -91,6 +91,12 @@ export default class Channel<T extends Action = Action> {
     if (this.late) {
       this.refresh()
     }
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Paused`,
+      data: { channel: this, action: this.actionName, paused },
+      groupId: this.signature,
+    })
   }
 
   private get late(): boolean {
@@ -103,6 +109,12 @@ export default class Channel<T extends Action = Action> {
     for (const subscription of this.subscriptions.values()) {
       subscription.late.value = late
     }
+
+    useSubscriptionDevtools.updateChannel(this, {
+      title: `${this.actionName} · Late`,
+      data: { channel: this, action: this.actionName, late },
+      groupId: this.signature,
+    })
   }
 
   public get response(): ActionResponse<T> | undefined {
