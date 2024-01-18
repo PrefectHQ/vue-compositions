@@ -48,7 +48,7 @@ export default class Channel<T extends Action = Action> {
   private scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
-  private late: boolean = false
+  private _late: boolean = false
   private _paused: boolean = false
   private _loading: boolean = false
   private _executed: boolean = false
@@ -84,8 +84,24 @@ export default class Channel<T extends Action = Action> {
   public set paused(paused: boolean) {
     this._paused = paused
 
+    for (const subscription of this.subscriptions.values()) {
+      subscription.paused.value = paused
+    }
+
     if (this.late) {
       this.execute()
+    }
+  }
+
+  private get late(): boolean {
+    return this._late
+  }
+
+  private set late(late: boolean) {
+    this._late = late
+
+    for (const subscription of this.subscriptions.values()) {
+      subscription.late.value = late
     }
   }
 

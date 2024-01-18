@@ -4,7 +4,7 @@ import { Action } from '@/useSubscription/types/action'
 import { MappedSubscription, SubscriptionPromise } from '@/useSubscription/types/subscription'
 
 export function mapSubscription<T extends Action>(subscription: Subscription<T>): MappedSubscription<T> {
-  const { loading, error, errored, response, executed } = subscription
+  const { loading, error, errored, response, executed, paused, late } = subscription
 
   return {
     loading,
@@ -12,6 +12,8 @@ export function mapSubscription<T extends Action>(subscription: Subscription<T>)
     errored,
     response,
     executed,
+    paused,
+    late,
     refresh: () => subscription.refresh(),
     unsubscribe: () => subscription.unsubscribe(),
     isSubscribed: () => subscription.isSubscribed(),
@@ -20,7 +22,7 @@ export function mapSubscription<T extends Action>(subscription: Subscription<T>)
 }
 
 function mapSubscriptionPromise<T extends Action>(subscription: Subscription<T>): Awaited<SubscriptionPromise<T>> {
-  const { loading, error, errored, response, executed } = subscription
+  const { loading, error, errored, response, executed, paused, late } = subscription
 
   return reactive({
     loading,
@@ -28,6 +30,8 @@ function mapSubscriptionPromise<T extends Action>(subscription: Subscription<T>)
     errored,
     response,
     executed,
+    paused,
+    late,
     refresh: () => subscription.refresh(),
     unsubscribe: () => subscription.unsubscribe(),
     isSubscribed: () => subscription.isSubscribed(),
