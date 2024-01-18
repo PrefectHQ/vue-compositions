@@ -7,7 +7,7 @@ import { getValidWatchSource } from '@/utilities/getValidWatchSource'
 import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 
-const defaultManager = new Manager()
+export const defaultSubscriptionManager = new Manager()
 
 /**
  * The `useSubscription` composition manages data sharing across components. Multiple components can subscribe to an `action` (any method or function) and share the response value.
@@ -21,7 +21,7 @@ export function useSubscription<T extends Action>(
   ...[action, args, optionsArg = {}]: SubscribeArguments<T>
 ): UseSubscription<T> {
   const options = unref(optionsArg)
-  const manager = options.manager ?? defaultManager
+  const manager = options.manager ?? defaultSubscriptionManager
   const argsWithDefault = args ?? [] as unknown as ActionArguments<T>
   const originalSubscription = manager.subscribe(action, argsWithDefault, options)
   const subscriptionResponse = reactive(mapSubscription(originalSubscription))
@@ -51,7 +51,7 @@ export function useSubscription<T extends Action>(
     }
 
     const options = unref(optionsArg)
-    const manager = options.manager ?? defaultManager
+    const manager = options.manager ?? defaultSubscriptionManager
     const newSubscription = manager.subscribe(action, argsWithDefault, options)
     subscriptionResponse.unsubscribe()
 
