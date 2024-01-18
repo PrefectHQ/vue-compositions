@@ -24,6 +24,18 @@ export default class Manager {
     return subscription
   }
 
+  public pause(): void {
+    for (const channel of this.channels.values()) {
+      channel.paused = true
+    }
+  }
+
+  public resume(): void {
+    for (const channel of this.channels.values()) {
+      channel.paused = false
+    }
+  }
+
   public deleteChannel(signature: ChannelSignature): void {
     const channel = this.channels.get(signature)
     if (channel) {
@@ -53,4 +65,5 @@ export default class Manager {
 
     useSubscriptionDevtools.addChannel(channel)
   }
+
 }

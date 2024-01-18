@@ -48,6 +48,8 @@ export default class Channel<T extends Action = Action> {
   private scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
   private lastExecution: number = 0
+  private late: boolean = false
+  private _paused: boolean = false
   private _loading: boolean = false
   private _executed: boolean = false
   private _errored: boolean = false
@@ -73,6 +75,18 @@ export default class Channel<T extends Action = Action> {
       .map(subscription => subscription.options.interval ?? Infinity)
 
     return Math.min(...intervals)
+  }
+
+  public get paused(): boolean {
+    return this._paused
+  }
+
+  public set paused(paused: boolean) {
+    this._paused = paused
+
+    if (this.late) {
+      this.execute()
+    }
   }
 
   public get response(): ActionResponse<T> | undefined {
@@ -195,6 +209,11 @@ export default class Channel<T extends Action = Action> {
   }
 
   public async execute(): Promise<void> {
+    if (this.paused) {
+      this.late = true
+      return
+    }
+
     const args = unrefArgs(this.args)
 
     this.loading = true
@@ -216,6 +235,7 @@ export default class Channel<T extends Action = Action> {
     } finally {
       this.executed = true
       this.loading = false
+      this.late = false
     }
   }
 

@@ -645,4 +645,30 @@ describe('subscribe', () => {
     expect(subscription.response).toBe(2)
   })
 
+  it('doest not execute if paused', () => {
+    vi.useFakeTimers()
+
+    const interval = 1000
+    const manager = new Manager()
+    const action = vi.fn()
+
+    useSubscription(action, [], { manager, interval })
+
+    expect(action).toBeCalledTimes(1)
+
+    vi.advanceTimersByTime(interval)
+
+    expect(action).toBeCalledTimes(2)
+
+    manager.pause()
+
+    vi.advanceTimersByTime(interval)
+
+    expect(action).toBeCalledTimes(2)
+
+    manager.resume()
+
+    expect(action).toBeCalledTimes(3)
+  })
+
 })
