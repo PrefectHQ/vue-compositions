@@ -13,7 +13,6 @@ jobs:
   verify-release:
     name: Verify Release
     runs-on: ubuntu-latest
-    environment: 'prod'
     outputs:
       release: ${{ steps.verify-release.outputs.release }}
     steps:
