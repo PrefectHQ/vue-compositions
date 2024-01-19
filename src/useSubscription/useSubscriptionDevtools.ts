@@ -7,7 +7,7 @@ import type {
   ExtractSettingsTypes
 } from '@vue/devtools-api'
 import { ComponentInternalInstance, getCurrentInstance, nextTick } from 'vue'
-import Channel from '@/useSubscription/models/channel'
+import { SubscriptionChannel } from '@/useSubscription/models/channel'
 
 function throttle(fn: () => void, wait: number): () => void {
   let isThrottled = false
@@ -53,8 +53,8 @@ export const SUBSCRIPTION_DEVTOOLS_SETTINGS = {
 
 export type SubscriptionDevtoolsSettings = ExtractSettingsTypes<typeof SUBSCRIPTION_DEVTOOLS_SETTINGS>
 
-const channelNodes: Map<Channel['signature'], { node: CustomInspectorNode, channel: Channel }> = new Map()
-const subscribedComponents: Map<Channel['signature'], Map<number, ComponentInternalInstance | null>> = new Map()
+const channelNodes: Map<SubscriptionChannel['signature'], { node: CustomInspectorNode, channel: SubscriptionChannel }> = new Map()
+const subscribedComponents: Map<SubscriptionChannel['signature'], Map<number, ComponentInternalInstance | null>> = new Map()
 let API: DevtoolsPluginApi<Record<string, unknown>> | null = null
 
 export function init(api: DevtoolsPluginApi<SubscriptionDevtoolsSettings>): void {
@@ -110,7 +110,7 @@ const refresh: () => void = throttle(() => {
   }, 100)
 }, 200)
 
-export function addChannel(channel: Channel): void {
+export function addChannel(channel: SubscriptionChannel): void {
   if (!initialized()) {
     return
   }
@@ -124,7 +124,7 @@ export type UpdateChannelEventTypes = 'Loading' | 'Error' | 'Executed' | 'Respon
 type UpdateChannelEvent = {
   [K in UpdateChannelEventTypes]: CreateSubscriptionDevtoolsTimelineEvent<K, EventTypeToDataMap[K]>
 }[UpdateChannelEventTypes]
-export function updateChannel(channel: Channel, event: UpdateChannelEvent): void {
+export function updateChannel(channel: SubscriptionChannel, event: UpdateChannelEvent): void {
   if (!initialized()) {
     return
   }
@@ -134,7 +134,7 @@ export function updateChannel(channel: Channel, event: UpdateChannelEvent): void
   refresh()
 }
 
-export function removeChannel(channel: Channel): void {
+export function removeChannel(channel: SubscriptionChannel): void {
   if (!initialized()) {
     return
   }
@@ -144,7 +144,7 @@ export function removeChannel(channel: Channel): void {
   refresh()
 }
 
-export function registerChannelSubscription(channel: Channel, subscriptionId: number): void {
+export function registerChannelSubscription(channel: SubscriptionChannel, subscriptionId: number): void {
   if (!initialized()) {
     return
   }
@@ -158,7 +158,7 @@ export function registerChannelSubscription(channel: Channel, subscriptionId: nu
   refresh()
 }
 
-export function removeChannelSubscription(channel: Channel, subscriptionId: number): void {
+export function removeChannelSubscription(channel: SubscriptionChannel, subscriptionId: number): void {
   if (!initialized()) {
     return
   }
@@ -178,7 +178,7 @@ type SubscriptionsInspectorState = CustomInspectorState & {
 }
 
 async function getCustomInspectorState(nodeId: string): Promise<SubscriptionsInspectorState> {
-  const { channel } = channelNodes.get(nodeId as Channel['signature']) ?? {}
+  const { channel } = channelNodes.get(nodeId as SubscriptionChannel['signature']) ?? {}
   if (!channel) {
     return { 'Error': [{ key: 'message', value: 'Channel not found.' }], 'State': [], 'Subscribed Components': [] }
   }
@@ -212,17 +212,17 @@ type CreateSubscriptionDevtoolsTimelineEvent<TEvent extends string, TData> = Omi
 }
 
 type EventTypeToDataMap = {
-  'Channel created': { channel: Channel, action: string },
-  'Channel removed': { channel: Channel, action: string },
-  'Subscription created': { channel: Channel, action: string, subscriptionId: number },
-  'Subscription removed': { channel: Channel, action: string, subscriptionId: number },
-  'Loading': { channel: Channel, action: string, loading: boolean },
-  'Error': { channel: Channel, action: string, error: unknown },
-  'Executed': { channel: Channel, action: string, executed: boolean },
-  'Response': { channel: Channel, action: string, response: unknown },
-  'Refresh': { channel: Channel, action: string },
-  'Paused': { channel: Channel, action: string, paused: boolean },
-  'Late': { channel: Channel, action: string, late: boolean },
+  'Channel created': { channel: SubscriptionChannel, action: string },
+  'Channel removed': { channel: SubscriptionChannel, action: string },
+  'Subscription created': { channel: SubscriptionChannel, action: string, subscriptionId: number },
+  'Subscription removed': { channel: SubscriptionChannel, action: string, subscriptionId: number },
+  'Loading': { channel: SubscriptionChannel, action: string, loading: boolean },
+  'Error': { channel: SubscriptionChannel, action: string, error: unknown },
+  'Executed': { channel: SubscriptionChannel, action: string, executed: boolean },
+  'Response': { channel: SubscriptionChannel, action: string, response: unknown },
+  'Refresh': { channel: SubscriptionChannel, action: string },
+  'Paused': { channel: SubscriptionChannel, action: string, paused: boolean },
+  'Late': { channel: SubscriptionChannel, action: string, late: boolean },
 }
 
 type SubscriptionDevtoolsTimelineEvent = {
@@ -239,7 +239,7 @@ function addTimelineEvent(event: SubscriptionDevtoolsTimelineEvent): void {
   })
 }
 
-function mapChannelToInspectorNode(channel: Channel): CustomInspectorNode {
+function mapChannelToInspectorNode(channel: SubscriptionChannel): CustomInspectorNode {
   return {
     id: channel.signature,
     label: `${channel.actionName} ${channel.signature}`,

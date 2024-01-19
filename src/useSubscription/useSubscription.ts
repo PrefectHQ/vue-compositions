@@ -1,5 +1,5 @@
 import { reactive, unref } from 'vue'
-import Manager from '@/useSubscription/models/manager'
+import { SubscriptionManager } from '@/useSubscription/models'
 import { Action, ActionArguments } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
 import { mapSubscription } from '@/useSubscription/utilities/subscriptions'
@@ -7,7 +7,7 @@ import { getValidWatchSource } from '@/utilities/getValidWatchSource'
 import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 import { uniqueValueWatcher } from '@/utilities/uniqueValueWatcher'
 
-export const defaultSubscriptionManager = new Manager()
+export const defaultSubscriptionManager = new SubscriptionManager()
 
 /**
  * The `useSubscription` composition manages data sharing across components. Multiple components can subscribe to an `action` (any method or function) and share the response value.

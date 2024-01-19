@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { ref, Ref, watch } from 'vue'
-import Channel from '@/useSubscription/models/channel'
+import { SubscriptionChannel } from '@/useSubscription/models/channel'
 import { Action, ActionResponse } from '@/useSubscription/types/action'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
 import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
@@ -13,7 +13,7 @@ class SubscriptionIdManager {
   }
 }
 
-export default class Subscription<T extends Action> {
+export class Subscription<T extends Action> {
   public readonly id: number
   public readonly options: SubscriptionOptions
   public loading: Ref<boolean> = ref(false)
@@ -24,9 +24,9 @@ export default class Subscription<T extends Action> {
   public paused: Ref<boolean> = ref(false)
   public late: Ref<boolean> = ref(false)
 
-  private readonly channel: Channel<T>
+  private readonly channel: SubscriptionChannel<T>
 
-  public constructor(channel: Channel<T>, options: SubscriptionOptions) {
+  public constructor(channel: SubscriptionChannel<T>, options: SubscriptionOptions) {
     this.id = SubscriptionIdManager.get()
     this.channel = channel
     this.options = options
