@@ -2,7 +2,7 @@ import { render } from '@testing-library/vue'
 import { test, describe, it, expect, afterEach, vi } from 'vitest'
 import { computed, h, reactive, ref } from 'vue'
 import { useSubscription } from '@/useSubscription'
-import Manager from '@/useSubscription/models/manager'
+import { SubscriptionManager } from '@/useSubscription/models/manager'
 import { SubscriptionOptions, UseSubscription } from '@/useSubscription/types/subscription'
 import { timeout, uniqueSubscribe } from '@/utilities/tests'
 
@@ -120,7 +120,7 @@ describe('subscribe', () => {
   })
 
   it('executes the action once when two subscriptions are created', () => {
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
 
     useSubscription(action, [], { manager })
@@ -132,7 +132,7 @@ describe('subscribe', () => {
   it('calculates the poll interval correctly', () => {
     vi.useFakeTimers()
 
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
     const initialExecutions = 1
     const additionalExecutions = 3
@@ -150,7 +150,7 @@ describe('subscribe', () => {
   it('calculates the poll interval correctly when a subscription is unsubscribed', () => {
     vi.useFakeTimers()
 
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
     const initialExecutions = 1
     const additionalExecutions = 3
@@ -171,7 +171,7 @@ describe('subscribe', () => {
   it('stops polling when all subscriptions with interval unsubscribe', () => {
     vi.useFakeTimers()
 
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
     const minInterval = 10
     const maxInterval = 20
@@ -361,7 +361,7 @@ describe('subscribe', () => {
   })
 
   it('does not update subscription when unsubscribed', async () => {
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     let int = 0
 
     function action(): number {
@@ -481,7 +481,7 @@ describe('subscribe', () => {
       return 0
     }
 
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
 
     useSubscription(action, [], { manager })
 
@@ -503,7 +503,7 @@ describe('subscribe', () => {
 
   it('correctly sets executed on additional subscriptions', async () => {
     const action = vi.fn()
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
 
     useSubscription(action, [], { manager })
 
@@ -556,7 +556,7 @@ describe('subscribe', () => {
   })
 
   it('unsubscribes nested subscriptions automatically', () => {
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
     let childSubscription: UseSubscription<typeof action>
 
@@ -573,7 +573,7 @@ describe('subscribe', () => {
 
   it('unsubscribes nested subscriptions when changing args', async () => {
     const number = ref(0)
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
     let childSubscription: UseSubscription<typeof action>
 
@@ -593,7 +593,7 @@ describe('subscribe', () => {
 
   it('it refreshes nested subscriptions when calling refresh', async () => {
     const action = vi.fn()
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const subscription = useSubscription((): void => {
       useSubscription(action, [], { manager })
     }, [], { manager })
@@ -649,7 +649,7 @@ describe('subscribe', () => {
     vi.useFakeTimers()
 
     const interval = 1000
-    const manager = new Manager()
+    const manager = new SubscriptionManager()
     const action = vi.fn()
 
     const subscription = useSubscription(action, [], { manager, interval })

@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import { isEqual } from 'lodash'
 import { effectScope } from 'vue'
-import Manager from '@/useSubscription/models/manager'
-import Subscription from '@/useSubscription/models/subscription'
+import { SubscriptionManager } from '@/useSubscription/models/manager'
+import { Subscription } from '@/useSubscription/models/subscription'
 import {
   Action,
   ActionArguments,
@@ -38,10 +38,10 @@ class ChannelSignatureManager {
   }
 }
 
-export default class Channel<T extends Action = Action> {
+export class SubscriptionChannel<T extends Action = Action> {
   public readonly signature: ChannelSignature
 
-  private readonly manager: Manager
+  private readonly manager: SubscriptionManager
   private readonly action: T
   private readonly args: ActionArguments<T>
   private readonly subscriptions: Map<number, Subscription<T>> = new Map()
@@ -56,7 +56,7 @@ export default class Channel<T extends Action = Action> {
   private _error: unknown = null
   private _response: ActionResponse<T> | undefined = undefined
 
-  public constructor(manager: Manager, action: T, args: ActionArguments<T>) {
+  public constructor(manager: SubscriptionManager, action: T, args: ActionArguments<T>) {
     this.signature = ChannelSignatureManager.get(action, args)
     this.manager = manager
     this.action = action

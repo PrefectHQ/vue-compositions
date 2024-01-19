@@ -1,3 +1,3 @@
-export { default as channel } from './channel'
-export { default as manager } from './manager'
-export { default as subscription } from './subscription'
+export * from './channel'
+export * from './manager'
+export * from './subscription'

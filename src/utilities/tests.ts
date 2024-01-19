@@ -1,6 +1,6 @@
 import { computed, unref } from 'vue'
 import { useSubscription } from '@/useSubscription'
-import Manager from '@/useSubscription/models/manager'
+import { SubscriptionManager } from '@/useSubscription/models/manager'
 import { Action } from '@/useSubscription/types/action'
 import { SubscribeArguments, UseSubscription } from '@/useSubscription/types/subscription'
 
@@ -14,7 +14,7 @@ export function uniqueSubscribe<T extends Action>(...[action, args, optionsArg =
 
     return {
       ...options,
-      manager: new Manager(),
+      manager: new SubscriptionManager(),
     }
   })
 

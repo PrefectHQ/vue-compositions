@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import Subscription from '@/useSubscription/models/subscription'
+import { Subscription } from '@/useSubscription/models'
 import { Action } from '@/useSubscription/types/action'
 import { MappedSubscription, SubscriptionPromise } from '@/useSubscription/types/subscription'
 

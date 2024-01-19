@@ -1,5 +1,5 @@
-import Channel from '@/useSubscription/models/channel'
-import Subscription from '@/useSubscription/models/subscription'
+import { SubscriptionChannel } from '@/useSubscription/models/channel'
+import { Subscription } from '@/useSubscription/models/subscription'
 import {
   Action,
   ActionArguments,
@@ -8,8 +8,8 @@ import {
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
 import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
 
-export default class Manager {
-  private readonly channels: Map<ChannelSignature, Channel> = new Map()
+export class SubscriptionManager {
+  private readonly channels: Map<ChannelSignature, SubscriptionChannel> = new Map()
 
   public subscribe<T extends Action>(
     action: T,
@@ -48,11 +48,11 @@ export default class Manager {
   private getChannel<T extends Action>(
     action: T,
     args: ActionArguments<T>,
-  ): Channel<T> {
-    const channel = new Channel<T>(this, action, args)
+  ): SubscriptionChannel<T> {
+    const channel = new SubscriptionChannel<T>(this, action, args)
 
     if (this.channels.has(channel.signature)) {
-      return this.channels.get(channel.signature)! as Channel<T>
+      return this.channels.get(channel.signature)! as SubscriptionChannel<T>
     }
 
     this.addChannel(channel)
@@ -60,7 +60,7 @@ export default class Manager {
     return channel
   }
 
-  private addChannel(channel: Channel): void {
+  private addChannel(channel: SubscriptionChannel): void {
     this.channels.set(channel.signature, channel)
 
     useSubscriptionDevtools.addChannel(channel)

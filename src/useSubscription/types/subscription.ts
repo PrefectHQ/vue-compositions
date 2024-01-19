@@ -1,6 +1,6 @@
 import { MaybeRef } from '@/types/maybe'
-import Manager from '@/useSubscription/models/manager'
-import Subscription from '@/useSubscription/models/subscription'
+import { SubscriptionManager } from '@/useSubscription/models/manager'
+import { Subscription } from '@/useSubscription/models/subscription'
 import { Action, ActionArguments, ActionParamsRequired, ActionResponse } from '@/useSubscription/types/action'
 
 export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> extends never[]
@@ -10,7 +10,7 @@ export type SubscribeArguments<T extends Action> = ActionParamsRequired<T> exten
 export type SubscriptionOptions = {
   /** The maximum time in milliseconds before the subscription is considered stale and refreshes. Defaults to `Infinity` */
   interval?: number,
-  manager?: Manager,
+  manager?: SubscriptionManager,
   lifecycle?: 'component' | 'app',
   onError?: (error: unknown) => void,
 }
