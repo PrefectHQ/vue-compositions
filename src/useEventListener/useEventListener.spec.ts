@@ -132,7 +132,7 @@ describe('useEventListener', () => {
     expect(updatedAddEventListenerMock).not.toHaveBeenCalled()
   })
 
-  it('also functions with window as the target', async () => {
+  it('also functions with window as the target', () => {
     const callback = vi.fn()
     const addEventListenerMock = vi.spyOn(window, 'addEventListener')
 
