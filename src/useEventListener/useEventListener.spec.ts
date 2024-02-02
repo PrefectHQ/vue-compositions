@@ -132,5 +132,22 @@ describe('useEventListener', () => {
     expect(updatedAddEventListenerMock).not.toHaveBeenCalled()
   })
 
+  it('also functions with window as the target', () => {
+    const callback = vi.fn()
+    const addEventListenerMock = vi.spyOn(window, 'addEventListener')
+
+    const { remove } = useEventListener(window, 'click', callback)
+
+    fireEvent.click(window)
+    expect(callback).toHaveBeenCalledOnce()
+    expect(addEventListenerMock).toHaveBeenCalledOnce()
+
+    remove()
+
+    fireEvent.click(window)
+
+    expect(callback).toHaveBeenCalledOnce()
+  })
+
 })
 

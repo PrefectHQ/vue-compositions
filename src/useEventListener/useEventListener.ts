@@ -18,8 +18,9 @@ const defaultOptions: UseEventListenerOptions = {
 
 export function useEventListener<K extends keyof DocumentEventMap>(target: MaybeRefOrGetter<Document | undefined | null>, key: K, callback: (this: Document, event: DocumentEventMap[K]) => unknown, options?: UseEventListenerOptions): UseEventListener
 export function useEventListener<K extends keyof HTMLElementEventMap>(target: MaybeRefOrGetter<HTMLElement | undefined | null>, key: K, callback: (this: HTMLElement, event: HTMLElementEventMap[K]) => unknown, options?: UseEventListenerOptions): UseEventListener
+export function useEventListener<K extends keyof WindowEventMap>(target: MaybeRefOrGetter<Window | undefined | null>, key: K, callback: (this: Window, event: WindowEventMap[K]) => unknown, options?: UseEventListenerOptions): UseEventListener
 // eslint-disable-next-line max-params
-export function useEventListener<K extends string>(target: MaybeRefOrGetter<Node | undefined | null>, key: K, callback: (this: Node, event: Event) => unknown, options: UseEventListenerOptions = {}): UseEventListener {
+export function useEventListener<K extends string>(target: MaybeRefOrGetter<Window | Node | undefined | null>, key: K, callback: (this: Node | Window, event: Event) => unknown, options: UseEventListenerOptions = {}): UseEventListener {
   const { immediate, ...listenerOptions } = { ...defaultOptions, ...options }
   const manualMode = ref(!immediate)
 
