@@ -36,6 +36,15 @@ export class SubscriptionManager {
     }
   }
 
+  public refresh<T extends Action>(
+    action: T,
+    args: ActionArguments<T>,
+  ): void {
+    const { signature } = new SubscriptionChannel<T>(this, action, args)
+
+    this.channels.get(signature)?.refresh()
+  }
+
   public deleteChannel(signature: ChannelSignature): void {
     const channel = this.channels.get(signature)
     if (channel) {
