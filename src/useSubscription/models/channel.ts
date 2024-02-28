@@ -47,7 +47,7 @@ export class SubscriptionChannel<T extends Action = Action> {
   private readonly subscriptions: Map<number, Subscription<T>> = new Map()
   private scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
-  private lastExecution: number = 0
+  private _lastExecution: number = 0
   private _late: boolean = false
   private _paused: boolean = false
   private _loading: boolean = false
@@ -61,6 +61,10 @@ export class SubscriptionChannel<T extends Action = Action> {
     this.manager = manager
     this.action = action
     this.args = args
+  }
+
+  public get lastExecution(): number {
+    return this._lastExecution
   }
 
   public get actionName(): string {
@@ -245,7 +249,7 @@ export class SubscriptionChannel<T extends Action = Action> {
     const args = unrefArgs(this.args)
 
     this.loading = true
-    this.lastExecution = Date.now()
+    this._lastExecution = Date.now()
 
     this.setInterval()
 
