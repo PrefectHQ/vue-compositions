@@ -25,6 +25,7 @@ test('refresh only calls the action if an channel exists', async () => {
 })
 
 test('refresh does not execute if maxRefreshRate has not been exceeded', async () => {
+  vi.useFakeTimers()
   const action = vi.fn()
   const manager = new SubscriptionManager()
   const maxRefreshRate = 50
@@ -37,5 +38,9 @@ test('refresh does not execute if maxRefreshRate has not been exceeded', async (
   manager.refresh(action, [], { maxRefreshRate })
   manager.refresh(action, [], { maxRefreshRate })
 
-  expect(action).toBeCalledTimes(1)
+  vi.advanceTimersByTime(maxRefreshRate)
+
+  manager.refresh(action, [], { maxRefreshRate })
+
+  expect(action).toBeCalledTimes(2)
 })
