@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { ref, Ref, watch } from 'vue'
 import { SubscriptionChannel } from '@/useSubscription/models/channel'
+import { RefreshChannelOptions } from '@/useSubscription/types'
 import { Action, ActionResponse } from '@/useSubscription/types/action'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
 import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
@@ -38,8 +39,8 @@ export class Subscription<T extends Action> {
     this.executed.value = channel.executed
   }
 
-  public async refresh(): Promise<void> {
-    await this.channel.refresh()
+  public async refresh(options?: RefreshChannelOptions): Promise<void> {
+    await this.channel.refresh(options)
   }
 
   public unsubscribe(): void {

@@ -3,6 +3,7 @@ import { isEqual } from 'lodash'
 import { effectScope } from 'vue'
 import { SubscriptionManager } from '@/useSubscription/models/manager'
 import { Subscription } from '@/useSubscription/models/subscription'
+import { RefreshChannelOptions } from '@/useSubscription/types'
 import {
   Action,
   ActionArguments,
@@ -45,9 +46,9 @@ export class SubscriptionChannel<T extends Action = Action> {
   private readonly action: T
   private readonly args: ActionArguments<T>
   private readonly subscriptions: Map<number, Subscription<T>> = new Map()
+  private lastExecution: number = 0
   private scope = effectScope()
   private timer: ReturnType<typeof setInterval> | null = null
-  private _lastExecution: number = 0
   private _late: boolean = false
   private _paused: boolean = false
   private _loading: boolean = false
@@ -61,10 +62,6 @@ export class SubscriptionChannel<T extends Action = Action> {
     this.manager = manager
     this.action = action
     this.args = args
-  }
-
-  public get lastExecution(): number {
-    return this._lastExecution
   }
 
   public get actionName(): string {
@@ -249,7 +246,7 @@ export class SubscriptionChannel<T extends Action = Action> {
     const args = unrefArgs(this.args)
 
     this.loading = true
-    this._lastExecution = Date.now()
+    this.lastExecution = Date.now()
 
     this.setInterval()
 
@@ -271,7 +268,13 @@ export class SubscriptionChannel<T extends Action = Action> {
     }
   }
 
-  public refresh(): Promise<void> {
+  public refresh(options?: RefreshChannelOptions): Promise<void> {
+    const maxRefreshRate = options?.maxRefreshRate ?? 0
+
+    if (this.lastExecution + maxRefreshRate > Date.now()) {
+      return Promise.resolve()
+    }
+
     this.scope.stop()
     this.scope = effectScope()
     const response = this.execute()
