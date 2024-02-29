@@ -5,6 +5,7 @@ import {
   ActionArguments,
   ChannelSignature
 } from '@/useSubscription/types/action'
+import { ManagerRefreshChannelOptions } from '@/useSubscription/types/channels'
 import { SubscriptionOptions } from '@/useSubscription/types/subscription'
 import * as useSubscriptionDevtools from '@/useSubscription/useSubscriptionDevtools'
 
@@ -39,10 +40,22 @@ export class SubscriptionManager {
   public refresh<T extends Action>(
     action: T,
     args: ActionArguments<T>,
+    options?: ManagerRefreshChannelOptions,
   ): void {
     const { signature } = new SubscriptionChannel<T>(this, action, args)
+    const channel = this.channels.get(signature)
 
-    this.channels.get(signature)?.refresh()
+    if (!channel) {
+      return
+    }
+
+    const maxRefreshRate = options?.maxRefreshRate ?? 0
+
+    if (channel.lastExecution + maxRefreshRate > Date.now()) {
+      return
+    }
+
+    channel.refresh()
   }
 
   public deleteChannel(signature: ChannelSignature): void {
