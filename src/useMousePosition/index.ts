@@ -1,1 +1,1 @@
-export * from './useMedia'
+export * from './useMousePosition'
