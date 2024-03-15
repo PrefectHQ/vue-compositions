@@ -22,6 +22,7 @@ npm i --save @prefecthq/vue-compositions
 - [useIsSame](https://github.com/prefecthq/vue-compositions/tree/main/src/useIsSame)
 - [useKeyDown](https://github.com/prefecthq/vue-compositions/tree/main/src/useKeyDown)
 - [useMedia](https://github.com/prefecthq/vue-compositions/tree/main/src/useMedia)
+- [useMousePosition](https://github.com/prefecthq/vue-compositions/tree/main/src/useMousePosition)
 - [useMutationObserver](https://github.com/prefecthq/vue-compositions/tree/main/src/useMutationObserver)
 - [useNow](https://github.com/prefecthq/vue-compositions/tree/main/src/useNow)
 - [usePatchRef](https://github.com/prefecthq/vue-compositions/tree/main/src/usePatchRef)
