@@ -1,5 +1,6 @@
 export * from './useBoolean'
 export * from './useChildrenAreWrapped'
+export * from './useClickOutside'
 export * from './useComputedStyle'
 export * from './useDebouncedRef'
 export * from './useElementRect'
