@@ -52,11 +52,6 @@ export function useClickOutside(element: MaybeRefOrGetter<Element>, callback: Us
 
   tryAddEventListener()
 
-  onScopeDispose(() => {
-    off()
-    tryTeardownEventListener()
-  })
-
   function off(): void {
     callbacks.delete(id)
     tryTeardownEventListener()
@@ -66,6 +61,11 @@ export function useClickOutside(element: MaybeRefOrGetter<Element>, callback: Us
     callbacks.set(id, { element, callback })
     tryAddEventListener()
   }
+
+  onScopeDispose(() => {
+    off()
+    tryTeardownEventListener()
+  })
 
   return {
     off,
