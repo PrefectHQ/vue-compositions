@@ -12,6 +12,7 @@ npm i --save @prefecthq/vue-compositions
 
 - [useBoolean](https://github.com/prefecthq/vue-compositions/tree/main/src/useBoolean)
 - [useChildrenAreWrapped](https://github.com/prefecthq/vue-compositions/tree/main/src/useChildrenAreWrapped)
+- [useClickOutside](https://github.com/prefecthq/vue-compositions/tree/main/src/useClickOutside)
 - [useComputedStyle](https://github.com/prefecthq/vue-compositions/tree/main/src/useComputedStyle)
 - [useDebouncedRef](https://github.com/prefecthq/vue-compositions/tree/main/src/useDebouncedRef)
 - [useElementRect](https://github.com/prefecthq/vue-compositions/tree/main/src/useElementRect)
