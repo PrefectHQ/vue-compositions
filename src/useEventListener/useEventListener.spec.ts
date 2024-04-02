@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/vue'
+import { mount } from '@vue/test-utils'
 import { vi, describe, it, test, expect, afterEach } from 'vitest'
 import { ref } from 'vue'
 import { useEventListener } from '@/useEventListener/useEventListener'
@@ -71,7 +71,7 @@ describe('useEventListener', () => {
 
     useEventListener(target, 'click', callback)
 
-    fireEvent.click(element)
+    element.dispatchEvent(new Event('click'))
 
     expect(callback).toHaveBeenCalledOnce()
   })
@@ -81,13 +81,13 @@ describe('useEventListener', () => {
     const target = ref<HTMLElement>(element)
     const addEventListenerMock = vi.spyOn(element, 'removeEventListener')
 
-    const { unmount } = render({
+    const wrapper = mount({
       setup: () => {
         useEventListener(target, 'click', vi.fn(), { immediate: false })
       },
     })
 
-    unmount()
+    wrapper.unmount()
 
     expect(addEventListenerMock).toHaveBeenCalled()
   })
@@ -138,13 +138,14 @@ describe('useEventListener', () => {
 
     const { remove } = useEventListener(window, 'click', callback)
 
-    fireEvent.click(window)
+    window.dispatchEvent(new Event('click'))
+
     expect(callback).toHaveBeenCalledOnce()
     expect(addEventListenerMock).toHaveBeenCalledOnce()
 
     remove()
 
-    fireEvent.click(window)
+    window.dispatchEvent(new Event('click'))
 
     expect(callback).toHaveBeenCalledOnce()
   })

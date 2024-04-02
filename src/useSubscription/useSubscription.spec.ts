@@ -1,4 +1,4 @@
-import { render } from '@testing-library/vue'
+import { mount } from '@vue/test-utils'
 import { test, describe, it, expect, afterEach, vi } from 'vitest'
 import { computed, h, reactive, ref } from 'vue'
 import { useSubscription } from '@/useSubscription'
@@ -324,7 +324,7 @@ describe('subscribe', () => {
     const action = vi.fn()
     let subscription: UseSubscription<typeof action>
 
-    const { unmount } = render({
+    const wrapper = mount({
       setup() {
         subscription = uniqueSubscribe(action, [], options)
 
@@ -334,7 +334,7 @@ describe('subscribe', () => {
 
     const spy = vi.spyOn(subscription!, 'unsubscribe')
 
-    unmount()
+    wrapper.unmount()
 
     expect(spy).toBeCalledTimes(1)
   })
@@ -343,7 +343,7 @@ describe('subscribe', () => {
     const action = vi.fn()
     let subscription: UseSubscription<typeof action>
 
-    const { unmount } = render({
+    const wrapper = mount({
       setup() {
         subscription = uniqueSubscribe(action, [], {
           lifecycle: 'app',
@@ -355,7 +355,7 @@ describe('subscribe', () => {
 
     const spy = vi.spyOn(subscription!, 'unsubscribe')
 
-    unmount()
+    wrapper.unmount()
 
     expect(spy).not.toBeCalled()
   })

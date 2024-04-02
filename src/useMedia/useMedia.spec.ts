@@ -1,4 +1,4 @@
-import { render } from '@testing-library/vue'
+import { mount } from '@vue/test-utils'
 import { describe, beforeEach, afterEach, it, vi, expect } from 'vitest'
 import { h, isRef, ref } from 'vue'
 import { useMedia } from '@/useMedia'
@@ -57,7 +57,7 @@ describe('media', () => {
 
 
   it('if vue component is unmounted, event listener is removed', () => {
-    const { unmount } = render({
+    const wrapper = mount({
       setup() {
         useMedia('(hover)')
 
@@ -65,7 +65,7 @@ describe('media', () => {
       },
     })
 
-    unmount()
+    wrapper.unmount()
 
     expect(removeEventListener).toBeCalledTimes(1)
   })
