@@ -18,6 +18,7 @@ describe('useValidation', () => {
     it.each([
       { value: 1, valueType: 'plain value' },
       { value: ref(1), valueType: 'ref' },
+      { value: () => 1, valueType: 'getter' },
     ])('sets valid to true when the rules pass (with $valueType)', async ({ value }) => {
       const { valid, error, validate } = useValidation(
         value,
@@ -33,6 +34,7 @@ describe('useValidation', () => {
     it.each([
       { value: 0, valueType: 'plain value' },
       { value: ref(0), valueType: 'ref' },
+      { value: () => 1, valueType: 'getter' },
     ])('sets valid to false with an error message when the rules do not pass (with $valueType)', async ({ value }) => {
       const errorMessage = 'Validation did not pass'
       const validationRule: ValidationRule<number> = () => errorMessage
