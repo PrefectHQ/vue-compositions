@@ -1,6 +1,6 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, WatchStopHandle } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, WatchStopHandle, toRef } from 'vue'
 import { NoInfer } from '@/types/generics'
-import { MaybeArray, MaybePromise, MaybeRef } from '@/types/maybe'
+import { MaybeArray, MaybePromise, MaybeRefOrGetter, MaybeRef } from '@/types/maybe'
 import { isValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'
@@ -61,10 +61,10 @@ function isRules<T>(value: MaybeRef<string> | RulesArg<T>): value is RulesArg<T>
   return typeof unref(value) !== 'string'
 }
 
-export function useValidation<T>(value: MaybeRef<T>, rules: RulesArg<NoInfer<T>>): UseValidation
-export function useValidation<T>(value: MaybeRef<T>, name: MaybeRef<string>, rules: RulesArg<NoInfer<T>>): UseValidation
+export function useValidation<T>(value: MaybeRefOrGetter<T>, rules: RulesArg<NoInfer<T>>): UseValidation
+export function useValidation<T>(value: MaybeRefOrGetter<T>, name: MaybeRef<string>, rules: RulesArg<NoInfer<T>>): UseValidation
 export function useValidation<T>(
-  value: MaybeRef<T>,
+  value: MaybeRefOrGetter<T>,
   nameOrRules: MaybeRef<string> | RulesArg<NoInfer<T>>,
   maybeRules?: RulesArg<NoInfer<T>>,
 ): UseValidation {
@@ -77,7 +77,7 @@ export function useValidation<T>(
     throw new Error('Invalid useValidation arguments')
   }
 
-  const valueRef = ref(value) as Ref<T>
+  const valueRef = toRef(value)
   const nameRef = ref(nameOrRules)
   const rulesRef = computed(() => asArray(unref(maybeRules)))
   const previousValueRef = ref() as Ref<T>
