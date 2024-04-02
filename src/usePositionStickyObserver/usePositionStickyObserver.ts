@@ -1,5 +1,4 @@
-import { Ref, computed, ref, watch, toRef, toValue } from 'vue'
-import { MaybeRefOrGetter } from '@/types/maybe'
+import { Ref, computed, ref, watch, toRef, toValue, MaybeRefOrGetter } from 'vue'
 import { useIntersectionObserver } from '@/useIntersectionObserver'
 
 export type UsePositionStickyObserverResponse = {

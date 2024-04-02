@@ -1,5 +1,5 @@
-import { ComputedRef, computed, reactive, unref } from 'vue'
-import { MaybeArray, MaybeRef } from '@/types/maybe'
+import { ComputedRef, computed, reactive, unref, MaybeRef } from 'vue'
+import { MaybeArray } from '@/types/maybe'
 import { asArray } from '@/utilities/arrays'
 import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 
