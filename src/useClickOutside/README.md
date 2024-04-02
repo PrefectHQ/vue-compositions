@@ -16,7 +16,7 @@ function handleClickOutside(): void {
 }
 
 const el = ref()
-const { on, off } = useClickOutside(children, handleClickOutside)
+const { on, off } = useClickOutside(el, handleClickOutside)
 // Don't need to do anything with on/off unless your handler needs to be paused for some reason 
 </script>
 ```
