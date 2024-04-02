@@ -1,6 +1,5 @@
-import { onMounted, onUnmounted, ref, Ref, unref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, Ref, unref, watch, toValue } from 'vue'
 import { MaybeRef, MaybeRefOrGetter } from '@/types/maybe'
-import { toValue } from '@/utilities/vue'
 
 export type UseIntersectionObserverResponse = {
   observe: (element: MaybeRefOrGetter<HTMLElement | undefined>) => void,

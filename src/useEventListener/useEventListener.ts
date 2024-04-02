@@ -1,7 +1,6 @@
-import { ref, watch } from 'vue'
+import { ref, watch, toValue } from 'vue'
 import { MaybeRefOrGetter } from '@/types/maybe'
 import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
-import { toValue } from '@/utilities/vue'
 
 export type UseEventListener = {
   add: () => void,
