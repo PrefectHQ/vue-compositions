@@ -1,5 +1,4 @@
-import { onMounted, onUnmounted, ref, Ref } from 'vue'
-import { MaybeRef } from '@/types/maybe'
+import { onMounted, onUnmounted, ref, Ref, MaybeRef } from 'vue'
 
 type DisconnectScrollLink = () => void
 type UseScrollLinking = {

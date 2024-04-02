@@ -1,6 +1,6 @@
-import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, WatchStopHandle, toRef } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, ToRefs, watch, unref, Ref, MaybeRef, MaybeRefOrGetter, WatchStopHandle, toRef } from 'vue'
 import { NoInfer } from '@/types/generics'
-import { MaybeArray, MaybePromise, MaybeRefOrGetter, MaybeRef } from '@/types/maybe'
+import { MaybeArray, MaybePromise } from '@/types/maybe'
 import { isValidationAbortedError } from '@/useValidation/ValidationAbortedError'
 import { ValidationRuleExecutor } from '@/useValidation/ValidationExecutor'
 import { ValidationObserverUnregister, VALIDATION_OBSERVER_INJECTION_KEY } from '@/useValidationObserver/useValidationObserver'

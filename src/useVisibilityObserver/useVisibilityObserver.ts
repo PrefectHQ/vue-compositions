@@ -1,5 +1,4 @@
-import { computed, onMounted, ref, Ref } from 'vue'
-import { MaybeRef } from '@/types/maybe'
+import { computed, onMounted, ref, Ref, MaybeRef } from 'vue'
 import { useIntersectionObserver, UseIntersectionObserverOptions } from '@/useIntersectionObserver'
 
 export type UseVisibilityObserverResponse = {

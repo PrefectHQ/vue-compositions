@@ -1,4 +1,4 @@
-import { MaybeRef } from '@/types/maybe'
+import { MaybeRef } from 'vue'
 import { SubscriptionManager } from '@/useSubscription/models/manager'
 import { Subscription } from '@/useSubscription/models/subscription'
 import { Action, ActionArguments, ActionParamsRequired, ActionResponse } from '@/useSubscription/types/action'

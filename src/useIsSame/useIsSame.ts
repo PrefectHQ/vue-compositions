@@ -1,5 +1,4 @@
-import { computed, ComputedRef, ref } from 'vue'
-import { MaybeRef } from '@/types/maybe'
+import { computed, ComputedRef, ref, MaybeRef } from 'vue'
 import { isSame } from '@/utilities/isSame'
 
 export function useIsSame(valueA: MaybeRef, valueB: MaybeRef): ComputedRef<boolean> {

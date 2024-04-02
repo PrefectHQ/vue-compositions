@@ -1,6 +1,5 @@
 import isEqual from 'lodash.isequal'
-import { reactive, ref, Ref, toRaw, watch } from 'vue'
-import { MaybeRef } from '@/types/maybe'
+import { reactive, ref, Ref, toRaw, watch, MaybeRef } from 'vue'
 import { Action, SubscriptionOptions, UseSubscription, ActionArguments, MappedSubscription } from '@/useSubscription/types'
 import { useSubscription } from '@/useSubscription/useSubscription'
 

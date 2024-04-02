@@ -1,5 +1,4 @@
-import { ref, Ref } from 'vue'
-import { MaybeRef } from '@/types/maybe'
+import { ref, Ref, MaybeRef } from 'vue'
 import { tryOnScopeDispose } from '@/utilities/tryOnScopeDispose'
 
 export type UseNow = {

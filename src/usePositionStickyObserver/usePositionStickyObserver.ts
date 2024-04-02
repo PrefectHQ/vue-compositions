@@ -1,7 +1,5 @@
-import { Ref, computed, ref, watch } from 'vue'
-import { MaybeRefOrGetter } from '@/types/maybe'
+import { Ref, computed, ref, watch, toRef, toValue, MaybeRefOrGetter } from 'vue'
 import { useIntersectionObserver } from '@/useIntersectionObserver'
-import { toValue } from '@/utilities/vue'
 
 export type UsePositionStickyObserverResponse = {
   stuck: Ref<boolean>,
@@ -21,7 +19,7 @@ export function usePositionStickyObserver(
   element: MaybeRefOrGetter<HTMLElement | undefined>,
   options?: MaybeRefOrGetter<UsePositionStickyObserverOptions>,
 ): UsePositionStickyObserverResponse {
-  const elementRef = computed(() => toValue(element))
+  const elementRef = toRef(element)
   const stuck = ref(false)
 
   const observerOptions = computed(() => {

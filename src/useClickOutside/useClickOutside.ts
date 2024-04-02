@@ -1,7 +1,5 @@
-import { onScopeDispose } from 'vue'
-import { MaybeRefOrGetter } from '@/types/maybe'
+import { MaybeRefOrGetter, onScopeDispose, toValue } from 'vue'
 import { useGlobalEventListener } from '@/useGlobalEventListener'
-import { toValue } from '@/utilities/vue'
 
 type ClickOutsideEntry = {
   element: MaybeRefOrGetter<Element>,
