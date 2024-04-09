@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unified-signatures */
 
 import isEqual from 'lodash.isequal'
-import { computed, ref, Ref, watch } from 'vue'
+import { computed, Ref } from 'vue'
 import { NoInfer } from '@/types/generics'
 import { MaybeArray } from '@/types/maybe'
 import { useRouteQuery } from '@/useRouteQuery/useRouteQuery'
@@ -44,21 +44,16 @@ export function useRouteQueryParam(key: string, formatterOrDefaultValue?: RouteP
   const [formatter] = asArray(formatterOrDefaultValue)
   const defaultValue = maybeDefaultValue
   const format = new formatter({ key, defaultValue, multiple })
-  const internalValue = ref(format.get(query))
-
-  watch(() => query[key], () => {
-    const newInternalValue = format.get(query)
-
-    if (isEqual(internalValue.value, newInternalValue)) {
-      return
-    }
-
-    internalValue.value = newInternalValue
-  })
 
   return computed({
-    get() {
-      return internalValue.value
+    get(oldValue) {
+      const value = format.get(query)
+
+      if (isEqual(value, oldValue)) {
+        return oldValue
+      }
+
+      return value
     },
     set(value) {
       format.set(query, value)

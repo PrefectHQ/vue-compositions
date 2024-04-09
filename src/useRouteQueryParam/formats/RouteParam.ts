@@ -58,7 +58,7 @@ export abstract class RouteParam<T> {
   }
 
   public set(query: LocationQuery, value: T | T[] | undefined): void {
-    if (value === undefined) {
+    if (value === undefined || value === null) {
       delete query[this.key]
       return
     }
