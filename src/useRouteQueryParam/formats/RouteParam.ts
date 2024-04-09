@@ -1,5 +1,5 @@
 import { LocationQuery, LocationQueryValue } from 'vue-router'
-import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
+import { InvalidRouteParamValue, isInvalidRouteParamValue, isNotInvalidRouteParamValue, isNotUndefined } from '@/useRouteQueryParam/formats/InvalidRouteParamValue'
 import { asArray } from '@/utilities/arrays'
 
 const IS_ROUTE_PARAM_SYMBOL: unique symbol = Symbol()
@@ -28,7 +28,7 @@ export abstract class RouteParam<T> {
   public static [IS_ROUTE_PARAM_SYMBOL] = true
 
   protected abstract parse(value: LocationQueryValue): T
-  protected abstract format(value: T): LocationQueryValue
+  protected abstract format(value: T): LocationQueryValue | undefined
 
   protected key: string
   protected defaultValue: T | T[] | undefined
@@ -46,7 +46,7 @@ export abstract class RouteParam<T> {
     }
 
     const strings = asArray(query[this.key])
-    const values = strings.map(value => this.safeParseValue(value)).filter(isNotInvalidRouteParamValue)
+    const values = strings.map(value => this.safeParseValue(value)).filter(isNotInvalidRouteParamValue).filter(isNotUndefined)
 
     if (this.multiple) {
       return values
@@ -64,7 +64,7 @@ export abstract class RouteParam<T> {
     }
 
     const values = asArray(value)
-    const strings = values.map(value => this.safeFormatValue(value)).filter(isNotInvalidRouteParamValue)
+    const strings = values.map(value => this.safeFormatValue(value)).filter(isNotInvalidRouteParamValue).filter(isNotUndefined)
 
     if (strings.length === 0) {
       delete query[this.key]
@@ -93,7 +93,7 @@ export abstract class RouteParam<T> {
     }
   }
 
-  private safeFormatValue(value: T): LocationQueryValue | InvalidRouteParamValue {
+  private safeFormatValue(value: T): LocationQueryValue | undefined | InvalidRouteParamValue {
     try {
       return this.format(value)
     } catch (error) {
