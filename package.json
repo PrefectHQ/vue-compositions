@@ -23,7 +23,8 @@
     "lint:fix": "eslint ./ --fix",
     "types": "vue-tsc --noEmit",
     "changelog": "auto-changelog --package --commit-limit 0",
-    "version": "npm run changelog && git add CHANGELOG.md"
+    "version": "npm run changelog && git add CHANGELOG.md",
+    "release": "./vue-compositions-release"
   },
   "repository": {
     "type": "git",
