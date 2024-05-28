@@ -18,5 +18,5 @@ export function uniqueSubscribe<T extends Action>(...[action, args, optionsArg =
     }
   })
 
-  return useSubscription(action, args, options)
+  return useSubscription(action, args!, options)
 }
