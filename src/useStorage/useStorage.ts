@@ -1,5 +1,4 @@
-/* eslint-disable no-redeclare */
-import { ref, Ref, UnwrapRef, watchEffect } from 'vue'
+import { ref, Ref, UnwrapRef, watch } from 'vue'
 import { StorageManager, StorageType } from '@/useStorage/storage'
 
 type UseStorage<T> = {
@@ -34,13 +33,13 @@ export function useStorage<T>(type: StorageType, key: string, defaultValue: T | 
     data.value = value
   }
 
-  watchEffect(() => {
+  watch(data, value => {
     if (stopped) {
       console.warn(`Storage for key ${key} as been removed and cannot be updated`)
       return
     }
 
-    storage.set(key, data.value)
+    storage.set(key, value)
   })
 
   return {
