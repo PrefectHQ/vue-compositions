@@ -9,7 +9,8 @@
   "exports": {
     ".": {
       "import": "./dist/vue-compositions.js",
-      "require": "./dist/vue-compositions.umd.cjs"
+      "require": "./dist/vue-compositions.umd.cjs",
+      "types": "./dist/types/src/index.d.ts"
     }
   },
   "files": [
